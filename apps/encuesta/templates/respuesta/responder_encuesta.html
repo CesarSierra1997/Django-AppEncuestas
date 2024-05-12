@@ -20,11 +20,10 @@ Respuesta Create
                 <option value="PASAPORTE">Pasaporte</option>
                 <option value="REGISTRO CIVIL">Registro Civil</option>
             </select><br><br>
-
             <label for="numeroDocumento">Número de Documento:</label>
-            <input type="text" id="numeroDocumento" name="numeroDocumento" required><br><br>
+            <input type="number" id="numeroDocumento" name="numeroDocumento" required><br><br>
             <label for="nombreUsuario">Nombres y apellidos:</label>
-            <input type="text" id="nombreUsuario" name="nombreUsuario" required><br><br>
+            <input type="text" id="nombreUsuario" name="nombreUsuario" pattern="[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+" title="Solo se permiten letras y espacios en blanco en el campo Nombres y apellidos" required><br><br>
             <hr>
             <h6>Preguntas</h6>
             <hr>
