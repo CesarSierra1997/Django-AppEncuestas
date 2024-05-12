@@ -1,0 +1,7 @@
+<form class="card card-body bg-dark bg-gradient" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="tipo_pregunta" value="{{ tipo_pregunta }}">
+    {{ form.as_p }}
+    <button class="btn btn-primary" type="submit">Guardar Pregunta</button>
+    <a class="btn btn-danger mt-1" href="{% url 'encuesta' encuesta_id  %}">Cancelar</a>
+</form>        

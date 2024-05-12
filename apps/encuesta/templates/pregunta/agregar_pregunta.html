@@ -1,0 +1,46 @@
+{% extends "encuestaHome.html" %}
+{% block title %}
+Pregunta Tipe
+{% endblock title %}
+{% block encuesta %}
+<body>
+    <h5 class="card-header">Editor de encuestas | Agregar pregunta</h5>
+    <div class="card card-body bg-light mt-2 p-4">
+        <form method="POST" id="tipo-pregunta-form">
+            {% csrf_token %}
+            <label for="tipo_pregunta">Seleccione el tipo de pregunta:</label>
+            <select class="form-control1" name="tipo_pregunta" id="tipo_pregunta">
+                <option value="general">Pregunta General</option>
+                <option value="select_multiple">Pregunta de Selección Múltiple</option>
+                <option value="si_o_no">Pregunta Sí o No</option>
+                <option value="numerica">Pregunta Numérica</option>
+            </select>
+            <button class="btn btn-dark" type="submit">Seleccionar</button>
+        </form>
+        <hr>
+        <div id="pregunta-form-container">
+            <!-- Aquí se cargará dinámicamente el segundo formulario -->
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tipoPreguntaForm = document.getElementById('tipo-pregunta-form');
+            const preguntaFormContainer = document.getElementById('pregunta-form-container');
+
+            tipoPreguntaForm.addEventListener('submit', function (event) {
+                event.preventDefault(); // Evita el envío del formulario por defecto
+
+                const selectedOption = document.getElementById('tipo_pregunta').value;
+
+                // Cargar el segundo formulario dinámicamente según la opción seleccionada
+                fetch(`pregunta.html?type=${selectedOption}`)
+                    .then(response => response.text())
+                    .then(html => preguntaFormContainer.innerHTML = html)
+                    .catch(error => console.error('Error:', error));
+            });
+        });
+    </script>
+</body>
+{% endblock encuesta %}

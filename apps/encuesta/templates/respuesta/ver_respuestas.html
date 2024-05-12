@@ -1,0 +1,37 @@
+{% extends "encuestaHome.html" %}
+{% block title %}
+Ver Respuestas
+{% endblock title %}
+{% block encuesta %}
+<!-- ver_respuestas.html -->
+
+<body>
+    <h5 class="card-header">Lista de encuestas respondidas</h5>
+    {% for encuesta in encuestas %}
+    <h2>{{ encuesta.titulo }}</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Pregunta</th>
+                <th>Respuesta</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pregunta_general in encuesta.preguntageneral_set.all %}
+                <tr>
+                    <td>{{ pregunta_general.texto_pre }}</td>
+                    <td>
+                        {% for respuesta_general in pregunta_general.respuesta_pregunta_general.all %}
+                            {{ respuesta_general.respuesta }}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+            <!-- Repite lo mismo para los otros tipos de preguntas -->
+        </tbody>
+    </table>
+{% endfor %}
+
+</body>
+
+{% endblock encuesta %}

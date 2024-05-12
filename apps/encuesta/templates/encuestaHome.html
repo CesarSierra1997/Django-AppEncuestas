@@ -1,0 +1,125 @@
+{% extends "index.html" %}
+{% block title %}
+Encuesta Home
+{% endblock title %}
+{% block body %}
+
+{% block style %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'style_home.css' %}">
+{% endblock style %}
+
+<body>
+    <div class="card bg-light">
+        <nav class="navbar navbar-light bg-light fixed-strat">
+            <div class="container-fluid justify-content-start">
+                <a class="navbar-brand" href="{% url 'encuestaHome' %}">
+                </a>
+                <a class="navbar-brand" href="{% url 'encuestaHome' %}">App Encuestas</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <form class="d-flex" style="margin-left: 10px;" method="GET" action="{% url 'buscar' %}">
+                    <input class="form-control me-2" type="search" name="q" placeholder="Buscar en encuestas"
+                        aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Buscar</button>
+                </form>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Encuestas
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{% url 'crear_encuesta' %}">Crear encuesta</a></li>
+                                <li><a class="dropdown-item" href="{% url 'encuestaHome' %}">Lista de encuestas</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="{% url 'ver_respuestas' %}">Lista de Respuestas</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Perfil navbar -->
+                <div style="position: absolute; right: 0; top: 0; margin-top: 15px; margin-right: 18px;">
+                    <div style="all: initial; " class="dropdown">
+                        <a style=" all: initial;" class="nav-link dropdown-toggle" href="#" role="button"
+                            id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-user"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-light dropdown-menu-end"
+                            aria-labelledby="profileDropdown">
+                            <li><a class="dropdown-item" href="{% url 'index' %}">
+                                    <i class="fa fa-user"> Perfil</i>
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="{% url 'admin:index' %}">
+                                    <i class="fa fa-user-cog"> Administrador</i>
+                                </a>
+                            </li>
+                            <li class="bg-danger"><a class="dropdown-item" href="#">
+                                    <i class="fa fa-power-off"> Logout</i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <section>
+        <div class="card card-body mt-2 bg-light">
+            {% if messages %}
+            <div class="alert alert-success alert-dismissible" role="alert">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                {% for message in messages %}
+                {{ message }}
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% block encuesta %}            
+            <h5 class="card-header">Listado de encuestas</h5>
+            {% if encuestas %}
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3"> <!-- Columnas responsivas -->
+                {% for encuesta, cantidad_preguntas, cantidad_respuestas in preguntas_por_encuesta %}
+                <div class="col">
+                    <div id="encuesta" class="card bg-dark bg-gradient mt-2 p-2 text-light">
+                        <div class="container">
+                            <p>Titulo - <strong>{{encuesta.titulo}}</strong></p> id: {{encuesta.id}}
+                            <p>Preguntas agregadas: {{ cantidad_preguntas }} </p>
+                        </div>
+                        <div class="position-relative">
+                            <em class="text-dark position-absolute top-0 end-0"> Respuestas enviadas: {{cantidad_respuestas}} </em>          
+          
+                        </div>
+                        <hr class="bg-light mt-4">
+                        <div class="container-fluid">
+                            <a class="btn btn-success inline-block"
+                                href="{% url 'responder_encuesta' encuesta.id %}">Responder Encuesta</a>
+                            <a class="btn btn-primary" href="{% url 'encuesta' encuesta.id %}">Editar</a>
+                            <P>[4.0.3.4.1.2]</P>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-danger alert-dismissible" role="alert">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <p>No hay encuestas creadas en el sistema, lo invitamos a crear una encuesta.</p>
+            </div>
+            {% endif %}
+            {% endblock encuesta %}
+        </div>
+    </section>
+
+</body>
+{% endblock body %}

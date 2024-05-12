@@ -1,0 +1,57 @@
+{% extends "encuestaHome.html" %}
+{% block title %}
+Pregunta Tipe
+{% endblock title %}
+{% block encuesta %}
+
+<body>
+    <h5 class="card-header">Resultados de busqueda "{{query}}"</h5>
+    {% if query %}
+    <h6>Encuestas</h6>
+    <ul>
+        {% for encuesta in encuestas %}
+        <li>{{ encuesta.titulo }}</li>
+        {% endfor %}
+    </ul>
+    <h6>Preguntas Generales</h6>
+    <ul>
+        {% for pregunta in preguntas_generales %}
+        <li>{{ pregunta.texto_pre }}</li>
+        {% endfor %}
+    </ul>
+    <h6>Preguntas de Selección Múltiple</h6>
+    <ul>
+        {% for pregunta in preguntas_select_multiple %}
+        <li>{{ pregunta.texto_pre }}</li>
+        <p><strong>A. </strong>{{ pregunta.opcion_a }} <br><strong>B. </strong>{{ pregunta.opcion_b }}<br> <strong>C. </strong>{{ pregunta.opcion_c }} <br><strong>D. </strong>{{ pregunta.opcion_d }}</p>
+        {% endfor %}
+    </ul>
+    <h6>Preguntas Sí o No</h6>
+    <ul>
+        {% for pregunta in preguntas_si_o_no %}
+        <li>{{ pregunta.texto_pre }}</li>
+        {% endfor %}
+    </ul>
+    <h6>Preguntas Numéricas</h6>
+    <ul>
+        {% for pregunta in preguntas_numericas %}
+        <li>{{ pregunta.texto_pre }}</li>
+        {% endfor %}
+    </ul>
+    <h6>Respuestas generales</h6>
+    <ul>
+        {% for respuesta in respuestas_generales %}
+        <li>{{respuesta.respuesta}}</li>
+        {% endfor %}
+
+    </ul>
+
+    {% else %}
+    <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <p>No se ha realizado ninguna búsqueda.</p>
+
+    </div>
+    {% endif %}
+</body>
+{% endblock encuesta %}
