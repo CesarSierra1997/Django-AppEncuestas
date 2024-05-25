@@ -96,7 +96,7 @@ import dj_database_url
 
 DATABASES = {
 'default': dj_database_url.config(#RENDER - agregar base de datos postgres SQL
-        default='postgresql://postgres:postgres@localhost/postgres',
+        default='postgres://encuestas_xsi9_user:4nfrRxw4PgdNMd99f9K5WG2QNDYbyeJS@dpg-cp8p5qtds78s73c7fuag-a/encuestas_xsi9',
         conn_max_age=600
     )
 }
