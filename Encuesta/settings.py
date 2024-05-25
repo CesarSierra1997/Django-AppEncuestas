@@ -95,8 +95,8 @@ import dj_database_url
 # Database documentation https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default='postgres://encuestas_xsi9_user:4nfrRxw4PgdNMd99f9K5WG2QNDYbyeJS@dpg-cp8p5qtds78s73c7fuag-a.oregon-postgres.render.com/encuestas_xsi9',
+'default': dj_database_url.config(#RENDER - agregar base de datos postgres SQL
+        default='postgresql://postgres:postgres@localhost/postgres',
         conn_max_age=600
     )
 }
