@@ -4,12 +4,14 @@ from .models import *
 class EncuestaForm(forms.ModelForm):
     class Meta:
         model = Encuesta
-        fields = ['titulo']
+        fields = ['titulo','tipoEncuesta']
         labels = {
             'titulo': 'Título de la encuesta',
+            'tipoEncuesta': 'Seleccione el tipo de encuesta',
         }
         widgets = {
             'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el titulo de la encuesta'}),
+            'tipoEncuesta': forms.Select(attrs={'class': 'form-control'}),
         }
 
 class PreguntaGeneralForm(forms.ModelForm):
@@ -26,32 +28,33 @@ class PreguntaGeneralForm(forms.ModelForm):
 class PreguntaSelectMultipleForm(forms.ModelForm):
     class Meta:
         model = PreguntaSelectMultiple
-        fields = ['texto_pre', 'opcion_a', 'opcion_b', 'opcion_c', 'opcion_d']
+        fields = ['texto_pre']
         labels = {
             'texto_pre': 'Digite la pregunta de selección múltiple',
-            'opcion_a': 'Opción A',
-            'opcion_b': 'Opción B',
-            'opcion_c': 'Opción C',
-            'opcion_d': 'Opción D',
         }
         widgets = {
             'texto_pre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese la pregunta aquí'}),
-            'opcion_a': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Opción A'}),
-            'opcion_b': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Opción B'}),
-            'opcion_c': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Opción C'}),
-            'opcion_d': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Opción D'}),
+        }
+
+class OpcionPreguntaSelectMultipleForm(forms.ModelForm):
+    class Meta:
+        model = OpcionPreguntaSelectMultiple
+        fields = ['opcion']
+        labels = {
+            'opcion': 'Digite la pregunta de selección múltiple',
+        }
+        widgets = {
+            'opcion': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Sleccione una opción'}),
         }
 
 class PreguntaSiONoForm(forms.ModelForm):
     class Meta:
         model = PreguntaSiONo
-        fields = ['texto_pre', 'opcion']
+        fields = ['texto_pre',]
         labels = {
             'texto_pre': 'Digite la pregunta de sí o no',
-            'opcion': 'Digite el texto de la opción',
         }
         widgets = {'texto_pre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese la pregunta de sí o no'}),
-            'opcion': forms.Select(choices=[(True, 'Sí'), (False, 'No')], attrs={'class': 'form-control'}),
         }
 
 class PreguntaNumericaForm(forms.ModelForm):
@@ -67,14 +70,30 @@ class PreguntaNumericaForm(forms.ModelForm):
             'rango': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Rango'}),
         }
 
-class RespuestaEncuestaForm(forms.ModelForm):
+class RespuestaEncuestaPublicaForm(forms.ModelForm):
     class Meta:
-        model = RespuestaEncuesta  
-        fields = ['tipoDocumento','numeroDocumento','nombreUsuario']
+        model = RespuestaEncuestaPublica  
+        fields = ['tipoDocumento','numeroDocumento','nombre','email']
+        labels = {
+            'tipoDocumento': 'Digite el tipo de documento',
+            'numeroDocumento': 'Digite el numero de documento',
+            'nombre': 'Digite el nombre completo',
+            'email': 'Digite su direccion de email',
+        }
         widgets = {
-            'tipoDocumento': forms.Select(attrs={'class': 'form-control','placeholder': 'Slecione el tipo de documento'}),
-            'numeroDocumento': forms.TextInput(attrs={'class': 'form-control','placeholder': 'Ingrese el numero de documento'}),
-            'nombreUsuario': forms.TextInput(attrs={'class': 'form-control','placeholder': 'Ingrese el nombre de usuario'}),
+            'tipoDocumento': forms.Select(attrs={'class': 'form-control','placeholder': 'Tipo de documento'}),
+            'numeroDocumento': forms.NumberInput(attrs={'class': 'form-control','placeholder': 'Numero de documento'}),
+            'nombre': forms.TextInput(attrs={'class': 'form-control','placeholder': 'Nombres y apellidos'}),
+            'email': forms.EmailInput(attrs={'class':'form-control','placeholder':'Correo electrónico'}),
+        }
+
+class RespuestaEncuestaPrivadaForm(forms.ModelForm):
+    class Meta:
+        model = RespuestaEncuestaPrivada 
+        fields = ['usuario','encuesta']
+        widgets = {
+            'usuario': forms.Select(attrs={'class': 'form-control','placeholder': 'Selecione el usuario'}),
+            'encuesta': forms.Select(attrs={'class': 'form-control','placeholder': 'Selecione la encuesta'}),
         }
 
 class RespuestaPreguntaGeneralForm(forms.ModelForm):

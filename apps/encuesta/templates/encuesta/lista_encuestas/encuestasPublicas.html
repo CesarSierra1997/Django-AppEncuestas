@@ -1,0 +1,12 @@
+{% comment %} {% extends "encuestaHome.html" %}
+{% block title %}
+Ecuesta List
+{% endblock title %}
+{% block encuesta %}
+    <h1>Lista de encuestas</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary m-line" type="submit">Guardar</button>
+    </form>
+{% endblock encuesta %} {% endcomment %}

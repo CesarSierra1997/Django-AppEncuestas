@@ -21,12 +21,15 @@
 
 <body>
 <header>
-    <div style="width:70%;overflow:auto; text-align: center;" class="w3-w3-green mx-auto">
-        <img loading="lazy" src="{% static 'img/sena1.png' %}" style="border:true;width:100%;"><br>
-        <img loading="lazy" src="{% static 'img/sena.png' %}" style="border:true;width:100%;border-color:black;height:150px;-webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
-    -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
-    box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);border: 1px solid #000000;height:100px"><br>
-    </div>
+    <!-- PlantiLla SENA -->
+    <a href="{% url 'index' %}">
+        <div style="width:70%;overflow:auto; text-align: center;" class="w3-w3-green mx-auto">
+            <img loading="lazy" src="{% static 'img/sena1.png' %}" style="border:true;width:100%;"><br>
+            <img loading="lazy" src="{% static 'img/sena.png' %}" style="border:true;width:100%;border-color:black;height:150px;-webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+        -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+        box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);border: 1px solid #000000;height:100px"><br>
+        </div>
+    </a>
     <nav>
         <div class="sena-card2 sena-p6">
             <div class="nav mx-auto">
@@ -39,21 +42,12 @@
                         <a class="nav-link dropdown-toggle sena-enlace-negro" data-bs-toggle="dropdown" href="#"
                             role="button" aria-expanded="false">Modulos</a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#"><i class="fa fa-user"></i> Usuarios</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fa fa-bookmark-o"></i> Regionales</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="#"><i class="fa fa-file-text-o"></i> Titulaciones</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fa fa-tasks"></i> Actividades de aprendizaje</a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="{% url 'encuestaHome' %}"><i class="fa fa-pie-chart"></i> <strong> App Encuestas
+                            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-calendar-days"></i> App Horarios</a></li>
+                            <hr class="dropdown-divider">
+
+                            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-list"></i> App Novedades </a></li>
+                            <hr class="dropdown-divider">
+                            <li><a class="dropdown-item" href="{% url 'encuestaHome' %}"><i class="fa-solid fa-cubes"></i> <strong> App Encuestas
                                     </strong></a></li>
                         </ul>
                     </li>
@@ -68,8 +62,8 @@
         </div>
     </nav>
 </header>
-<section style="max-width: 950px; margin: auto; margin-bottom: -50px;">
-    <hr>    
+<!-- App -->
+<section style="max-width: 945px; margin: auto;">
     {% block body %}
         <div class="container card-body card">
             <h3>Bienvenido a la fabrica de software</h3>
@@ -79,7 +73,6 @@
             <p>a click para ir a nuestra app de encuestas!</p>
         </div>
     {% endblock body %}
-        
 </section>
 <footer>
     <div style="width:75%;overflow:auto;background-color:39a900; margin: auto; height: 50%;"

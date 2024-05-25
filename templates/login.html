@@ -1,0 +1,49 @@
+{% extends "index.html" %}
+{% block title %}
+Inicio de Sesión
+{% endblock title %}
+{% load static %}
+{% block body %}
+
+<body> <!-- Agregado el GIF como fondo -->
+    <div class="bg-light card card-body p-2">
+        <a  style="position: absolute; right: 0; top: 1; margin-right: 25px;" class="btn btn-danger mt-1" href="{% url 'encuestaHome'  %}"><i class="fa-solid fa-arrow-rotate-left"></i> voler</a>
+        <h3 class="text-dark text-center card-body"><i class="fa-solid fa-cubes"></i> <strong> App Encuestas
+            </strong></a></li>
+        </h3>
+        <div class="card-header mx-3">
+            <h4>Iniciar Sesión
+            </h4>
+        </div>
+        <div class="card-body card-block">
+            <div class="login-form">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div form-group>
+                        <label">Nombre de Usuario</label>
+                            {{form.username}}
+                    </div>
+                    <div form-group>
+                        <label">Contraseña</label>
+                            {{form.password}}
+                    </div>
+                    <button type="submit" style="width: 100%;" class="btn btn-primary mt-2">Iniciar Sesion</button>
+                </form>
+            </div>
+        </div>
+        {% if form.errors %} <!-- Mostrar errores -->
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <strong>Advertencia:</strong> Por favor, corrija los siguientes errores:
+            <ul>
+                {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</body>
+{% endblock body %}

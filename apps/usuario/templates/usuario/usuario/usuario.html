@@ -1,0 +1,43 @@
+{% block encuesta %}
+{% if form.errors %}
+<main class="container py-2">
+    <div class="alert alert-danger container mt-2">
+        <strong>Error de edicion:</strong> Por favor, corrija los errores debajo.
+    </div>
+    <div class="card card-body bg-light">
+        <h2 class="card-title">Edicion de Usuario</h2>
+        <div class="card-body">
+            <form action="{% url 'usuario:editar_usuario' object.id %}" method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="card-footer text-center">
+                    <a class="btn btn-danger" href="{% url 'usuario:listar_usuario' %}">Cancelar</a>
+                    <button class="btn btn-primary" type="submit">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+{% else %}
+<div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+        <div class="modal-header">
+            <h2 class="modal-title">Editar datos ID: {{object.id}}</h2>
+
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="{% url 'usuario:editar_usuario' object.id %}" method="POST">
+            {% csrf_token %}
+            <div class="modal-body">
+                {{form.as_p}}
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" type="button" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-primary" type="submit">Confirmar</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+{% endblock encuesta %}

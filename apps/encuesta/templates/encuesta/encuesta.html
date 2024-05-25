@@ -4,15 +4,15 @@ Encuesta Custom
 {% endblock title %}
 {% block encuesta %}
 <h5 class="card-header">Editor de Encuestas</h5>
-<div class="card-body mt-2 bg-light bg-gradient">
-    <h5>Editar encuesta || {{ encuesta.titulo }}</h5>
-    <div class="card-body card">
+<div class="card-body mt-2 bg-light bg-gradient"> 
+    <div class="card-body card bg-dark bg-gradient border-solid text-light">
+        <h5>Editar encuesta || {{ encuesta.titulo }} <a href="{% url 'editar_encuesta' encuesta.id %}"><i class="text-primary fa-solid fa-pen-to-square"></i></a></h5>
         <h6>Preguntas:</h6>
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3"> <!-- Columnas responsivas -->
                 {% if preguntas %}
                 {% for tipo, pregunta in preguntas %}
                 <div class="col d-flex">
-                    <div id="encuesta" class="card bg-dark bg-gradient mt-1 p-2 text-light">
+                    <div id="pregunta" style="box-shadow: rgb(0, 0, 0) 1px 1px 3px; border-bottom-left-radius: 30px; border-top-right-radius: 30px;" class="card bg-dark mt-2 p-2">
                         <div class="container">
                             <h6><strong>{{ pregunta.texto_pre }}</strong></h6>
                             <!-- Opciones de las preguntas -->
@@ -38,21 +38,24 @@ Encuesta Custom
                             </ul>
                             {% endif %}
                             <em>
-                                <p>pregunta tipo | {{ tipo }}</p>
+                                <p>pregunta tipo {{ tipo }} | id {{pregunta.id}} </p>
                             </em>
                             <div class="card-footer "> 
-                                <a class="btn btn-info mt-2" href="#"><i class="fa-solid fa-pen-to-square"></i></a>
-                                <a class="btn btn-danger mt-2" href="#"><i class="fa-solid fa-trash"></i></a>
+                                <a class="btn btn-info mt-2" href="{% url 'editar_pregunta' encuesta_id=encuesta.id pregunta_id=pregunta.id %}?type={{ tipo }}"><i class="fa-solid fa-pen-to-square"></i></a>
+                                <a class="btn btn-danger mt-2" href="{% url 'eliminar_pregunta' encuesta_id=encuesta.id pregunta_id=pregunta.id %}?type={{ tipo }}"><i class="fa-solid fa-trash"></i></a>
                             </div>
                         </div>
                     </div>
                 </div>
                 {% endfor %}
                 {% else %}
-                <h3>No hay preguntas registradas{{ tipo }}</h3>
+                <div class="card-body alert alert-warning alert-dismissible mt-2" style="margin-inline: 12px;" role="alert">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <p>No hay perguntas en esta encuesta!.</p>
+                </div>
                 {% endif %}
             </div>
-        <a class="btn btn-primary mt-2" href="{% url 'agregar_pregunta' encuesta.id %}">Agregar Pregunta</a>
+        <a class="btn btn-primary mt-4" href="{% url 'agregar_pregunta' encuesta.id %}">Agregar Pregunta</a>
         <hr>
         <div style="display: flex;">
             <a class="btn btn-success" href="{% url 'responder_encuesta' encuesta.id %}"
