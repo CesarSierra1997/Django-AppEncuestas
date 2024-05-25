@@ -96,12 +96,10 @@ import dj_database_url
 
 DATABASES = {
     'default': dj_database_url.config(
-        # Replace this value with your local database's connection string.
-        default='postgresql://postgres:postgres@localhost:5432/mysite',
+        default='postgres://encuestas_xsi9_user:4nfrRxw4PgdNMd99f9K5WG2QNDYbyeJS@dpg-cp8p5qtds78s73c7fuag-a.oregon-postgres.render.com/encuestas_xsi9',
         conn_max_age=600
     )
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
