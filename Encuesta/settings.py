@@ -24,11 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', default='your secret key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = 'RENDER' not in os.environ #RENDER
+DEBUG = True
 
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['django-appencuestas.onrender.com']
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
@@ -148,7 +146,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static/')]
 APPEND_SLASH = True
 
-if not DEBUG:#RENDER
+if 'RENDER' in os.environ:
     # Tell Django to copy static assets into a path called `staticfiles` (this is specific to Render)
     STATIC_ROOT = os.path.join(BASE_DIR, 'static')
     # Enable the WhiteNoise storage backend, which compresses static files to reduce disk use
