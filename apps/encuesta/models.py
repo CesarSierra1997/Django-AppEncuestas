@@ -10,6 +10,8 @@ class Encuesta(models.Model):
         ('Privada', 'Encuesta privada'),
     ]
     tipoEncuesta = models.CharField('Tipo de Encuesta', max_length=50, choices=TIPO_ENCUESTA, default=False)
+    class Meta:
+        db_table = 'tabla_encuesta'
 #TIPOS DE PREGUNTAS:
 class PreguntaGeneral(models.Model):
     texto_pre = models.CharField('Digite la pregunta general', max_length=200, blank=False, null=False)
