@@ -9,16 +9,16 @@ Encuesta Home
 <link rel="stylesheet" href="{% static 'css/style_home.css' %}">
 {% endblock style %}
 
-<body >
+<body>
     <div class="mt-2">
         {% if not request.user.is_authenticated %}
         <nav class="navbar navbar-white bg-light border border-light-10 fixed-strat ">
             <div class="container-fluid justify-content-start">
-                <a class="navbar-brand" href="{% url 'encuestaHome' %}"></a>
-                <a class="navbar-brand text-dark" href="{% url 'encuestaHome' %}"><i
-                        class="text-dark fa-solid fa-cubes"></i><strong> App Encuestas</strong></a>
+                <a class="navbar-brand text-black" href="{% url 'encuestaHome' %}">
+                <strong> Encuestas Publicas</strong></a>
                 {% else %}
-                <nav style="background-color: #00ae01; border-top-right-radius: 10px; border-top-left-radius: 10px;" class="navbar navbar-light fixed-strat">
+                <nav style="background-color: #00ae01; border-top-right-radius: 10px; border-top-left-radius: 10px;"
+                    class="navbar navbar-light fixed-strat">
                     <div class="container-fluid justify-content-start">
                         <a class="navbar-brand" href="{% url 'encuestaHome' %}">
                         </a>
@@ -32,8 +32,8 @@ Encuesta Home
                             <span class="navbar-toggler-icon"></span>
                         </button>
                         <form class="d-flex" style="margin-left: 10px;" method="GET" action="{% url 'buscar' %}">
-                            <input class="form-control me-2 bg-light" type="search" name="q" placeholder="Buscar en encuestas"
-                                aria-label="Search">
+                            <input class="form-control me-2 bg-light" type="search" name="q"
+                                placeholder="Buscar en encuestas" aria-label="Search">
                             <button class="btn btn-outline-dark " type="submit">Buscar</button>
                         </form>
                         <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -41,15 +41,19 @@ Encuesta Home
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa-regular fa-folder-open"></i> Modulo de Encuestas 
+                                        <i class="fa-regular fa-folder-open"></i> Modulo de Encuestas
                                     </a>
-                                    <ul class="dropdown-menu" style="background-color: #efefeb ;" aria-labelledby="navbarDropdown">
-                                        <li><a class="text-success dropdown-item" href="{% url 'crear_encuesta' %}"><i class="fa-solid fa-file-circle-plus"></i> Crear encuesta</a></li>
-                                        <li><a class="text-success dropdown-item" href="{% url 'encuestaHome' %}"><i class="fa-solid fa-file-lines"></i> Lista de encuestas</a></li>
+                                    <ul class="dropdown-menu" style="background-color: #efefeb ;"
+                                        aria-labelledby="navbarDropdown">
+                                        <li><a class="text-success dropdown-item" href="{% url 'crear_encuesta' %}"><i
+                                                    class="fa-solid fa-file-circle-plus"></i> Crear encuesta</a></li>
+                                        <li><a class="text-success dropdown-item" href="{% url 'encuestaHome' %}"><i
+                                                    class="fa-solid fa-file-lines"></i> Lista de encuestas</a></li>
                                         <li>
                                             <hr class="text-success dropdown-divider">
                                         </li>
-                                        <li><a class="text-success dropdown-item" href="{% url 'ver_respuestas' %}"><i class="fa-solid fa-file-export"></i> Lista de Respuestas</a>
+                                        <li><a class="text-success dropdown-item" href="{% url 'ver_respuestas' %}"><i
+                                                    class="fa-solid fa-file-export"></i> Lista de Respuestas</a>
                                         </li>
                                     </ul>
                                 </li>
@@ -61,7 +65,7 @@ Encuesta Home
                                 <li class="nav-item dropdown">
                                     <a class="nav-link" href="{% url  'usuario:listar_usuario'%}" id="" role=""
                                         data-bs-toggle="" aria-expanded="false">
-                                        <i class="fa-solid fa-users-rectangle"></i> Modulo de Usuarios 
+                                        <i class="fa-solid fa-users-rectangle"></i> Modulo de Usuarios
                                     </a>
                                     <!-- <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                         <li ><a class="text-success dropdown-item" href="RUTA"><i class="ICONO"></i>INFO</a></li>
@@ -69,26 +73,27 @@ Encuesta Home
                                 </li>
                             </ul>
                         </div>
-                        <em style="position: absolute; right:0; top:0; margin-right: 70px; margin-top: 15px;">Direccion IP: {{ ip_address }}</em>
+                        <em style="position: absolute; right:0; top:0; margin-right: 70px; margin-top: 15px;">Direccion
+                            IP: {{ ip_address }}</em>
 
                         <!-- Perfil navbar -->
                         <div style="position: absolute; right: 0; top: 0; margin-top: 15px; margin-right: 18px;">
                             <div style="all: initial; " class="dropdown">
-                                <a style=" all: initial;" class="nav-link dropdown-toggle text-white " href="#" role="button"
-                                    id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <a style=" all: initial;" class="nav-link dropdown-toggle text-white " href="#"
+                                    role="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="text-white fa fa-user-check"></i>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-light text-success dropdown-menu-end"
                                     aria-labelledby="profileDropdown">
                                     <li><a class="dropdown-item" href="{% url 'index' %}">
-                                        <i class="fa-solid fa-user-gear"> perfil</i>
+                                            <i class="fa-solid fa-user-gear"> perfil</i>
                                         </a>
                                     </li>
                                     <li><a class="dropdown-item" href="{% url 'admin:index' %}">
                                             <i class="fa-solid fa-screwdriver-wrench"> admin</i>
                                         </a>
                                     </li>
-                                        <hr class="dropdown-divider">
+                                    <hr class="dropdown-divider">
                                     <li class="bg-danger"><a class="dropdown-item" href="{% url 'logout' %}">
                                             <i class="fa fa-power-off"> logout</i>
                                         </a>
@@ -100,7 +105,7 @@ Encuesta Home
                         <div style="position: absolute; right: 0; top: 0; margin-top: 15px; margin-right: 18px;">
                             <div style="all: initial; " class="dropdown">
                                 <a style=" all: initial;" class="nav-link dropdown-toggle" href="#" role="button"
-                                    id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">Login
                                     <i class="fa fa-user"></i>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-light dropdown-menu-end"
@@ -117,95 +122,36 @@ Encuesta Home
                 </nav>
             </div>
 
-            <section class="mt-2">
-                {% block encuesta %}
-                    
-                    {% if not request.user.is_authenticated  %}
-                    <div class="card card-body">
-                    {% else %}
-                    <div class="card card-body" style="background-color: #efefeb ;">
-                    {% endif %}
+{% block encuesta %}
+            <section class="mt-2">    
+                <div class="select-container">
+                    <div class="text-container">
+                        <div class="card mt-2 p-4 ">
 
-                    {% if messages %}
-                    <div class="alert alert-success alert-dismissible" role="alert">
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        {% for message in messages %}
-                        {{ message }}
-                        {% endfor %}
+                        <h1>Responde nuestras encuetas</h1>
+                        <p>Conoce nuestros tipos de encuestas</p>
+                        <div class="image-container ">
+                            <img style="width: 30%;" src="{% static 'img/encuestas.jpg' %}" alt="Imagen de encuestas">
+                        </div>
+                            {% if request.user.is_authenticated %}
+                            
+                            <a class="btn btn-outline-info" style="width: 300px" href="{% url 'encuestasPrivadas' %}">Encuestas
+                                Privadas</a>
+                            <p>haz click para ir a las encuestas privadas</p>   
+                            {% else %}
+                            <a class="btn btn-outline-success" style="width: 300px"
+                            href="{% url 'encuestasPublicas' %}">Encuestas Publicas</a>
+                            <p>haz click para ir las encuestas publicas</p>
+                            <a class="btn btn-outline-info" style="width: 300px" href="{% url 'login' %}">Encuestas
+                                Privadas</a>
+                            <p>haz click para ir al login</p>
+                            {% endif %}
+                        
+                        </div>
                     </div>
-                    {% endif %}
-                    <h5 class="card-header">Listado de encuestas</h5>
-
-                    <hr>
-                    {% if request.user.is_authenticated %}
-                    <p><strong>Bienvenido {{user.nombres.upper}} </strong></p>
-                    <P>A continuacion encontraras todas las encuestas para su gestion, con las diferentes funcionalidades para ello</P>
-                        {% if encuestas %}
-                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3"> <!-- Columnas responsivas -->
-                            {% for encuesta, cantidad_preguntas, cantidad_respuestas in preguntas_por_encuesta %}
-                            <div class="col">
-                                <div id="encuesta" class="card bg-dark bg-gradient mt-2 p-2 text-light">
-                                    <div class="container">
-                                        <p>Titulo encuesta <strong>{{encuesta.titulo.upper}}</strong></p><em class="text-info position-absolute top-0 end-0">{{encuesta.id}}<i class="fa-solid fa-file mx-2"></i></em>
-                                        <ul>
-                                            <li>Tipo <strong>{{ encuesta.tipoEncuesta }}</strong> </li>
-                                            <li>Cantidad de preguntas <strong>{{ cantidad_preguntas }}</strong> </li>
-                                        </ul>
-                                    </div>                                        
-                                    <div class="position-relative">
-                                        {% if cantidad_respuestas == 0 %}
-                                        <em class="text-danger position-absolute top-0 end-0">{{cantidad_respuestas}} respuestas</em>
-                                        {% else %}
-                                        <em class="text-info position-absolute top-0 end-0">{{cantidad_respuestas}} respuestas <i class="fa-solid fa-bell"></i> </em>
-                                        {% endif %}
-                                    </div>
-                                    <hr class="bg-light mt-4">
-                                    <div class="card border border-0">
-                                        <a class="btn btn-primary" href="{% url 'encuesta' encuesta.id %}"><i class="fa-solid fa-file-pen"></i></i> Editar encuesta</a>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        {% else %}
-                        <div class="alert alert-danger alert-dismissible" role="alert">
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            <p>No hay encuestas creadas en el sistema, comuniquese con el administrador</p>
-                        </div>
-                        {% endif %}
-
-                    {% else %}
-                    <!-- Encuentas publicas --> 
-                    <p><strong>Bienvenido a la App de encuestas</strong> <br>acontinuacion encontrara las encuentas publicas</p>
-                        {% if encuestas %}
-                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3"> <!-- Columnas responsivas -->
-                            {% for encuesta, cantidad_preguntas, cantidad_respuestas in preguntas_por_encuesta %}
-                            <div class="col">
-                                <div id="encuesta" class="card bg-light bg-gradient mt-2 p-2 text-dark">
-                                    <div class="container">
-                                        <p>Titulo - <strong>{{encuesta.titulo.upper}}</strong></p>
-                                        <p><i class="fa-solid fa-file-circle-question"></i> {{ cantidad_preguntas }} Preguntas</p>
-                                    </div>
-                                    <div class="card border border-0">
-                                        <a class="btn btn-success inline-block"
-                                            href="{% url 'responder_encuesta' encuesta.id %}">Ver Encuesta <i class="fa-solid fa-reply-all"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        {% else %}
-                        <div class="alert alert-danger alert-dismissible" role="alert">
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            <p>No hay encuestas publicas en este momento.</p>
-                        </div>
-                        {% endif %}
-                    {% endif %}
-
-                {% endblock encuesta %}
                 </div>
             </section>
-
+{% endblock encuesta %}
 </body>
 
 {% endblock body %}

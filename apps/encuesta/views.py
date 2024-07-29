@@ -21,10 +21,6 @@ def buscar(request):
     else:
         return render(request, 'busqueda_resultados.html')
 
-from django.shortcuts import render
-
-from django.shortcuts import render
-
 def obtener_direccion_ip(request):
     # Si tu aplicación se ejecuta detrás de un proxy, la dirección IP puede estar en otro encabezado
     ip_address = request.META.get('HTTP_X_FORWARDED_FOR', None)
@@ -99,43 +95,75 @@ def editar_encuesta(request, encuesta_id):
     return render(request, 'encuesta/editar_encuesta.html', {'form': form})
 
 #CRUD PREGUNTA - TIPO PREGUNTA
-class PreguntaFactory: 
+class PreguntaFactory:
     @staticmethod
     def crear_pregunta(tipo, *args, **kwargs):
         if tipo == 'general':
             return PreguntaGeneralForm(*args, **kwargs)
         elif tipo == 'select_multiple':
-            return PreguntaSelectMultipleForm(*args, **kwargs)
+            pregunta_form = PreguntaSelectMultipleForm(*args, **kwargs)
+            opcion_form = OpcionPreguntaSelectMultipleForm()
+            return pregunta_form, opcion_form
         elif tipo == 'si_o_no':
             return PreguntaSiONoForm(*args, **kwargs)
         elif tipo == 'numerica':
             return PreguntaNumericaForm(*args, **kwargs)
         else:
-            raise ValueError('Tipo de pregunta no válido RAISE class - PreguntaFactory : {}'.format(tipo))
+            raise ValueError('Tipo de pregunta no válido: {}'.format(tipo))
 
 def agregar_pregunta(request, encuesta_id):
-    encuesta = Encuesta.objects.get(pk=encuesta_id)
+    encuesta = get_object_or_404(Encuesta, pk=encuesta_id)
+    tipo_pregunta = request.GET.get('tipo_pregunta')
+    opcion_form = None
+
     if request.method == 'POST':
         tipo_pregunta = request.POST.get('tipo_pregunta')
-        form = PreguntaFactory.crear_pregunta(tipo_pregunta, request.POST)
-        print("El tipo de pregunta en el BACK",tipo_pregunta)
-        if form.is_valid():
-            pregunta = form.save(commit=False)
-            pregunta.encuesta = encuesta
-            pregunta.save()
-            messages.success(request, 'Pregunta agregada correctamente a la encuesta')
-            return redirect('encuesta', encuesta_id=encuesta_id)
-        else:
-            messages.error(request, 'Hubo un error al agregar la pregunta. Por favor, verifica los datos ingresados.')
-    else:
-        form = PreguntaFactory.crear_pregunta('si_o_no')  # Formulario por defecto
-    
-    return render(request, 'pregunta/agregar_pregunta.html', {'form': form})
+        if tipo_pregunta not in ['general', 'select_multiple', 'si_o_no', 'numerica']:
+            messages.error(request, 'Tipo de pregunta no válido')
+            return render(request,'pregunta/agregar_pregunta.html',{'encuesta_id':encuesta_id})
 
-def pregunta(request, encuesta_id):
-    tipo_pregunta = request.GET.get('type', '') 
-    form = PreguntaFactory.crear_pregunta(tipo_pregunta)
-    return render(request, 'pregunta/pregunta.html', {'tipo_pregunta': tipo_pregunta, 'form':form, 'encuesta_id': encuesta_id,})
+        if tipo_pregunta == 'select_multiple':
+            pregunta_form, opcion_form = PreguntaFactory.crear_pregunta(tipo_pregunta, request.POST)
+            if pregunta_form.is_valid():
+                pregunta = pregunta_form.save(commit=False)
+                pregunta.encuesta = encuesta
+                pregunta.save()
+                # Guardar las opciones
+                opciones = request.POST.getlist('opciones')
+                for opcion_texto in opciones:
+                    if opcion_texto:  # Guardar solo si no está vacío
+                        OpcionPreguntaSelectMultiple.objects.create(pregunta=pregunta, opcion=opcion_texto)
+                messages.success(request, 'Pregunta de selección múltiple agregada correctamente a la encuesta')
+                return redirect('encuesta', encuesta_id=encuesta_id)
+            else:
+                form = pregunta_form  # En caso de error, definir 'form' para renderizado
+                messages.error(request, 'Hubo un error al agregar la pregunta. Por favor, verifica los datos ingresados.')
+        else:
+            form = PreguntaFactory.crear_pregunta(tipo_pregunta, request.POST)
+            if form.is_valid():
+                pregunta = form.save(commit=False)
+                pregunta.encuesta = encuesta
+                pregunta.save()
+                messages.success(request, 'Pregunta agregada correctamente a la encuesta')
+                return redirect('encuesta', encuesta_id=encuesta_id)
+            else:
+                messages.error(request, 'Hubo un error al agregar la pregunta. Por favor, verifica los datos ingresados.')
+    else:
+        if tipo_pregunta == 'select_multiple':
+            form, opcion_form = PreguntaFactory.crear_pregunta(tipo_pregunta)
+        elif tipo_pregunta in ['general', 'si_o_no', 'numerica']:
+            form = PreguntaFactory.crear_pregunta(tipo_pregunta)
+        else:
+            form = None
+            messages.error(request, 'Tipo de pregunta no válido')
+
+    return render(request, 'pregunta/agregar_pregunta.html', {
+        'form': form, 
+        'opcion_form': opcion_form, 
+        'tipo_pregunta': tipo_pregunta, 
+        'encuesta_id': encuesta_id,
+        'encuesta': encuesta
+    })
 
 def editar_pregunta(request, encuesta_id, pregunta_id):
     encuesta = get_object_or_404(Encuesta, pk=encuesta_id)
@@ -189,7 +217,10 @@ def eliminar_pregunta(request, encuesta_id, pregunta_id):
 
 #INICIO APP ENCUESTAS - LISTA DE ENCUESTAS
 def encuestaHome(request):
-    encuestas = Encuesta.objects.all()
+    return render(request, 'encuestaHome.html')
+
+def encuestasPublicas(request):
+    encuestas = Encuesta.objects.filter(tipoEncuesta='Publica')
     preguntas_por_encuesta = []
     for encuesta in encuestas:
         cantidad_preguntas = 0
@@ -202,8 +233,32 @@ def encuestaHome(request):
         cantidad_preguntas += PreguntaNumerica.objects.filter(encuesta=encuesta).count()
         preguntas_por_encuesta.append((encuesta, cantidad_preguntas, cantidad_respuestas))
         
-    return render(request, 'encuestaHome.html', {'encuestas': encuestas, 'preguntas_por_encuesta': preguntas_por_encuesta})
+    if not request.user.is_authenticated:
+        return render(request, 'encuesta/lista_encuestas/encuestasPublicas.html', {'encuestas': encuestas, 'preguntas_por_encuesta': preguntas_por_encuesta})
+    else:
+        return render(request, 'encuesta/lista_encuestas/encuestasPublicas.html')
 
+
+def encuestasPrivadas(request):
+    encuestas = Encuesta.objects.filter(tipoEncuesta='Privada')
+    preguntas_por_encuesta = []
+    for encuesta in encuestas:
+        cantidad_preguntas = 0
+        cantidad_respuestas = 0
+        cantidad_respuestas += RespuestaEncuestaPublica.objects.filter(encuesta=encuesta).count()
+        # Contar la cantidad de preguntas de cada tipo para esta encuesta
+        cantidad_preguntas += PreguntaGeneral.objects.filter(encuesta=encuesta).count()
+        cantidad_preguntas += PreguntaSelectMultiple.objects.filter(encuesta=encuesta).count()
+        cantidad_preguntas += PreguntaSiONo.objects.filter(encuesta=encuesta).count()
+        cantidad_preguntas += PreguntaNumerica.objects.filter(encuesta=encuesta).count()
+        preguntas_por_encuesta.append((encuesta, cantidad_preguntas, cantidad_respuestas))
+
+    if request.user.is_authenticated:
+        return render(request, 'encuesta/lista_encuestas/encuestasPrivadas.html', {'encuestas': encuestas, 'preguntas_por_encuesta': preguntas_por_encuesta})
+    else:
+        return render(request, 'encuesta/lista_encuestas/encuestasPrivadas.html')
+
+        
 #CRUD RESPUESTA DE ENCUESTA
 def responder_encuesta(request, encuesta_id):
     encuesta = Encuesta.objects.get(pk=encuesta_id)

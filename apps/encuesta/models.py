@@ -21,7 +21,7 @@ class PreguntaSelectMultiple(models.Model):
 
 class OpcionPreguntaSelectMultiple(models.Model):
     opcion = models.CharField('Opción', max_length=255)
-    pregunta = models.ForeignKey(PreguntaSelectMultiple, on_delete=models.CASCADE)
+    pregunta = models.ForeignKey(PreguntaSelectMultiple, on_delete=models.CASCADE, related_name='opciones')
 
 class PreguntaSiONo(models.Model):
     texto_pre = models.CharField('Digite la pregunta de sí o no', max_length=200, blank=False, null=False)
@@ -59,7 +59,7 @@ class RespuestaPreguntaGeneral(models.Model):
 
 class RespuestaPreguntaSelectMultiple(models.Model):
     pregunta = models.ForeignKey(PreguntaSelectMultiple, on_delete=models.CASCADE, related_name='respuesta_pregunta_selectMultiple')
-    respuesta =  models.CharField('Seleccione una opción', max_length=200, blank=False, null=False)
+    respuesta =  models.ForeignKey(OpcionPreguntaSelectMultiple, on_delete=models.CASCADE, related_name='opcion_respuesta_pregunta_selectMultiple')
 
 class RespuestaPreguntaSiONo(models.Model):
     pregunta = models.ForeignKey(PreguntaSiONo, on_delete=models.CASCADE, related_name='respuesta_pregunta_siOno')

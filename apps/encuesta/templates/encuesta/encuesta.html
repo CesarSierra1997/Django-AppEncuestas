@@ -6,6 +6,17 @@ Encuesta Custom
 <h5 class="card-header">Editor de Encuestas</h5>
 <div class="card-body mt-2 bg-light bg-gradient"> 
     <div class="card-body card bg-dark bg-gradient border-solid text-light">
+        {% if messages %}
+        <div>
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
         <h5>Editar encuesta || {{ encuesta.titulo }} <a href="{% url 'editar_encuesta' encuesta.id %}"><i class="text-primary fa-solid fa-pen-to-square"></i></a></h5>
         <h6>Preguntas:</h6>
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3"> <!-- Columnas responsivas -->
@@ -19,7 +30,12 @@ Encuesta Custom
                             {% if tipo == "select_multiple" %}
                             <p>opciones de seleccion multiple:</p>
                             <ul>
-                                <p>a) {{ pregunta.opcion_a }}</p>
+                                {{opcion}}
+                                {% for opcion in pregunta.opcionpreguntageneral_set %}
+                                <p>X) {{ opcion}}</p>
+                                    
+                                {% endfor %}
+                                    
                                 <p>b) {{ pregunta.opcion_b }}</p>
                                 <p>c) {{ pregunta.opcion_c }}</p>
                                 <p>d) {{ pregunta.opcion_d }}</p>

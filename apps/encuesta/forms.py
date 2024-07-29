@@ -41,10 +41,10 @@ class OpcionPreguntaSelectMultipleForm(forms.ModelForm):
         model = OpcionPreguntaSelectMultiple
         fields = ['opcion']
         labels = {
-            'opcion': 'Digite la pregunta de selección múltiple',
+            'opcion': 'Digite la opcion para la pregunta',
         }
         widgets = {
-            'opcion': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Sleccione una opción'}),
+            'opcion':  forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese la opcion'}),
         }
 
 class PreguntaSiONoForm(forms.ModelForm):

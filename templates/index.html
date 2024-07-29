@@ -30,7 +30,7 @@
         box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);border: 1px solid #000000;height:100px"><br>
         </div>
     </a>
-    <nav>
+<!-- <nav>
         <div class="sena-card2 sena-p6">
             <div class="nav mx-auto">
                 <ul class="nav nav-pills" style="margin-left: 190px;">
@@ -56,20 +56,20 @@
                                 class="fa fa-search"></i>Acerca de</a>
                     </li>
                 </ul>
-                <h3 style="margin-left: 380px; margin-top: 2px; color: #06ae06;">Regional Distrito Capital </h3>
+                <h3 style="margin-left: 340px; margin-top: 2px; color: #06ae06;">Regional Distrito Capital </h3>
             </div>
             
         </div>
-    </nav>
+    </nav> -->
 </header>
 <!-- App -->
 <section style="max-width: 945px; margin: auto;">
     {% block body %}
-        <div class="container card-body card">
-            <h3>Bienvenido a la fabrica de software</h3>
+        <div class="container card-body card mt-2">
+            <h3>Bienvenido a Home 52</h3>
             <p>Somos una fábrica de software dedicada a la creación de soluciones web innovadoras para el sector educativo y empresarial. Nuestro compromiso es desarrollar aplicaciones que impulsen el crecimiento y la transformación digital.</p>
             <p>¡Únete a nosotros y sé parte de la revolución digital en el SENA!</p>
-
+            <a class="btn" style="background-color: #06ae06; width: 300px" href="{% url 'encuestaHome' %}">App encuestas</a>
             <p>a click para ir a nuestra app de encuestas!</p>
         </div>
     {% endblock body %}
