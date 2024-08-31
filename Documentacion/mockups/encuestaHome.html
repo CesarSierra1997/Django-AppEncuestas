@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>encuestaHome</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <link href="'fontawesomefree/css/fontawesome.css'" rel="stylesheet" type="text/css">
+    <link href="'fontawesomefree/css/brands.css'" rel="stylesheet" type="text/css">
+    <link href="'fontawesomefree/css/solid.css'" rel="stylesheet" type="text/css">
+    <script>
+        function loadFile(filename, elementId) {
+            fetch(filename)
+                .then(response => response.text())
+                .then(text => document.getElementById(elementId).innerHTML = text);
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            loadFile('header.html', 'header-placeholder');
+            loadFile('footer.html', 'footer-placeholder');
+        });
+    </script>
+    <style>
+     .seccion-1 {
+        max-width: 1000px;
+        margin: auto;
+        font-size: 0.9em;
+    }
+</style>
+
+</head>
+
+<body>
+
+    <div id="header-placeholder"></div>
+    <div class="seccion-1">
+    <link rel="stylesheet" href="style.css">
+
+    <div class="mt-2">
+        <nav class="navbar navbar-white bg-light border border-light-10 fixed-strat ">
+            <div class="container-fluid d-flex justify-content-between" style="background-color: #efefeb;">
+                <div>
+                    <a class="navbar-brand text-black" href="encuestaHome.html">
+                        <strong>Encuestas Públicas</strong>
+                    </a>
+                </div>
+                <div style="position: relative;">
+                    <div class="dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="color:black;" >
+                            Login <i class="fa fa-user"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-light dropdown-menu-end" aria-labelledby="profileDropdown">
+                            <li><a class="dropdown-item" href="login.html">
+                                    <i class="fa fa-power-off"> INICIAR SESIÓN</i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+    </div>
+    <div class="seccion-1">
+    <section class="mt-2">
+        <div class="select-container">
+            <div class="text-container">
+                <div class="card mt-2 p-4 ">
+
+                    <h1>Responde nuestras encuestas</h1>
+                    <p>Conoce nuestros tipos de encuestas</p>
+                    <div class="image-container ">
+                        <img style="width: 30%;" src="img/encuestas.jpg" alt="Imagen de encuestas">
+                    </div>
+
+
+                    <a class="btn btn-outline-success" style="width: 300px"
+                        href="encuestasPublicas.html">Encuestas Publicas</a>
+                    <p>haz click para ir las encuestas publicas</p>
+                    <a class="btn btn-outline-info" style="width: 300px" href="login.html" >Encuestas
+                        Privadas</a>
+                    <p>haz click para ir al login</p>
+
+
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+</div>
+    <div id="footer-placeholder"></div>
+</body>
+
+</html>
