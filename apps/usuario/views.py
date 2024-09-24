@@ -1,15 +1,23 @@
+import json
+from django.core.serializers import serialize
 from django.shortcuts import render, redirect
 from django.views.generic.edit import FormView
+from ..usuario.forms import FormularioLogin
 from django.urls import reverse_lazy
 from django.utils.decorators import  method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth import login, logout
-from django.http import HttpResponseRedirect
-from django.views.generic import CreateView, ListView, UpdateView, DeleteView, View
-from .models import Usuario
-from .forms import FormularioUsuario, FormularioLogin
-from django.conf import settings
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
+from django.views.generic import CreateView, ListView, UpdateView, DeleteView, TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from apps.usuario.models import Usuario
+from apps.usuario.forms import *
+from apps.usuario.mixin import *
+
+class Inicio(TemplateView): #vista basada en clases para una sola vista
+    def get(self, request, *args, **kwargs):
+        return render(request, 'index.html')
 
 class Login(FormView):
     template_name = "login.html"
@@ -34,67 +42,106 @@ class Login(FormView):
     
 def logoutUsuario(request):
     logout(request)
-    return HttpResponseRedirect('/encuestas/home/')
+    return HttpResponseRedirect('/accounts/login/')
 
-class ListadoUsuario(View):
+
+class InicioUsuario(LoginSuperStaffMixin, ValidarPermisosMixin, TemplateView):
+    permission_required = ('usuario.view_usuario', 'usuario.add_usuario', 'usuario.delete_usuario', 'usuario.change_usuario')
+
+    template_name = 'usuario/listar_usuarios.html'
+
+class ListadoUsuario(LoginSuperStaffMixin, ValidarPermisosMixin, ListView):
     model = Usuario
-    template_name = "usuario/usuario/listar_usuario.html"
-    form_class = FormularioUsuario
+    permission_required = ('usuario.view_usuario', 'usuario.add_usuario', 'usuario.delete_usuario', 'usuario.change_usuario')
+
 
     def get_queryset(self):
-        return self.model.objects.filter(usuario_activo=True)
-    
-    def get_context_data(self, **kwargs):
-        context = {}
-        context["usuarios"] = self.get_queryset() 
-        context["form"] = self.form_class() 
-        return context
+        return self.model.objects.filter(is_active=True) 
     
     def get(self, request, *args, **kwargs):
-            return render(request, self.template_name, self.get_context_data())
-    
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('usuario:listar_usuario')
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return HttpResponse(serialize('json', self.get_queryset()), 'application/json')
         else:
-            form = self
-            return render(request, self.template_name, self.get_context_data()) 
-
-class RegistrarUsuario(CreateView):
-    model = Usuario
-    template_name = "usuario/usuario/crear_usuario.html"
-    form_class = FormularioUsuario
-    success_url = reverse_lazy('usuario:listar_usuario')
-
-    def form_valid(self, form):
-        # Antes de guardar el formulario, necesitas asignar el rol seleccionado
-        usuario = form.save(commit=False)
-        # Obtener el rol seleccionado en el formulario
-        rol_seleccionado = form.cleaned_data['rol']
+            return redirect('usuario:inicio_usuarios')
         
-        # Verificar si el rol seleccionado es "Administrador"
-        if rol_seleccionado.rol == 'administrador':
-            usuario.usuario_administrador = True
-        else:
-            usuario.usuario_administrador = False
-        usuario.save()
-        return super().form_valid(form)
 
-class ActualizarUsuario(UpdateView):
+class RegistrarUsuario(LoginSuperStaffMixin, ValidarPermisosMixin, CreateView):
     model = Usuario
-    template_name = "usuario/usuario/usuario.html"
     form_class = FormularioUsuario
-    success_url = reverse_lazy('usuario:listar_usuario')
+    template_name = "usuario/registrar_usuario.html"
+    permission_required = ('usuario.view_usuario', 'usuario.add_usuario', 'usuario.delete_usuario', 'usuario.change_usuario')
 
-class EliminarUsuario(DeleteView):
+
+    def post(self, request, *args, **kwargs):
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            form = self.form_class(request.POST)
+            if form.is_valid():
+                nuevo_usuario = Usuario(
+                    nombres = form.cleaned_data.get('nombres'),
+                    apellidos = form.cleaned_data.get('apellidos'),
+                    email = form.cleaned_data.get('email'),
+                    username = form.cleaned_data.get('username'),
+                )  
+                nuevo_usuario.set_password(form.cleaned_data.get('password1'))
+                nuevo_usuario.save()
+                mensaje = f'¡{self.model.__name__} registrado correctamente!'
+                error = f'no hay error'
+                response = JsonResponse({'mensaje':mensaje, 'error':error})
+                response.status_code = 201
+                return response
+            else:
+                mensaje = f'{self.model.__name__} no se ha podido registrar'
+                error = form.errors
+                response = JsonResponse({'mensaje':mensaje, 'error':error})
+                response.status_code = 400
+                return response
+        else:
+            return redirect('usuario:inicio_usuarios')
+        
+class EditarUsuario(LoginSuperStaffMixin, ValidarPermisosMixin, UpdateView):
     model = Usuario
-    queryset = Usuario.objects.all()
+    form_class = FormularioUsuario
+    template_name = "usuario/editar_usuario.html"
+    permission_required = ('usuario.view_usuario', 'usuario.add_usuario', 'usuario.delete_usuario', 'usuario.change_usuario')
 
-    def post(self, request, pk, *args, **kwargs):
-        object = Usuario.objects.get(id = pk)
-        object.usuario_activo = False
-        object.save()
-        return redirect("usuario:listar_usuario")
 
+    def post(self, request, *args, **kwargs):
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            form = self.form_class(request.POST, instance = self.get_object())
+            if form.is_valid():
+                form.save()
+                mensaje = f'¡{self.model.__name__} actualizado correctamente!'
+                error = f'no hay error'
+                response = JsonResponse({'mensaje':mensaje, 'error':error})
+                response.status_code = 201
+                return response
+            else:
+                mensaje = f'{self.model.__name__} no se ha podido actualizar'
+                error = form.errors
+                response = JsonResponse({'mensaje':mensaje, 'error':error})
+                response.status_code = 400
+                return response
+        else:
+            return redirect('usuario:inicio_usuarios')
+        
+class EliminarUsuario(LoginSuperStaffMixin, ValidarPermisosMixin, DeleteView):
+    model = Usuario
+    template_name = "usuario/eliminar_usuario.html"
+    success_url = reverse_lazy('usuario:inicio_usuarios')
+    permission_required = ('usuario.view_usuario', 'usuario.add_usuario', 'usuario.delete_usuario', 'usuario.change_usuario')
+
+
+    def post(self, request, *args, **kwargs):
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            usuario = self.get_object()
+            usuario.is_active = False
+            usuario.save()
+            mensaje = f'¡{self.model.__name__} eliminado correctamente!'
+            error = f'no hay error'
+            response = JsonResponse({'mensaje':mensaje, 'error':error})
+            response.status_code = 201
+            return response
+        else:
+            return redirect('usuario:inicio_usuarios')
+
+        

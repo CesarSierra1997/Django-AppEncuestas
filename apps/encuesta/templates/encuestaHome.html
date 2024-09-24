@@ -9,28 +9,35 @@ Encuesta Home
 <link rel="stylesheet" href="{% static 'css/style_home.css' %}">
 {% endblock style %}
 
+{% block extrajs %}
+<script src="{% static 'js/index.js' %}"> </script>
+{% endblock extrajs %}
+
 <body>
     <div class="mt-2">
         {% if not request.user.is_authenticated %}
-        <nav class="navbar navbar-white bg-light border border-light-10 fixed-strat ">
+        <nav class="navbar border border-light-10 fixed-strat " style="background-color: #4b4b4bc9;">
             <div class="container-fluid justify-content-start">
-                <a class="navbar-brand text-black" href="{% url 'encuestaHome' %}">
-                <strong> Encuestas Publicas</strong></a>
+                <a class="navbar-brand text-white" href="{% url 'encuestaHome' %}"><img style="width: 5%;" class="img" src="{% static 'img/hm52.png' %}" alt="Imagen de encuestas">
+                <strong> Encuestas publicas</strong></a>
                 {% else %}
-                <nav style="background-color: #00ae01; border-top-right-radius: 10px; border-top-left-radius: 10px;"
+                <nav style="background-color: #007C75; border-top-right-radius: 10px; border-top-left-radius: 10px;"
                     class="navbar navbar-light fixed-strat">
                     <div class="container-fluid justify-content-start">
                         <a class="navbar-brand" href="{% url 'encuestaHome' %}">
                         </a>
-                        <a class="navbar-brand text-white" href="{% url 'encuestaHome' %}"><i
-                                class="text-white fa-solid fa-cubes"></i><strong> App Encuestas</strong></a>
+                        <a class="navbar-brand text-white" href="{% url 'encuestaHome' %}"><img style="width: 5%;" class="img" src="{% static 'img/hm52.png' %}" alt="Imagen de encuestas">
+                            <strong>Fabrica de Encuestas</strong></a>
                         {% endif %}
                         {% if request.user.is_authenticated %}
+                        {% if request.user.is_superuser %}
+
                         <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse"
                             data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                             aria-expanded="false" aria-label="Toggle navigation">
                             <span class="navbar-toggler-icon"></span>
                         </button>
+
                         <form class="d-flex" style="margin-left: 10px;" method="GET" action="{% url 'buscar' %}">
                             <input class="form-control me-2 bg-light" type="search" name="q"
                                 placeholder="Buscar en encuestas" aria-label="Search">
@@ -63,7 +70,7 @@ Encuesta Home
                         <div class="collapse navbar-collapse" id="navbarSupportedContent">
                             <ul class="navbar-nav me-auto mb-lg-0">
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link" href="{% url  'usuario:listar_usuario'%}" id="" role=""
+                                    <a class="nav-link" href="{% url  'usuario:listar_usuarios'%}" id="" role=""
                                         data-bs-toggle="" aria-expanded="false">
                                         <i class="fa-solid fa-users-rectangle"></i> Modulo de Usuarios
                                     </a>
@@ -73,9 +80,10 @@ Encuesta Home
                                 </li>
                             </ul>
                         </div>
+                        {% endif %}
                         <em style="position: absolute; right:0; top:0; margin-right: 70px; margin-top: 15px;">Direccion
                             IP: {{ ip_address }}</em>
-
+                        
                         <!-- Perfil navbar -->
                         <div style="position: absolute; right: 0; top: 0; margin-top: 15px; margin-right: 18px;">
                             <div style="all: initial; " class="dropdown">
@@ -111,13 +119,13 @@ Encuesta Home
                                 <ul class="dropdown-menu dropdown-menu-light dropdown-menu-end"
                                     aria-labelledby="profileDropdown">
                                     <li><a class="dropdown-item" href="{% url 'login' %}">
-                                            <i class="fa fa-power-off"> Iniciar Sesion</i>
+                                            <i class="fa fa-power-off"></i>Iniciar Sesion
                                         </a>
                                     </li>
                                 </ul>
                             </div>
                         </div>
-                        {% endif %}
+                    {% endif %}
                     </div>
                 </nav>
             </div>
@@ -135,14 +143,14 @@ Encuesta Home
                         </div>
                             {% if request.user.is_authenticated %}
                             
-                            <a class="btn btn-outline-info" style="width: 300px" href="{% url 'encuestasPrivadas' %}">Encuestas
+                            <a class="btn" style="background-color: #FF7411; width: 300px" href="{% url 'encuestasPrivadas' %}">Encuestas
                                 Privadas</a>
                             <p>haz click para ir a las encuestas privadas</p>   
                             {% else %}
-                            <a class="btn btn-outline-success" style="width: 300px"
+                            <a class="btn " style="background-color: #007C75 ; width: 300px"
                             href="{% url 'encuestasPublicas' %}">Encuestas Publicas</a>
                             <p>haz click para ir las encuestas publicas</p>
-                            <a class="btn btn-outline-info" style="width: 300px" href="{% url 'login' %}">Encuestas
+                            <a class="btn" style="background-color: #FF7411; width: 300px" href="{% url 'login' %}">Encuestas
                                 Privadas</a>
                             <p>haz click para ir al login</p>
                             {% endif %}

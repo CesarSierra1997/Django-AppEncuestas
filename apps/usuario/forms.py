@@ -32,59 +32,53 @@ class FormularioUsuario(forms.ModelForm):
     ))
     class Meta:
         model = Usuario
-        fields = ['tipoDocumento','numeroDocumento','nombres', 'apellidos','email','rol','username' ]
+        fields = ['nombres', 'apellidos','email','username' ]
         widgets = {
-            'tipoDocumento': forms.Select(
-                attrs={
-                    'class': 'form-control',
-                    'placeholder': 'Slecione el tipo de documento'
-                }),
-            'numeroDocumento': forms.NumberInput(
-                attrs={'class': 'form-control',
-                       'placeholder': 'Ingrese el numero de documento'
-                }),
+
             'email': forms.EmailInput(
                 attrs={
                     'class':'form-control',
                     'placeholder':'Correo electrónico'
-                }),
+                }
+            ),
             'nombres': forms.TextInput(
                 attrs={
                     'class':'form-control',
-                    'placeholder':'Digite su nombre'
-                }),
+                    'placeholder':'Digite su nombre',
+                    'required':'required'
+                }
+            ),
             'apellidos': forms.TextInput(
                 attrs={
                     'class':'form-control',
-                    'placeholder':'Digite sus apellidos'
-                }),
+                    'placeholder':'Digite sus apellidos',
+                    'required':'required'
+                }
+            ),
             'username': forms.TextInput(
                 attrs={
                     'class':'form-control',
                     'placeholder':'Nombre de usuario - caractéres permitidos ( /, *, +, -, ., _ )'
-                }),
-            'rol': forms.Select(
-                attrs={
-                    'class':'form-control'
-                })}
-    def clean_nombres(self):
-        mail = self.cleaned_data.get('mail')
-        if mail.is_valid():
-            mail = mail.lower()   
-        return mail
+                }
+            ),
+        }
 
     def clean_nombres(self):
         nombres = self.cleaned_data.get('nombres')
+        if not nombres:
+            raise ValidationError(_('Este campo es obligatorio.'))
         if not nombres.replace(" ", "").isalpha():
             raise ValidationError(_('El nombre solo debe contener letras.'))
         return nombres.lower()   
 
     def clean_apellidos(self):
         apellidos = self.cleaned_data.get('apellidos')
+        if not apellidos:
+            raise ValidationError(_('Este campo es obligatorio.'))
         if not apellidos.replace(" ", "").isalpha():
             raise ValidationError(_('Los apellidos solo deben contener letras.'))
         return apellidos.lower()    
-    
+
     def clean_username(self):
         username = self.cleaned_data.get('username')
         username = username.replace(" ", "_")
@@ -111,29 +105,49 @@ class FormularioUsuario(forms.ModelForm):
         if commit:
             user.save()
         return user
+    
 
+class FormularioUpdateUsuario(forms.ModelForm):
+    class Meta:
+        model = Usuario
+        fields = ['nombres', 'apellidos','email' ]
+        widgets = {
 
+            'email': forms.EmailInput(
+                attrs={
+                    'class':'form-control',
+                    'placeholder':'Correo electrónico'
+                }
+            ),
+            'nombres': forms.TextInput(
+                attrs={
+                    'class':'form-control',
+                    'placeholder':'Digite su nombre',
+                    'required':'required'
+                }
+            ),
+            'apellidos': forms.TextInput(
+                attrs={
+                    'class':'form-control',
+                    'placeholder':'Digite sus apellidos',
+                    'required':'required'
+                }
+            ),
+        }
 
-# class FormularioEstudiante(forms.ModelForm):
-#     class Meta:
-#         model = Estudiante
-#         fields = ['usuario_id']
-#         widgets = {
+    def clean_nombres(self):
+        nombres = self.cleaned_data.get('nombres')
+        if not nombres:
+            raise ValidationError(_('Este campo es obligatorio.'))
+        if not nombres.replace(" ", "").isalpha():
+            raise ValidationError(_('El nombre solo debe contener letras.'))
+        return nombres.lower()   
 
-#             'usuario_id': forms.Select(
-#                 attrs={
-#                     'class':'form-control'
-#                 }
-#             )}
-        
-# class FormularioProfesor(forms.ModelForm):
-#     class Meta:
-#         model = Profesor
-#         fields = ['usuario_id']
-#         widgets = {
+    def clean_apellidos(self):
+        apellidos = self.cleaned_data.get('apellidos')
+        if not apellidos:
+            raise ValidationError(_('Este campo es obligatorio.'))
+        if not apellidos.replace(" ", "").isalpha():
+            raise ValidationError(_('Los apellidos solo deben contener letras.'))
+        return apellidos.lower()    
 
-#             'usuario_id': forms.Select(
-#                 attrs={
-#                     'class':'form-control'
-#                 }
-#             )}

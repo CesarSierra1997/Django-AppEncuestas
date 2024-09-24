@@ -5,11 +5,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
@@ -17,6 +19,42 @@
     <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
+
+
+     <!-- SweetAlert2 -->
+     
+     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-material-ui@4/material-ui.css" rel="stylesheet">
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+ 
+     <!-- Ajax -->
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+     <script src="{% static 'js/main.js' %}"> </script>
+ 
+ 
+     <!-- Bootstrap -->
+     {% comment %} <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+         crossorigin="anonymous"></script>
+  {% endcomment %}
+     <!-- jQuery - DataTable -->
+     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+      
+     <!-- Incluye el CSS de DataTables Bootstrap desde un CDN (opcional, si usas Bootstrap) -->
+     <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css"> -->
+     
+     <!-- Incluye jQuery desde un CDN (DataTables depende de jQuery) -->
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+     
+     <!-- Incluye el JS de DataTables desde un CDN -->
+     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+     <title>
+        {% block title %}
+        index
+        {% endblock title %}
+    </title>
 </head>
 
 <body>
@@ -67,12 +105,31 @@
     {% block body %}
         <div class="container card-body card mt-2">
             <h3>Bienvenido a Home 52</h3>
+            
             <p>Somos una fábrica de software dedicada a la creación de soluciones web innovadoras para el sector educativo y empresarial. Nuestro compromiso es desarrollar aplicaciones que impulsen el crecimiento y la transformación digital.</p>
+            <div class="image-container ">
+                <img style="width: 30%;" src="{% static 'img/hm52.png' %}" alt="Imagen de encuestas">
+            </div>
             <p>¡Únete a nosotros y sé parte de la revolución digital en el SENA!</p>
-            <a class="btn" style="background-color: #06ae06; width: 300px" href="{% url 'encuestaHome' %}">App encuestas</a>
+            <a class="btn" style="background-color: #FF7411; width: 300px" href="{% url 'encuestaHome' %}">App encuestas</a>
             <p>a click para ir a nuestra app de encuestas!</p>
         </div>
     {% endblock body %}
+
+        {% comment %} MSJ PERMISOS {% endcomment %}
+        <script>
+            {% if messages %}
+                var html_mensaje = ''
+                {% for mensaje in messages %}
+                    html_mensaje += '{{mensaje}}';
+                {% endfor %}
+                notificacionWarning(html_mensaje);
+            {% endif %}
+        </script>
+    
+        {% block extrajs %}      
+        {% endblock extrajs %}
+    
 </section>
 <footer>
     <div style="width:75%;overflow:auto;background-color:39a900; margin: auto; height: 50%;"

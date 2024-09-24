@@ -1,0 +1,46 @@
+{% extends "encuestaHome.html" %}
+
+{% block title %}
+Listado de Usuarios
+{% endblock title %}
+
+<!-- Enlasamos nuestros estilos de css -->
+{% load static %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/styles2.css' %}">
+{% endblock styles %}
+<!-- Segimos con el contenido interno -->
+{% block extrajs %}
+<script src="{% static 'js/index.js' %}"> </script>
+{% endblock extrajs %}
+
+<!-- Modal -->
+{% block encuesta %}
+
+<main class="container mt-2 pb-5">
+        <button class="btn btn-primary"
+        onclick="abrir_modal_creacion('{% url 'usuario:registrar_usuario' %}')">Registrar Usuario</button>
+    <div class="talbe-stats order-table ov-h">
+        <table id="tabla_usuarios" class="card card-body table">
+            <thead>
+                <tr id="spc">
+                    <th>#</th>
+                    <th>Username</th>
+                    <th>Nombres</th>
+                    <th>Apellidos</th>
+                    <th>Email</th>
+                    <th>Opciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+    <div class="modal fade" id="creacion" role="dialog">
+    </div>
+    <div class="modal fade" id="edicion" role="dialog">
+    </div>
+    <div class="modal fade" id="eliminacion" role="dialog">
+    </div>
+</main>
+{% endblock encuesta %}

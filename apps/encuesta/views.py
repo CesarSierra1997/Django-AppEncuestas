@@ -2,6 +2,8 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
 from .forms import *
+from .mixin import login_super_staff_required, validar_permisos_required
+
 #BUSQUEDA EN MODELOS
 def buscar(request):
     if 'q' in request.GET:
@@ -33,12 +35,14 @@ def obtener_direccion_ip(request):
     return ip_address
 
 #INDEX FABRICA DE SOFTWARE 
-def inicio(request):
-    ip_address = obtener_direccion_ip(request)
-    print("su direccion ip: ",ip_address)
-    return render(request, 'index.html',{'ip_address': ip_address})
+# def inicio(request):
+#     ip_address = obtener_direccion_ip(request)
+#     print("su direccion ip: ",ip_address)
+#     return render(request, 'index.html',{'ip_address': ip_address})
 
 #CRUD ENCUESTA
+@login_super_staff_required
+@validar_permisos_required(permission_required='app_encuesta.add_encuesta')
 def crear_encuesta(request):
     if request.method == 'POST':
         form = EncuestaForm(request.POST)
@@ -49,6 +53,8 @@ def crear_encuesta(request):
         form = EncuestaForm()
     return render(request, 'encuesta/crear_encuesta.html', {'form': form})
 
+@login_super_staff_required
+@validar_permisos_required(permission_required='app_encuesta.view_encuesta')
 def encuesta(request, encuesta_id):
     encuesta = get_object_or_404(Encuesta, pk=encuesta_id)
     preguntas = []
@@ -238,7 +244,8 @@ def encuestasPublicas(request):
     else:
         return render(request, 'encuesta/lista_encuestas/encuestasPublicas.html')
 
-
+@login_super_staff_required
+@validar_permisos_required(permission_required='app_encuesta.view_encuesta')
 def encuestasPrivadas(request):
     encuestas = Encuesta.objects.filter(tipoEncuesta='Privada')
     preguntas_por_encuesta = []
