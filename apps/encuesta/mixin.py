@@ -19,6 +19,6 @@ def validar_permisos_required(permission_required=''):
             if request.user.has_perm(permission_required):
                 return view_func(request, *args, **kwargs)
             messages.error(request, 'No tienes permisos para realizar esta acción.')
-            return redirect(reverse_lazy('login'))  # Redirige a la URL de login
+            return redirect(reverse_lazy('index'))  # Redirige a la URL de login
         return wrapper
     return decorator

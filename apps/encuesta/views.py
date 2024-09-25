@@ -244,8 +244,6 @@ def encuestasPublicas(request):
     else:
         return render(request, 'encuesta/lista_encuestas/encuestasPublicas.html')
 
-@login_super_staff_required
-@validar_permisos_required(permission_required='app_encuesta.view_encuesta')
 def encuestasPrivadas(request):
     encuestas = Encuesta.objects.filter(tipoEncuesta='Privada')
     preguntas_por_encuesta = []

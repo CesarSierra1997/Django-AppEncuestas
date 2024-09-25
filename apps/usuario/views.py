@@ -27,7 +27,7 @@ class Login(FormView):
     @method_decorator(csrf_protect)
     @method_decorator(never_cache)
 
-    #redefinir metodo dispatch() 
+    #redefinir método dispatch() 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             usuario = request.user
