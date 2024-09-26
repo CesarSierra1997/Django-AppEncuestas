@@ -1,53 +1,53 @@
 {% extends "encuestaHome.html" %}
 {% block title %}
-Encuestas Publicas
+Admin publicas
 {% endblock title %}
 {% block encuesta %}
                     
 <h5>Listado de encuestas publicas</h5>
 <p>a continuacion encontrara el listado de encuestas publicas</p>
 
-                    <div class="card card-body" style="background-color: #efefeb ;">
-                    {% if messages %}
-                    <div class="alert alert-success alert-dismissible" role="alert">
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        {% for message in messages %}
-                        {{ message }}
-                        {% endfor %}
-                    </div>
-                    {% endif %}
+<div class="card card-body" style="background-color: #efefeb ;">
+{% if messages %}
+<div class="alert alert-success alert-dismissible" role="alert">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    {% for message in messages %}
+    {{ message }}
+    {% endfor %}
+</div>
+{% endif %}
 
 
-                    <!-- Encuentas publicas --> 
-                    <p><strong>Bienvenido a la App de encuestas</strong> <br>acontinuacion encontrara las encuentas publicas</p>
-                        {% if encuestas %}
-                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3"> <!-- Columnas responsivas -->
-                            {% for encuesta, cantidad_preguntas, cantidad_respuestas in preguntas_por_encuesta %}
-                            <div class="col">
-                                <div id="encuesta" class="card bg-light bg-gradient mt-2 p-2 text-dark">
-                                    <div class="container">
-                                        <p>Titulo - <strong>{{encuesta.titulo.upper}}</strong></p>
-                                        <p><i class="fa-solid fa-file-circle-question"></i> {{ cantidad_preguntas }} Preguntas</p>
-                                    </div>
-                                    <div class="card border border-0">
-                                        <a class="btn btn-success inline-block"
-                                            href="{% url 'responder_encuesta' encuesta.id %}">Responder encuesta <i class="fa-solid fa-reply-all"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        {% elif request.user.is_authenticated %}
-                        <div class="alert alert-danger alert-dismissible" role="alert">
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            <p>No puedes acceder </p>
-                        </div>
-                        {% else %}
-                        <div class="alert alert-danger alert-dismissible" role="alert">
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            <p>No hay encuestas publicas en este momento.</p>
-                        </div>
-                        {% endif %}
-                    </div>
+<!-- Encuentas publicas --> 
+<p><strong>Bienvenido a la App de encuestas</strong> <br>acontinuacion encontrara las encuentas publicas</p>
+    {% if encuestas %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3"> <!-- Columnas responsivas -->
+        {% for encuesta, cantidad_preguntas, cantidad_respuestas in preguntas_por_encuesta %}
+        <div class="col">
+            <div id="encuesta" class="card bg-light bg-gradient mt-2 p-2 text-dark">
+                <div class="container">
+                    <p>Titulo - <strong>{{encuesta.titulo.upper}}</strong></p>
+                    <p><i class="fa-solid fa-file-circle-question"></i> {{ cantidad_preguntas }} Preguntas</p>
+                </div>
+                <div class="card border border-0">
+                    <a class="btn btn-success inline-block"
+                        href="{% url 'responder_encuesta' encuesta.id %}">Responder encuesta <i class="fa-solid fa-reply-all"></i></a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% elif request.user.is_authenticated %}
+    <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <p>No puedes acceder </p>
+    </div>
+    {% else %}
+    <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <p>No hay encuestas publicas en este momento.</p>
+    </div>
+    {% endif %}
+</div>
 
-                {% endblock encuesta %}
+{% endblock encuesta %}

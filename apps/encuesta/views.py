@@ -34,11 +34,6 @@ def obtener_direccion_ip(request):
         ip_address = request.META.get('REMOTE_ADDR', None)
     return ip_address
 
-#INDEX FABRICA DE SOFTWARE 
-# def inicio(request):
-#     ip_address = obtener_direccion_ip(request)
-#     print("su direccion ip: ",ip_address)
-#     return render(request, 'index.html',{'ip_address': ip_address})
 
 #CRUD ENCUESTA
 @login_super_staff_required
@@ -125,7 +120,7 @@ def agregar_pregunta(request, encuesta_id):
     if request.method == 'POST':
         tipo_pregunta = request.POST.get('tipo_pregunta')
         if tipo_pregunta not in ['general', 'select_multiple', 'si_o_no', 'numerica']:
-            messages.error(request, 'Tipo de pregunta no válido')
+            messages.error(request, 'Tipo de pregunta no válido L128')
             return render(request,'pregunta/agregar_pregunta.html',{'encuesta_id':encuesta_id})
 
         if tipo_pregunta == 'select_multiple':
@@ -161,7 +156,7 @@ def agregar_pregunta(request, encuesta_id):
             form = PreguntaFactory.crear_pregunta(tipo_pregunta)
         else:
             form = None
-            messages.error(request, 'Tipo de pregunta no válido')
+            messages.error(request, 'Tipo de pregunta no válido L164')
 
     return render(request, 'pregunta/agregar_pregunta.html', {
         'form': form, 

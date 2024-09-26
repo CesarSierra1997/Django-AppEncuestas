@@ -42,7 +42,7 @@ class Login(FormView):
     
 def logoutUsuario(request):
     logout(request)
-    return HttpResponseRedirect('/accounts/login/')
+    return HttpResponseRedirect('/encuestas/home/')
 
 
 class InicioUsuario(LoginSuperStaffMixin, ValidarPermisosMixin, TemplateView):
