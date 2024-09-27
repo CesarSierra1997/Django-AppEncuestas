@@ -1,0 +1,58 @@
+{% extends "encuestaHome.html" %}
+{% block title %}
+Respuesta Create
+{% endblock title %}
+{% block encuesta %}
+<!-- responder_encuesta.html -->
+
+<body>
+    <h5 class="card-header">Responder encuestas</h5>
+    <div class="card-body text-light">
+        <h6 class="card-header bg-dark bg-gradient">{{ encuesta.titulo }}</h6>
+        <form class="card-body bg-dark bg-gradient mt-1 p-4" method="post">
+            {% csrf_token %}
+            <h6>Datos personales</h6>
+            <hr>
+            <label for="tipoDocumento">Tipo de Documento:</label>
+            <select id="tipoDocumento" name="tipoDocumento" required>
+                <option value="CC">Cédula de Ciudadanía</option>
+                <option value="TI">Tarjeta de Identidad</option>
+                <option value="PASAPORTE">Pasaporte</option>
+                <option value="REGISTRO CIVIL">Registro Civil</option>
+            </select><br><br>
+            <label for="numeroDocumento">Número de Documento:</label>
+            <input type="number" id="numeroDocumento" name="numeroDocumento" required><br><br>
+            <label for="nombre">Nombres y apellidos:</label>
+            <input type="text" id="nombre" name="nombre" pattern="[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]+" title="Solo se permiten letras y espacios en blanco en el campo Nombres y apellidos" required><br><br>
+            <hr>
+            <h6>Preguntas</h6>
+            <hr>
+            {% for pregunta in preguntas %}
+            <h6>{{ pregunta.pregunta.texto_pre }}</h6>
+            {% if pregunta.tipo_pregunta == 'general' %}
+            <input type="text" name="respuesta_general_{{ pregunta.pregunta.id }}" required><br><br>
+            {% elif pregunta.tipo_pregunta == 'select_multiple' %}
+            <select name="respuesta_select_multiple_{{ pregunta.pregunta.id }}">
+                <option value="{{ pregunta.opcion_a }}">{{pregunta.pregunta.opcion_a}}</option>
+                <option value="{{ pregunta.opcion_b }}">{{pregunta.pregunta.opcion_b}}</option>
+                <option value="{{ pregunta.opcion_c }}">{{pregunta.pregunta.opcion_c}}</option>
+                <option value="{{ pregunta.opcion_d }}">{{pregunta.pregunta.opcion_d}}</option>
+            </select><br><br>
+            {% elif pregunta.tipo_pregunta == 'si_o_no' %}
+            <label><input type="radio" name="respuesta_si_o_no_{{ pregunta.pregunta.id }}" value="True" required>
+                Sí</label>
+            <label><input type="radio" name="respuesta_si_o_no_{{ pregunta.pregunta.id }}" value="False" required>
+                No</label><br><br>
+            {% elif pregunta.tipo_pregunta == 'numerica' %}
+            <input type="number" name="respuesta_numerica_{{ pregunta.pregunta.id }}" required><br><br>
+            {% endif %}
+            {% endfor %}
+            <div class="card-footer text-center">
+                <input type="submit" value="Enviar Respuestas" style="width: 50%;" class="btn btn-primary">
+                <a class="btn btn-danger mt-1" style="width: 50%;" href="{% url 'encuestaHome'  %}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+
+</body>
+{% endblock encuesta %}

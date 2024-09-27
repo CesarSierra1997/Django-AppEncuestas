@@ -1,0 +1,21 @@
+
+{% extends "encuestaHome.html" %}
+{% block title %}
+Pregunta custome
+{% endblock title %}
+{% block encuesta %}
+<body>
+    <h5 class="card-header">Editor de encuestas | Editar pregunta</h5>
+    <div class="card card-body bg-light mt-2 p-4">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="btn btn-info" type="submit">Actualizar pregunta</button>
+            <a class="btn btn-danger" href="{% url 'encuesta' encuesta_id  %}">Volver</a>
+        </form>
+        <div id="pregunta-form-container">
+            <!-- Aquí se cargará dinámicamente el segundo formulario -->
+        </div>
+    </div>
+</body>
+{% endblock encuesta %}
