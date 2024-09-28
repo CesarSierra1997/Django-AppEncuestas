@@ -42,18 +42,16 @@ class Login(FormView):
     
 def logoutUsuario(request):
     logout(request)
-    return HttpResponseRedirect('/encuestas/home/')
+    return HttpResponseRedirect('/encuesta/encuestaHome/')
 
 
 class InicioUsuario(LoginSuperStaffMixin, ValidarPermisosMixin, TemplateView):
     permission_required = ('usuario.view_usuario', 'usuario.add_usuario', 'usuario.delete_usuario', 'usuario.change_usuario')
-
     template_name = 'usuario/listar_usuarios.html'
 
 class ListadoUsuario(LoginSuperStaffMixin, ValidarPermisosMixin, ListView):
     model = Usuario
     permission_required = ('usuario.view_usuario', 'usuario.add_usuario', 'usuario.delete_usuario', 'usuario.change_usuario')
-
 
     def get_queryset(self):
         return self.model.objects.filter(is_active=True) 
@@ -83,8 +81,14 @@ class RegistrarUsuario(LoginSuperStaffMixin, ValidarPermisosMixin, CreateView):
                     username = form.cleaned_data.get('username'),
                 )  
                 nuevo_usuario.set_password(form.cleaned_data.get('password1'))
-                nuevo_usuario.save()
-                mensaje = f'¡{self.model.__name__} registrado correctamente!'
+                if nuevo_usuario.rol.rol == 'Administrador':
+                    nuevo_usuario.is_staff = True
+                    nuevo_usuario.is_superuser = True
+                    nuevo_usuario.save()
+                    mensaje = f'¡{self.model.__name__} Administrador registrado correctamente en el sistema!'
+                else:
+                    nuevo_usuario.save()
+                    mensaje = f'¡{self.model.__name__} registrado correctamente!'
                 error = f'no hay error'
                 response = JsonResponse({'mensaje':mensaje, 'error':error})
                 response.status_code = 201
