@@ -3,20 +3,15 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 
 class LoginSuperStaffMixin(object):
-
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            if request.user.is_staff:
+            if request.user.is_staff and request.user.is_superuser:
                 return super().dispatch(request, *args, **kwargs)
+            else: 
+                messages.error(request, 'No tienes permisos para acceder a esta vista.')
+        else: 
+            messages.warning(request, 'Debe iniciar sesión para acceder a esta sección.')
         return redirect('index')
-
-# class LoginSuperUserMixin(object):
-
-#     def dispatch(self, request, *args, **kwargs):
-#         if request.user.is_authenticated:
-#             if request.user.is_superuser:
-#                 return super().dispatch(request, *args, **kwargs)
-#         return redirect('index')
 
 class ValidarPermisosMixin(object):
     permission_required = ''
