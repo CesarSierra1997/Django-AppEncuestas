@@ -2,22 +2,26 @@
 {% block title %}
 Deshabilitar encuesta
 {% endblock title %}
-
 {% block encuesta %}
-<main class="container py-5">
-    <div class="card card-body m-5 ">
-        <div class="card-header bg-secondary">
-            <h4>Confirmación de desactivación de encuesta</h4>
-        </div>
-        <div class="text-center">
-            <form method="POST">
-                {% csrf_token %}
-                <h5>¿Desea cambiar el estado de la encuesta "{{object}}" a inactivo?</h5>
-                <button type="submit" class="btn btn-danger">Desactivar</button>
-                <a class="btn btn-dark" href="{% url 'encuesta:listado_' %}">Cancelar</a>
-            </form>
-        </div>
+
+<div class="card-header p-1">
+    <em class="">Detalle encuesta/<strong>Eliminar encuesta</strong>/</em>
+</div>
+<div class="card bg-light mt-2 p-4">
+    <div class="card-header">
+        <h5>Confirmación de <strong>desactivación</strong> de encuesta</h5>
     </div>
-</main>
+    <div class="text-center card card-body">
+        <form method="POST">
+            {% csrf_token %}
+            <h4>Encuesta activa</h4>
+            <h5>¿Desea cambiar el estado de la encuesta "{{object.titulo}}" a <strong class="text-danger">inactivo</strong>?</h5>
+            <div class="card-btn">
+                <button type="submit" class="btn btn-danger bg-gradient">Desactivar</button>
+                <a class="btn btn-dark bg-gradient" href="{% url 'encuesta:encuesta_detail' object.id %}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
 
 {% endblock encuesta %}
