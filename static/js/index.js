@@ -1,5 +1,6 @@
 var $ = jQuery.noConflict();
 function listarUsuarios() {
+    $('#loading').show();
     $.ajax({
         url: "/usuario/listar_usuarios/",
         type: "get",
@@ -15,22 +16,22 @@ function listarUsuarios() {
             } else {
                 $('#agregar_usuario').show();  // Mostrar botón si hay usuarios
             }
-            for (let i=0; i<response.length; i++){
+            for (let i = 0; i < response.length; i++) {
                 let fila = '<tr>';
-                fila += '<td>' + (i+1) + '</td>';
+                fila += '<td>' + (i + 1) + '</td>';
                 fila += '<td>' + response[i]["fields"]['username'] + '</td>';
                 fila += '<td>' + response[i]["fields"]['nombres'] + '</td>';
                 fila += '<td>' + response[i]["fields"]['apellidos'] + '</td>';
                 fila += '<td>' + response[i]["fields"]['email'] + '</td>';
-                if (response[i]["fields"]['rol'] == 1){
+                if (response[i]["fields"]['rol'] == 1) {
                     fila += '<td>Admin</td>';
-                }else{
+                } else {
                     fila += '<td>Usuario</td>';
                 }
                 fila += '<td>' + '<button class="btn btn-outline-info btn-sm tableButtom"';
-                fila +=  'onclick ="abrir_modal_edicion(\'/usuario/editar_usuario/'+response[i]['pk']+'/\')" ><i class="fa-solid fa-user-pen"></i></button>'
-                fila +=  '<button class="btn btn-outline-danger btn-sm mx-1"';
-                fila +=  'onclick ="abrir_modal_eliminacion(\'/usuario/eliminar_usuario/'+response[i]['pk']+'/\')" ><i class="fa-solid fa-trash-can mx-1"></i></button>' + '</td>';
+                fila += 'onclick ="abrir_modal_edicion(\'/usuario/editar_usuario/' + response[i]['pk'] + '/\')" ><i class="fa-solid fa-user-pen"></i></button>'
+                fila += '<button class="btn btn-outline-danger btn-sm mx-1"';
+                fila += 'onclick ="abrir_modal_eliminacion(\'/usuario/eliminar_usuario/' + response[i]['pk'] + '/\')" ><i class="fa-solid fa-trash-can mx-1"></i></button>' + '</td>';
                 fila += '</tr>';
                 $('#tabla_usuarios').append(fila);
             }
@@ -58,25 +59,31 @@ function listarUsuarios() {
                     },
                 },
             });
+            // Ocultar el GIF de carga y mostrar la tabla
+            $('#loading').hide();
+            $('#tabla_usuarios').show();
         },
         error: function (error) {
             console.log(error);
+            // Ocultar el GIF de carga incluso en caso de error
+            $('#loading').hide();
+            $('#tabla_usuarios').show();
         }
     });
 }
 
-function registrar(){
+function registrar() {
     activarBotonCreacion();
     $.ajax({
         data: $('#form_creacion').serialize(),
         url: $('#form_creacion').attr('action'),
         type: $('#form_creacion').attr('method'),
-        success: function (response){
+        success: function (response) {
             notificacionSuccess(response.mensaje);
             listarUsuarios();
             cerrar_modal_creacion();
         },
-        error: function(error){
+        error: function (error) {
             notificacionError(error.responseJSON.mensaje);
             mostrarErroresCreacion(error);
             activarBotonCreacion();
@@ -84,18 +91,18 @@ function registrar(){
     });
 }
 
-function editar(){
+function editar() {
     activarBotonEdicion();
     $.ajax({
         data: $('#form_edicion').serialize(),
         url: $('#form_edicion').attr('action'),
         type: $('#form_edicion').attr('method'),
-        success: function (response){
+        success: function (response) {
             notificacionSuccess(response.mensaje);
             listarUsuarios();
             cerrar_modal_edicion();
         },
-        error: function(error){
+        error: function (error) {
             notificacionError(error.responseJSON.mensaje);
             mostrarErroresEdicion(error);
             activarBotonEdicion();
@@ -103,20 +110,20 @@ function editar(){
     });
 }
 
-function eliminar(pk){
+function eliminar(pk) {
     $.ajax({
         data: {
             csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']").val()
         },
-        url: '/usuario/eliminar_usuario/'+pk+'/',
+        url: '/usuario/eliminar_usuario/' + pk + '/',
         type: 'post',
-        success: function (response){
+        success: function (response) {
             notificacionSuccess(response.mensaje);
             listarUsuarios();
             cerrar_modal_eliminacion();
-            console.log("menjsae del servidor",response);
+            console.log("menjsae del servidor", response);
         },
-        error: function(error){
+        error: function (error) {
             notificacionError(error.responseJSON.mensaje);
             console.log(error);
 
