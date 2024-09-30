@@ -21,6 +21,7 @@ Listado de Usuarios
         <button  id="agregar_usuario" class="btn" style="display: none;"
         onclick="abrir_modal_creacion('{% url 'usuario:registrar_usuario' %}')"><i class="fa-solid fa-user-plus"></i> Agregar usuario</button>
     <div class="talbe-stats order-table ov-h mt-2">
+
         <table id="tabla_usuarios" class="table table-striped table-bordered">
             <thead>
                 <tr>
@@ -34,8 +35,16 @@ Listado de Usuarios
                 </tr>
             </thead>
             <tbody>
+
             </tbody>
         </table>
+        <div id="loading" style="display: none;" class="text-center">
+            <img src="{% static 'img/load_gif.gif' %}" width="80" height="80" style="" frameBorder="0" class="giphy-embed text-center" ></iframe>
+            <div class="row text-center">
+                <p>Cargando datos, por favor espere...</p>
+                <img style="width: 25%; margin: auto; margin-top: -10px;"  src="{% static 'img/hm52.png' %}" />
+            </div>
+        </div>
     </div>
     <div class="modal fade" id="creacion" role="dialog">
     </div>
