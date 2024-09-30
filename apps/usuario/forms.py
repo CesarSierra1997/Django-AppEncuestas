@@ -82,8 +82,8 @@ class FormularioUsuario(forms.ModelForm):
     def clean_numeroDocumento(self):
         numeroDoc = self.cleaned_data["numeroDocumento"]
         numeroDoc_str = str(numeroDoc)
-        if len(str(numeroDoc_str)) < 11:
-            raise ValidationError(_('El número de documento debe tener al menos 11 caracteres.'))
+        if len(str(numeroDoc_str)) < 8:
+            raise ValidationError(_('El número de documento debe tener al menos 8 caracteres.'))
         if not numeroDoc_str.isdigit():
             raise ValidationError(_('El número de documento debe ser un número entero.'))
         return numeroDoc_str
@@ -158,7 +158,7 @@ class FormularioUsuario(forms.ModelForm):
             user.save()
         return user
     
-# Formulario para actualizar ciertos datos de un usuario registrado
+# Formulario para actualizar ciertos datos de un usuario registrado PERFIL: correo, contraseña
 # class FormularioUpdateUsuario(forms.ModelForm):
 #     class Meta:
 #         model = Usuario

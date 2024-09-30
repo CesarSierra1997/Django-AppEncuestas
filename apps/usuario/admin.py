@@ -15,7 +15,6 @@ class RolAdmin(ImportExportModelAdmin, admin.ModelAdmin):
     class Meta:
         model = Rol
 
-
 class UsuarioAdmin(admin.ModelAdmin):
 
     search_fields = ('nombres','apellidos','rol__rol')
@@ -43,5 +42,5 @@ class UsuarioAdmin(admin.ModelAdmin):
 admin.site.register(Usuario, UsuarioAdmin),
 admin.site.register(Rol, RolAdmin),
 admin.site.register(Permission),
-admin.site.register(ContentType),
+# admin.site.register(ContentType),
 
