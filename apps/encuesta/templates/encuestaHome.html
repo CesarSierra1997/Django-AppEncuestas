@@ -4,10 +4,7 @@ Encuesta Home
 {% endblock title %}
 {% block body %}
 
-{% block style %}
 {% load static %}
-<link rel="stylesheet" href="{% static 'css/style_home.css' %}">
-{% endblock style %}
 
 {% block extrajs %}
 <script src="{% static 'js/index.js' %}"> </script>
@@ -53,22 +50,19 @@ Encuesta Home
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa-regular fa-folder-open"></i> Modulo de Encuestas
+                                        <i class="fa-solid fa-rectangle-list"></i> Modulo de Encuestas
                                     </a>
                                     <ul class="dropdown-menu" style="background-color: #efefeb ;"
                                         aria-labelledby="navbarDropdown">
-                                        <li><a class="text-success dropdown-item" href="{% url 'encuesta:crear_encuesta' %}"><i
-                                                    class="fa-solid fa-file-circle-plus"></i> Crear encuesta</a></li>
                                         <li>
-                                            <ul>                                            
-                                                <a class="text-success dropdown-item" href="{% url 'encuesta:listado_encuestas' %}"><i class="fa-solid fa-unlock-keyhole"></i> Encuestas home</a>
-                                            </ul>
-                                        </li>
+                                            <a class="text-success dropdown-item" href="{% url 'encuesta:inicio_encuestas' %}"><i class="fa-solid fa-house-chimney"></i> Inicio encuestas</a>
+
+                                            <a class="text-success dropdown-item" href="{% url 'encuesta:crear_encuesta' %}"><i
+                                                class="fa-solid fa-file-circle-plus"></i> Crear encuesta</a></li>
                                         <li>
                                             <hr class="text-success dropdown-divider">
                                         </li>
-                                        <li><a class="text-success dropdown-item" href=""><i
-                                                    class="fa-solid fa-file-export"></i> Lista de Respuestas</a>
+                                        <li><a class="text-success dropdown-item" href=""><i class="fa-solid fa-clipboard-question"></i> Respuestas</a>
                                         </li>
                                     </ul>
                                 </li>
