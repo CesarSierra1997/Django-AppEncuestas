@@ -100,7 +100,8 @@
 <!-- App -->
 <section style="max-width: 945px; margin: auto;">
 {% block body %}
-    <div class="container card-body card mt-2">
+    <div class="mt-2">
+        <hr>
         <h3>Bienvenidos al observatorio de tendencias Home 52</h3>
         
         <p>Aca podrás encontrar un sitio web con aun listado de encuestas publicas,  las cuales podras responder alguna si te llama la atención. s responder nuestras encuestas publicas o solicitar un usuario para responder nuestras encuestas privadas</p>
@@ -115,20 +116,6 @@
     </div>
 {% endblock body %}
 
-        {% comment %} MSJ PERMISOS {% endcomment %}
-        <!-- <script>
-            {% if messages %}
-                var html_mensaje = ''
-                {% for mensaje in messages %}
-                    html_mensaje += '{{mensaje}}';
-                {% endfor %}
-                {% if mensaje == mensaje.error %}
-                    notificacionError(html_mensaje);
-                {% elif mensaje == mensaje.warning %}
-                    notificacionWarning(html_mensaje);
-                {% endif %}
-            {% endif %}
-        </script> -->
         <script>
             {% if messages %}
                 var html_mensaje = '';
