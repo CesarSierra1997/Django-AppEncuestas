@@ -133,5 +133,8 @@ function eliminar(pk) {
 }
 
 $(document).ready(function () {
-    listarUsuarios();
+    if (window.location.pathname === '/usuario/inicio_usuarios/') {
+        listarUsuarios();
+    }
 });
+
