@@ -3,7 +3,6 @@ from django.utils import timezone
 from .models import *
 
 class EncuestaForm(forms.ModelForm):
-
     class Meta:
         model = Encuesta
         fields = ['titulo', 'tipoEncuesta', 'fechaInicio', 'fechaFinal', 'estado']
@@ -19,6 +18,7 @@ class EncuestaForm(forms.ModelForm):
             'tipoEncuesta': forms.Select(attrs={'class': 'form-control'}),
             'fechaInicio': forms.SelectDateWidget(attrs={'class': 'form-control'}),
             'fechaFinal': forms.SelectDateWidget(attrs={'class': 'form-control'}),
+            'estado': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
     def clean(self):
@@ -26,11 +26,41 @@ class EncuestaForm(forms.ModelForm):
         fecha_inicio = cleaned_data.get('fechaInicio')
         fecha_final = cleaned_data.get('fechaFinal')
 
-        # Validar que la fecha de inicio es anterior a la fecha final
         if fecha_inicio and fecha_final and fecha_inicio >= fecha_final:
             raise forms.ValidationError("La fecha de finalización debe ser posterior a la de incio.")
-
         return cleaned_data
+    
+class ActualizarEncuestaForm(forms.ModelForm):
+    class Meta:
+        model = Encuesta
+        fields = ['fechaInicio', 'fechaFinal', 'estado']
+        labels = {
+            'fechaInicio': 'Fecha de inicio',
+            'fechaFinal': 'Fecha de finalización',
+            'estado': '¿Encuesta activada?',
+        }
+        widgets = {
+            'fechaInicio': forms.SelectDateWidget(attrs={'class': 'form-control'}),
+            'fechaFinal': forms.SelectDateWidget(attrs={'class': 'form-control'}),
+            'estado': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        fecha_inicio = cleaned_data.get('fechaInicio')
+        fecha_final = cleaned_data.get('fechaFinal')
+
+        if fecha_inicio and fecha_final and fecha_inicio >= fecha_final:
+            raise forms.ValidationError("La fecha de finalización debe ser posterior a la de incio.")
+        return cleaned_data
+    
+    def clean_titulo_data(self):
+        titulo = self.cleaned_data.get('titulo')
+        # Validar que el título no contenga caracteres especiales
+        if not titulo.replace(" ", "").isalpha():
+            raise forms.ValidationError("El título solo puede contener letras.")
+        return titulo.lower()
+
     
 
 # class EncuestaModificarForm(forms.ModelForm):
@@ -60,10 +90,13 @@ class PreguntaForm(forms.ModelForm):
             raise forms.ValidationError("El texto de la pregunta debe tener al menos 10 caracteres.")
         return texto_pregunta
     
-    # def clean_tipoPregunta(self):
-    #     cleaned_data = super().clean()
-    #     tipoPregunta = cleaned_data.get('tipoPregunta')
-    #     # Validar que la pregunta sea de tipo selección múltiple
-    #     if tipoPregunta!= '4':
-    #         raise forms.ValidationError("La pregunta debe ser de tipo selección múltiple.")
-    #     return tipoPregunta
+class OpcionPreguntaForm(forms.Form):
+    class Meta:
+        model = OpcionesPregunta
+        fields = ['oncion_1', 'oncion_2', 'oncion_3', 'oncion_4']
+        labels = {
+            'texto_opcion': 'Ingrese la opción',
+        }
+        widgets = {
+            'texto_opcion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese la opción'}),
+        }
