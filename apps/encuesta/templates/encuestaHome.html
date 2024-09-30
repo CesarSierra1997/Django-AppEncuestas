@@ -14,19 +14,24 @@ Encuesta Home
 {% endblock extrajs %}
 
 <body>
-    <div class="mt-2">
+    
+    {% block nav %}
+        
+    {% endblock nav %}
+        
+    <div class="mt-2" >
         {% if not request.user.is_authenticated %}
         <nav class="navbar border border-light-10 fixed-strat " style="background-color: #4b4b4bc9;">
             <div class="container-fluid justify-content-start">
-                <a class="navbar-brand text-white" href="{% url 'encuestaHome' %}"><img style="width: 5%;" class="img" src="{% static 'img/hm52.png' %}" alt="Imagen de encuestas">
+                <a class="navbar-brand text-white" href="{% url 'encuesta:encuestaHome' %}"><img style="width: 5%;" class="img" src="{% static 'img/hm52.png' %}" alt="Imagen de encuestas">
                 <strong> Encuestas Home 52</strong></a>
                 {% else %}
                 <nav style="background-color: #007C75; border-top-right-radius: 10px; border-top-left-radius: 10px;"
                     class="navbar navbar-light fixed-strat">
                     <div class="container-fluid justify-content-start">
-                        <a class="navbar-brand" href="{% url 'encuestaHome' %}">
+                        <a class="navbar-brand" href="{% url 'encuesta:encuestaHome' %}">
                         </a>
-                        <a class="navbar-brand text-white" href="{% url 'encuestaHome' %}"><img style="width: 5%;" class="img" src="{% static 'img/hm52.png' %}" alt="Imagen de encuestas">
+                        <a class="navbar-brand text-white" href="{% url 'encuesta:encuestaHome' %}"><img style="width: 5%;" class="img" src="{% static 'img/hm52.png' %}" alt="Imagen de encuestas">
                             <strong>Fabrica de Encuestas</strong></a>
                         {% endif %}
                         {% if request.user.is_authenticated %}
@@ -38,7 +43,7 @@ Encuesta Home
                             <span class="navbar-toggler-icon"></span>
                         </button>
 
-                        <form class="d-flex" style="margin-left: 10px;" method="GET" action="{% url 'buscar' %}">
+                        <form class="d-flex" style="margin-left: 10px;" method="GET" action="">
                             <input class="form-control me-2 bg-light" type="search" name="q"
                                 placeholder="Buscar en encuestas" aria-label="Search">
                             <button class="btn btn-outline-dark " type="submit">Buscar</button>
@@ -52,19 +57,17 @@ Encuesta Home
                                     </a>
                                     <ul class="dropdown-menu" style="background-color: #efefeb ;"
                                         aria-labelledby="navbarDropdown">
-                                        <li><a class="text-success dropdown-item" href="{% url 'crear_encuesta' %}"><i
+                                        <li><a class="text-success dropdown-item" href="{% url 'encuesta:crear_encuesta' %}"><i
                                                     class="fa-solid fa-file-circle-plus"></i> Crear encuesta</a></li>
                                         <li>
                                             <ul>                                            
-                                                <a class="text-success dropdown-item" href="{% url 'encuestasPublicas' %}"><i class="fa-solid fa-unlock-keyhole"></i> Encuestas publicas</a>
-                                                <a class="text-success dropdown-item" href="{% url 'encuestasPrivadas' %}"><i class="fa-solid fa-lock"></i>
-                                                Encuestas privadas</a>
+                                                <a class="text-success dropdown-item" href="{% url 'encuesta:listado_encuestas' %}"><i class="fa-solid fa-unlock-keyhole"></i> Encuestas home</a>
                                             </ul>
                                         </li>
                                         <li>
                                             <hr class="text-success dropdown-divider">
                                         </li>
-                                        <li><a class="text-success dropdown-item" href="{% url 'ver_respuestas' %}"><i
+                                        <li><a class="text-success dropdown-item" href=""><i
                                                     class="fa-solid fa-file-export"></i> Lista de Respuestas</a>
                                         </li>
                                     </ul>
@@ -75,7 +78,7 @@ Encuesta Home
                         <div class="collapse navbar-collapse" id="navbarSupportedContent">
                             <ul class="navbar-nav me-auto mb-lg-0">
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link text-white" href="{% url  'usuario:listar_usuarios'%}" id="" role=""
+                                    <a class="nav-link text-white" href="{% url 'usuario:inicio_usuarios' %}" id="" role=""
                                         data-bs-toggle="" aria-expanded="false">
                                         <i class="fa-solid fa-users-rectangle"></i> Modulo de Usuarios
                                     </a>
@@ -148,12 +151,12 @@ Encuesta Home
                         </div>
                             {% if request.user.is_authenticated %}
                             
-                            <a class="btn" style="background-color: #FF7411; width: 300px" href="{% url 'encuestasPrivadas' %}">Encuestas
+                            <a class="btn" style="background-color: #FF7411; width: 300px" href="">Encuestas
                                 Privadas</a>
                             <p>haz click para ir a las encuestas privadas</p>   
                             {% else %}
                             <a class="btn " style="background-color: #007C75 ; width: 300px"
-                            href="{% url 'encuestasPublicas' %}">Encuestas Publicas</a>
+                            href="">Encuestas Publicas</a>
                             <p>haz click para ir las encuestas publicas</p>
                             <a class="btn" style="background-color: #FF7411; width: 300px" href="{% url 'login' %}">Encuestas
                                 Privadas</a>
