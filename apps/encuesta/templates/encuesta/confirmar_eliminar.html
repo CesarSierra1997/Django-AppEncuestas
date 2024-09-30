@@ -1,0 +1,23 @@
+{% extends "encuestaHome.html" %}
+{% block title %}
+Deshabilitar encuesta
+{% endblock title %}
+
+{% block encuesta %}
+<main class="container py-5">
+    <div class="card card-body m-5 ">
+        <div class="card-header bg-secondary">
+            <h4>Confirmación de desactivación de encuesta</h4>
+        </div>
+        <div class="text-center">
+            <form method="POST">
+                {% csrf_token %}
+                <h5>¿Desea cambiar el estado de la encuesta "{{object}}" a inactivo?</h5>
+                <button type="submit" class="btn btn-danger">Desactivar</button>
+                <a class="btn btn-dark" href="{% url 'encuesta:listado_' %}">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</main>
+
+{% endblock encuesta %}
