@@ -9,7 +9,7 @@ Encuesta Edit
             {% csrf_token %}
             {{ form.as_p }}
         <button  class="btn btn-primary" style="width: 100%;" type="submit">Actualizar</button>
-        <a class="btn btn-danger mt-1" style="width: 100%;" href="{% url 'encuestaHome'  %}" style="flex: 1; margin-left: 5px; margin-right: 5px;">
+        <a class="btn btn-danger mt-1" style="width: 100%;" href="{% url 'encuesta:listado_encuestas'  %}" style="flex: 1; margin-left: 5px; margin-right: 5px;">
             Cancelar
         </a>
        </form>
