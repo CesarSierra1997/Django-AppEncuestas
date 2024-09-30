@@ -1,92 +1,87 @@
 {% extends "encuestaHome.html" %}
 {% block title %}
-Encuesta Custom
+Admin publicas
 {% endblock title %}
 {% block encuesta %}
-<h5 class="card-header">Editor de Encuestas</h5>
-<div class="card-body mt-2 bg-light bg-gradient"> 
-    <div class="card-body card bg-dark bg-gradient border-solid text-light">
-        {% if messages %}
-        <div>
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                {{ message }}
+                    
+<h5>Listado de encuestas publicas</h5>
+<p>a continuacion encontrara el listado de encuestas publicas</p>
+
+<div class="card card-body" style="background-color: #efefeb ;">
+
+    {% if messages %}
+    <div class="alert alert-success alert-dismissible" role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+
+<!-- Encuentas publicas --> 
+<p><strong>Bienvenido a la App de encuestas</strong> <br>acontinuacion encontrara las encuentas publicas</p>
+    {% if encuestas %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3"> <!-- Columnas responsivas -->
+        {% for encuesta in encuestas %}
+        <div class="col">
+            <div id="encuesta" class="card bg-light bg-gradient mt-2 p-2 text-dark">
+                <div class="container">
+                    <p>Titulo - <strong>{{encuesta.titulo.upper}}</strong></p>
+                    <p><i class="fa-solid fa-file-circle-question"></i> {{ cantidad_preguntas }} Preguntas</p>
+                </div>
+                <div class="card border border-0">
+                    <a class="btn btn-success inline-block"
+                        href="}">Responder encuesta <i class="fa-solid fa-reply-all"></i></a>
+                </div>
             </div>
-            {% endfor %}
         </div>
-        {% endif %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <p>No hay encuestas publicas en este momento.</p>
+    </div>
+    {% endif %}
+
+    {% if encuestas %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3"> 
         
-        <h5>Editar encuesta || {{ encuesta.titulo }} <a href="{% url 'editar_encuesta' encuesta.id %}"><i class="text-primary fa-solid fa-pen-to-square"></i></a></h5>
-        <h6>Preguntas:</h6>
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3"> <!-- Columnas responsivas -->
-                {% if preguntas %}
-                {% for tipo, pregunta in preguntas %}
-                <div class="col d-flex">
-                    <div id="pregunta" style="box-shadow: rgb(0, 0, 0) 1px 1px 3px; border-bottom-left-radius: 30px; border-top-right-radius: 30px;" class="card bg-dark mt-2 p-2">
-                        <div class="container">
-                            <h6><strong>{{ pregunta.texto_pre }}</strong></h6>
-                            <!-- Opciones de las preguntas -->
-                            {% if tipo == "select_multiple" %}
-                            <p>opciones de seleccion multiple:</p>
-                            <ul>
-                                {{opcion}}
-                                {% for opcion in pregunta.opcionpreguntageneral_set %}
-                                <p>X) {{ opcion}}</p>
-                                    
-                                {% endfor %}
-                                    
-                                <p>b) {{ pregunta.opcion_b }}</p>
-                                <p>c) {{ pregunta.opcion_c }}</p>
-                                <p>d) {{ pregunta.opcion_d }}</p>
-                            </ul>
-                            {% elif tipo == "si_o_no" %}
-                            <ul>
-                                <p>opcion de respuesta: {{pregunta.opcion}}</p>
-                            </ul>
-                            {% elif tipo == "numerica" %}
-                            <ul>
-                                <p>rango de respuesta, [1-{{pregunta.rango}}]</p>
-                            </ul>
-                            {% else %}
-                            <ul>
-                                <p>opcion de respuesta abierta</p>
-                            </ul>
-                            {% endif %}
-                            <em>
-                                <p>pregunta tipo {{ tipo }} | id {{pregunta.id}} </p>
-                            </em>
-                            <div class="card-footer "> 
-                                <a class="btn btn-info mt-2" href="{% url 'editar_pregunta' encuesta_id=encuesta.id pregunta_id=pregunta.id %}?type={{ tipo }}"><i class="fa-solid fa-pen-to-square"></i></a>
-                                <a class="btn btn-danger mt-2" href="{% url 'eliminar_pregunta' encuesta_id=encuesta.id pregunta_id=pregunta.id %}?type={{ tipo }}"><i class="fa-solid fa-trash"></i></a>
-                            </div>
-                        </div>
+        {% for encuesta in encuestas %}
+            {% comment %} {% if encuesta.estado %} {% endcomment %}
+            <div class="col">
+                <div id="encuesta" class="card bg-dark bg-gradient mt-2 p-2 text-light">
+                    <div class="container">
+                        <p>Titulo encuesta <strong>{{encuesta.titulo.upper}}</strong></p><em class="text-info position-absolute top-0 end-0">{{encuesta.id}}<i class="fa-solid fa-file mx-2"></i></em>
+                        <ul>
+                            <li>Tipo <strong>{{ encuesta.tipoEncuesta }}</strong> </li>
+                            <li>Estado <strong>{{ encuesta.estado }}</strong> </li>
+                            <li>Cantidad de preguntas <strong></strong> </li>
+                        </ul>
+                    </div>                                        
+                    <div class="position-relative">
+                        {% if cantidad_respuestas == 0 %}
+                        <em class="text-danger position-absolute top-0 end-0"> respuestas</em>
+                        {% else %}
+                        <em class="text-info position-absolute top-0 end-0"> respuestas <i class="fa-solid fa-bell"></i> </em>
+                        {% endif %}
+                    </div>
+                    <hr class="bg-light mt-4">
+                    <div class="card border border-0">
+                        <a class="btn btn-primary" href="{% url 'encuesta:encuesta_detail' encuesta.id %}"><i class="fa-solid fa-file-pen"></i></i> Editar encuesta</a>
                     </div>
                 </div>
-                {% endfor %}
-                {% else %}
-                <div class="card-body alert alert-warning alert-dismissible mt-2" style="margin-inline: 12px;" role="alert">
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    <p>No hay perguntas en esta encuesta!.</p>
-                </div>
-                {% endif %}
             </div>
-        <a class="btn btn-primary mt-4" href="{% url 'agregar_pregunta' encuesta.id %}">Agregar Pregunta</a>
-        <hr>
-        <div style="display: flex;">
-            <a class="btn btn-success" href="{% url 'responder_encuesta' encuesta.id %}"
-                style="flex: 2; margin-right: 5px;">
-                Responder Encuesta
-            </a>
-            <form style="flex: 1;" action="{% url 'eliminar_encuesta' encuesta.id %}" method="post">
-                {% csrf_token %}
-                <button class="btn btn-danger" style="width: 100%;">
-                    Eliminar encuesta
-                </button>
-            </form>
-        </div>
+            {% comment %} {% endif %} {% endcomment %}
+        {% endfor %}
     </div>
-
+    {% else %}
+    <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <p>No hay encuestas creadas en el sistema, comuniquese con el administrador</p>
+    </div>
+    {% endif %}
 </div>
 
 {% endblock encuesta %}
