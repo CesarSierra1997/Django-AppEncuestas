@@ -1,17 +1,36 @@
 {% extends "encuestaHome.html" %}
 {% block title %}
-Encuesta Create
+Crear encuesta
 {% endblock title %}
 {% block encuesta %}
-    <h5 class="card-header">Crear Encuesta</h5>
-    <div style="display: flex;" class="card card-body bg-light mt-2 p-4">
-        <form style="flex: 1;"  method="POST">
+<!-- crear_encuesta.html -->
+{% load static %}
+    <div class="card card-body bg-light mt-2 p-4">    
+        <h1>Crear Encuesta</h1>
+        <form method="post">
+            <!-- {% if form.non_field_errors %}
+            <div class="alert alert-danger alert-dismissible">
+                <div class=""><strong>Errores generales:</strong>  
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <ul>
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %} -->
             {% csrf_token %}
-            {{ form.as_p }}
-        <button  class="btn btn-primary" style="width: 100%;" type="submit">Guardar</button>
-        <a class="btn btn-danger mt-1" style="width: 100%;" href="{% url 'encuestaHome'  %}" style="flex: 1; margin-left: 5px; margin-right: 5px;">
-            Cancelar
-        </a>
-       </form>
+            <div class="mb-3">
+                {{ form.as_p }}
+            </div>
+            <button  class="btn btn-primary" style="width: 100%;" type="submit">Guardar</button>
+            <a class="btn btn-danger mt-1" style="width: 100%;" href="{% url 'encuesta:encuestaHome'  %}" style="flex: 1; margin-left: 5px; margin-right: 5px;">
+                Cancelar
+            </a>
+            
+        </form>
     </div>
 {% endblock encuesta %}
+
+
