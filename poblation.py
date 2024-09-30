@@ -17,7 +17,7 @@ def generate_usuario(num_users):
         # Intenta obtener una instancia del rol
         try:
             # Cambia el número a uno que exista en tu base de datos
-            rol_instance = Rol.objects.get(id=1)  # Reemplaza 1 con el ID que desees
+            rol_instance = Rol.objects.get(id=2)  # Reemplaza 1 con el ID que desees
         except Rol.DoesNotExist:
             print("El rol no existe. Asegúrate de tener roles en la base de datos.")
             continue  # Continúa con el siguiente usuario si el rol no existe
