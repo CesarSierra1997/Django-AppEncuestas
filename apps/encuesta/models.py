@@ -5,7 +5,7 @@ from apps.usuario.models import Usuario
 
 # ENCUESTA
 class Encuesta(models.Model):
-    titulo = models.CharField('Título de la encuesta', max_length=50, blank=False, null=False)
+    titulo = models.CharField('Título', max_length=50, blank=False, null=False)
     TIPO_ENCUESTA = [
         ('Publica', 'Encuesta pública'),
         ('Privada', 'Encuesta privada'),
@@ -14,9 +14,13 @@ class Encuesta(models.Model):
     administrador = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     fechaInicio = models.DateTimeField(null=False)
     fechaFinal = models.DateTimeField(null=True)
-    fechaCreacion = models.DateTimeField(auto_now_add=True)
+    fechaCreacion = models.DateTimeField('Fecha de creación',auto_now_add=True)
     fechaModificacion = models.DateTimeField(auto_now_add=False, null=True)
-    estado = models.BooleanField('Estado de la encuesta', default=True)
+    estado = models.BooleanField('Estado', default=True)
+
+    def __str__ (self):
+        return f'{self.titulo} - tipo {self.tipoEncuesta}'
+
 
 # PREGUNTA
 class Pregunta(models.Model):
@@ -26,20 +30,24 @@ class Pregunta(models.Model):
         ('3', 'Pregunta numérica'),
         ('4', 'Pregunta tipo selección múltiple'),
     ]
-    tipoPregunta = models.CharField('Seleccione el tipo de pregunta', max_length=30, choices=TIPO_PREGUNTA_CHOICES)
-    texto_pregunta = models.CharField('Digite la pregunta', max_length=200, blank=False, null=False)
+    tipoPregunta = models.CharField('Tipo de pregunta', max_length=30, choices=TIPO_PREGUNTA_CHOICES)
+    texto_pregunta = models.CharField('Pregunta', max_length=200, blank=False, null=False)
     encuesta = models.ForeignKey(Encuesta, on_delete=models.CASCADE)
 
-    # def tiene_opciones(self):
-    #     """Verifica que las preguntas de selección múltiple tengan opciones."""
-    #     if self.tipoPregunta == '4':
-    #         return self.opciones.all().exists()
-    #     return True
+    def __str__(self):
+        return self.texto_pregunta
 
 # OPCION DE PREGUNTA
-class OpcionPregunta(models.Model):
-    texto_opcion = models.CharField('Digite la opción', max_length=100, blank=False, null=False)
+class OpcionesPregunta(models.Model):
+    opcion_1 = models.CharField('Opción 1', max_length=50, blank=False, null=False)
+    opcion_2 = models.CharField('Opción 2', max_length=50, blank=False, null=False)
+    opcion_3 = models.CharField('Opción 3', max_length=50, blank=False, null=False)
+    opcion_4 = models.CharField('Opción 4', max_length=50, blank=False, null=False)
     pregunta = models.ForeignKey(Pregunta, on_delete=models.CASCADE, related_name="opciones")
+
+    def __str__(self):
+        return f"Opciones para la pregunta: {self.pregunta.texto_pregunta}"
+
 
 # RESPUESTA ENCUESTA PÚBLICA
 class RespuestaEncuestaPublica(models.Model):
