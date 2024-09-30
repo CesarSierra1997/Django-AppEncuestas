@@ -3,45 +3,63 @@
 Encuesta detalle
 {% endblock title %}
 {% block encuesta %}
-<h5 class="card-header">Encuesta detalle | Preguntas </h5>
-    <div class="card-body card bg-light bg-gradient border-solid text-dark">
-        {% if messages %}
-        <div>
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                {{ message }}
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
+
+<div class="card-header p-1">
+    <em class="">Detalle encuesta/preguntas/</em>
+</div>
+<div class="card-body card bg-light bg-gradient border-solid text-dark mt-2">
+{% if messages %}
+<div>
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
         
     {% if encuesta.estado %}
-    <h5>Editar encuesta || {{ encuesta.titulo }} <a href="{% url 'encuesta:editar_encuesta' encuesta.id %}"><i class="text-primary fa-solid fa-pen-to-square"></i></a></h5>
+    <h5>Detalle de encuesta {{ encuesta.titulo }} <a href="{% url 'encuesta:editar_encuesta' encuesta.id %}"><i class="text-primary fa-solid fa-pen-to-square"></i></a></h5>
     <h6>Preguntas:</h6>
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3"> <!-- Columnas responsivas -->
-            {% if preguntas %}
-            {% for tipo, pregunta in preguntas %}
-            <div class="col d-flex">
-                <div id="pregunta" style="box-shadow: rgb(0, 0, 0) 1px 1px 3px; border-bottom-left-radius: 30px; border-top-right-radius: 30px;" class="card bg-dark">
-                    <div class="container">
-                       
-                        <div class="card-footer "> 
-                            <a class="btn btn-info mt-2" href=""><i class="fa-solid fa-pen-to-square"></i></a>
-                            <a class="btn btn-danger mt-2" href=""><i class="fa-solid fa-trash"></i></a>
-                        </div>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3"> <!-- Columnas responsivas -->
+        {% if preguntas_con_opciones %}
+        {% for pregunta_con_opciones in preguntas_con_opciones %}
+        <div class="col d-flex">
+            <div id="pregunta" class="card mt-2 p-2">
+                <div class="container">
+                    <!-- Mostrar el tipo de pregunta y el texto -->
+                    {{ pregunta_con_opciones.pregunta.get_tipoPregunta_display }}
+                    <br>
+                    {{ pregunta_con_opciones.pregunta.texto_pregunta }}
+                    
+                    <!-- Mostrar opciones si es selección múltiple -->
+                    {% if pregunta_con_opciones.pregunta.tipoPregunta == '4' and pregunta_con_opciones.opciones %}
+                        <ul>
+                            <P><strong>A.</strong> {{ pregunta_con_opciones.opciones.opcion_1 }}</P>
+                            <P><strong>B.</strong> {{ pregunta_con_opciones.opciones.opcion_2 }}</P>
+                            <P><strong>C.</strong> {{ pregunta_con_opciones.opciones.opcion_3 }}</P>
+                            <P><strong>D.</strong> {{ pregunta_con_opciones.opciones.opcion_4 }}</P>
+                        </ul>
+                    {% endif %}
+                    
+                    <div class="card-footer">
+                        <a class="btn btn-info mt-2" href=""><i class="fa-solid fa-pen-to-square"></i></a>
+                        <a class="btn btn-danger mt-2" href=""><i class="fa-solid fa-trash"></i></a>
                     </div>
                 </div>
             </div>
-            {% endfor %}
-            {% else %}
-            <div class="card-body alert alert-warning alert-dismissible mt-2" style="margin-inline: 12px;" role="alert">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                <p>No hay perguntas en esta encuesta!.</p>
-            </div>
-            {% endif %}
         </div>
-    <a class="btn btn-primary mt-4" href="">Agregar Pregunta</a>
+        {% endfor %}
+        {% else %}
+        <div class="card-body alert alert-warning alert-dismissible mt-2" style="margin-inline: 12px;" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <p>No hay preguntas en esta encuesta.</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <a class="btn btn-primary mt-4" href="{% url 'encuesta:agregar_pregunta' encuesta.id %}">Agregar Pregunta</a>
     <hr>
     <div style="display: flex;">
         <a class="btn btn-success" href=""

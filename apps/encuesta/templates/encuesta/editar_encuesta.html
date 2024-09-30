@@ -3,15 +3,18 @@
 Encuesta Edit
 {% endblock title %}
 {% block encuesta %}
-    <h5 class="card-header">Editar Datos de encuesta</h5>
-    <div style="display: flex;" class="card card-body bg-light mt-2 p-4">
-        <form style="flex: 1;"  method="POST" >
-            {% csrf_token %}
-            {{ form.as_p }}
-        <button  class="btn btn-primary" style="width: 100%;" type="submit">Actualizar</button>
-        <a class="btn btn-danger mt-1" style="width: 100%;" href="{% url 'encuesta:listado_encuestas'  %}" style="flex: 1; margin-left: 5px; margin-right: 5px;">
-            Cancelar
-        </a>
-       </form>
-    </div>
+<div class="card-header p-1">
+    <em class="">Detalle encuesta/editar encuesta/</em>
+</div>
+<div class="card card-body bg-light mt-2 p-4">
+    <h5 class="">Encuesta {{object.titulo}}</h5>
+    <form style="flex: 1;"  method="POST" >
+        {% csrf_token %}
+        {{ form.as_p }}
+    <button  class="btn btn-primary" style="width: 100%;" type="submit">Actualizar</button>
+    <a class="btn btn-danger mt-1" style="width: 100%;" href="{% url 'encuesta:encuesta_detail' object.id %}" style="flex: 1; margin-left: 5px; margin-right: 5px;">
+        Cancelar
+    </a>
+    </form>
+</div>
 {% endblock encuesta %}
