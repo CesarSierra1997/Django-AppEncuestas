@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 from django.core.exceptions import ValidationError
 from apps.usuario.models import Usuario
 
@@ -16,12 +15,8 @@ class Encuesta(models.Model):
     fechaInicio = models.DateTimeField(null=False)
     fechaFinal = models.DateTimeField(null=True)
     fechaCreacion = models.DateTimeField(auto_now_add=True)
-
-    @property
-    def esta_activa(self):
-        """Determina si la encuesta está activa en función de las fechas."""
-        now = timezone.now()
-        return self.fechaInicio <= now <= self.fechaFinal
+    fechaModificacion = models.DateTimeField(auto_now_add=False, null=True)
+    estado = models.BooleanField('Estado de la encuesta', default=True)
 
 # PREGUNTA
 class Pregunta(models.Model):
@@ -35,11 +30,11 @@ class Pregunta(models.Model):
     texto_pregunta = models.CharField('Digite la pregunta', max_length=200, blank=False, null=False)
     encuesta = models.ForeignKey(Encuesta, on_delete=models.CASCADE)
 
-    def tiene_opciones(self):
-        """Verifica que las preguntas de selección múltiple tengan opciones."""
-        if self.tipoPregunta == '4':
-            return self.opciones.all().exists()
-        return True
+    # def tiene_opciones(self):
+    #     """Verifica que las preguntas de selección múltiple tengan opciones."""
+    #     if self.tipoPregunta == '4':
+    #         return self.opciones.all().exists()
+    #     return True
 
 # OPCION DE PREGUNTA
 class OpcionPregunta(models.Model):
