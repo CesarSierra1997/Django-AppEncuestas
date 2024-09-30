@@ -1,23 +1,30 @@
-div#encuesta.card.bg-dark.bg-gradient.mt-2.p-2.text-light {
+#encuesta {
     /* Definir el tamaño y el estilo de la caja */
     width: 100%;
-    height: 100%;
+    height: 95%;
     transition: transform 0.3s ease;
+    background-color: #007c75 ;
+    color: lightcyan;
+
 }
 
-div#encuesta.card.bg-dark.bg-gradient.mt-2.p-2.text-light:hover {
+#encuesta:hover {
     /* Agrandar la caja al hacer hover */
-    transform: scale(1.1);
+    transform: scale(1.05);
+    z-index: 1000;
+    background-color: #4B4B4B  ;
+    box-shadow: 2px 2px 6px #FF7411;
 }
 
-div#pregunta.card.bg-dark.mt-2.p-2{
+#pregunta{
     /* Definir el tamaño y el estilo de la caja */
     width: 100%;
     height: 100%;
     transition: transform 0.3s ease;
+    background-color: #007C75 ;
 }
 
-div#pregunta.card.bg-dark.mt-2.p-2:hover {
+#pregunta:hover {
         /* Agrandar la caja al hacer hover */
         transform: scale(1.05);
         box-shadow: 2px, 2px, 2px, 2px, white;
