@@ -22,7 +22,7 @@ class Inicio(TemplateView): #vista basada en clases para una sola vista
 class Login(FormView):
     template_name = "login.html"
     form_class = FormularioLogin
-    success_url = reverse_lazy('encuestaHome')
+    success_url = reverse_lazy('encuesta:encuestaHome')
 
     @method_decorator(csrf_protect)
     @method_decorator(never_cache)
