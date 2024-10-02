@@ -17,18 +17,23 @@ class Encuesta(models.Model):
     fechaCreacion = models.DateTimeField('Fecha de creación',auto_now_add=True)
     fechaModificacion = models.DateTimeField(auto_now_add=False, null=True)
     estado = models.BooleanField('Estado', default=True)
+    # encuestaDesplegada = models.BooleanField('Despliegue de encuesta', default=False)
 
     def __str__ (self):
         return f'{self.titulo} - tipo {self.tipoEncuesta}'
-
+    
+    class Meta:
+        verbose_name_plural = 'Encuestas'
+        ordering = ['-id']
+        verbose_name = 'Encuesta'
 
 # PREGUNTA
 class Pregunta(models.Model):
     TIPO_PREGUNTA_CHOICES = [
-        ('1', 'Pregunta general'),
-        ('2', 'Pregunta tipo sí o no'),
-        ('3', 'Pregunta numérica'),
-        ('4', 'Pregunta tipo selección múltiple'),
+        ('1', 'General'),
+        ('2', 'Sí o no'),
+        ('3', 'Numérica'),
+        ('4', 'Selección múltiple'),
     ]
     tipoPregunta = models.CharField('Tipo de pregunta', max_length=30, choices=TIPO_PREGUNTA_CHOICES)
     texto_pregunta = models.CharField('Pregunta', max_length=200, blank=False, null=False)

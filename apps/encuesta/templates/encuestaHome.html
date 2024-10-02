@@ -7,161 +7,150 @@ Encuesta Home
 {% load static %}
 
 {% block extrajs %}
-<script src="{% static 'js/index.js' %}"> </script>
+<script src="{% static 'js/index.js' %}"></script>
 {% endblock extrajs %}
 
-<body>
-    
-    {% block nav %}
-        
-    {% endblock nav %}
-        
-    <div class="mt-2" >
-        {% if not request.user.is_authenticated %}
-        <nav class="navbar border border-light-10 fixed-strat " style="background-color: #4b4b4bc9;">
-            <div class="container-fluid justify-content-start">
-                <a class="navbar-brand text-white" href="{% url 'encuesta:encuestaHome' %}"><img style="width: 5%;" class="img" src="{% static 'img/hm52.png' %}" alt="Imagen de encuestas">
-                <strong> Encuestas Home 52</strong></a>
-                {% else %}
-                <nav style="background-color: #007C75; border-top-right-radius: 10px; border-top-left-radius: 10px;"
-                    class="navbar navbar-light fixed-strat">
-                    <div class="container-fluid justify-content-start">
-                        <a class="navbar-brand" href="{% url 'encuesta:encuestaHome' %}">
-                        </a>
-                        <a class="navbar-brand text-white" href="{% url 'encuesta:encuestaHome' %}"><img style="width: 5%;" class="img" src="{% static 'img/hm52.png' %}" alt="Imagen de encuestas">
-                            <strong>Fabrica de Encuestas</strong></a>
-                        {% endif %}
-                        {% if request.user.is_authenticated %}
-                        {% if request.user.is_superuser %}
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/style_home.css' %}">
+{% endblock style %}
 
-                        <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                            aria-expanded="false" aria-label="Toggle navigation">
-                            <span class="navbar-toggler-icon"></span>
-                        </button>
-
-                        <form class="d-flex" style="margin-left: 10px;" method="GET" action="">
-                            <input class="form-control me-2 bg-light" type="search" name="q"
-                                placeholder="Buscar en encuestas" aria-label="Search">
-                            <button class="btn btn-outline-dark " type="submit">Buscar</button>
-                        </form>
-                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                            <ul class="navbar-nav me-auto mb-lg-0">
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fa-solid fa-rectangle-list"></i> Modulo de Encuestas
-                                    </a>
-                                    <ul class="dropdown-menu" style="background-color: #efefeb ;"
-                                        aria-labelledby="navbarDropdown">
-                                        <li>
-                                            <a class="text-success dropdown-item" href="{% url 'encuesta:inicio_encuestas' %}"><i class="fa-solid fa-house-chimney"></i> Inicio encuestas</a>
-
-                                            <a class="text-success dropdown-item" href="{% url 'encuesta:crear_encuesta' %}"><i
-                                                class="fa-solid fa-file-circle-plus"></i> Crear encuesta</a></li>
-                                        <li>
-                                            <hr class="text-success dropdown-divider">
-                                        </li>
-                                        <li><a class="text-success dropdown-item" href=""><i class="fa-solid fa-clipboard-question"></i> Respuestas</a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                            <ul class="navbar-nav me-auto mb-lg-0">
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link text-white" href="{% url 'usuario:inicio_usuarios' %}" id="" role=""
-                                        data-bs-toggle="" aria-expanded="false">
-                                        <i class="fa-solid fa-users-rectangle"></i> Modulo de Usuarios
-                                    </a>
-                                    <!-- <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                        <li ><a class="text-success dropdown-item" href="RUTA"><i class="ICONO"></i>INFO</a></li>
-                                    </ul> -->
-                                </li>
-                            </ul>
-                        </div>
-                        {% endif %}
-                        <em style="position: absolute; right:0; top:0; margin-right: 70px; margin-top: 15px;">Direccion
-                            IP: {{ ip_address }}</em>
-                        
-                        <!-- Perfil navbar -->
-                        <div style="position: absolute; right: 0; top: 0; margin-top: 15px; margin-right: 18px;">
-                            <div style="all: initial; " class="dropdown">
-                                <a style=" all: initial;" class="nav-link dropdown-toggle text-white " href="#"
-                                    role="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="text-white fa fa-user-check"></i>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-light text-success dropdown-menu-end"
-                                    aria-labelledby="profileDropdown">
-                                    <li><a class="dropdown-item" href="{% url 'index' %}">
-                                            <i class="fa-solid fa-user-gear"> perfil</i>
-                                        </a>
-                                    </li>
-                                    <li><a class="dropdown-item" href="{% url 'admin:index' %}">
-                                            <i class="fa-solid fa-screwdriver-wrench"> admin</i>
-                                        </a>
-                                    </li>
-                                    <hr class="dropdown-divider">
-                                    <li class="bg-danger"><a class="dropdown-item" href="{% url 'logout' %}">
-                                            <i class="fa fa-power-off"> logout</i>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        {% else %}
-                        <div style="position: absolute; right: 0; top: 0; margin-top: 15px; margin-right: 18px;">
-                            <div style="all: initial; " class="dropdown">
-                                <a style=" all: initial;" class="nav-link dropdown-toggle" href="#" role="button"
-                                    id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">Login
-                                    <i class="fa fa-user"></i>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-light dropdown-menu-end"
-                                    aria-labelledby="profileDropdown">
-                                    <li><a class="dropdown-item" href="{% url 'login' %}">
-                                            <i class="fa fa-power-off"></i>Iniciar Sesion
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
+<div class="mt-2">
+    {% if not request.user.is_authenticated %}
+    <nav class="navbar border border-light-10 fixed-strat" style="background-color: #a5a5a58f;">
+        <div class="container-fluid justify-content-start">
+            <a class="navbar-brand text-white" href="{% url 'encuesta:encuestaHome' %}">
+                <img style="width: 5%;" class="img" src="{% static 'img/hm52.png' %}" alt="Imagen de encuestas">
+                <strong>Encuestas Home 52</strong>
+            </a>
+            {% else %}
+            <nav style="background-color: #007C75; border-top-right-radius: 10px; border-top-left-radius: 10px;"
+                class="navbar navbar-light fixed-strat">
+                <div class="container-fluid justify-content-start">
+                    <a class="navbar-brand text-white" href="{% url 'encuesta:encuestaHome' %}">
+                        <img style="width: 5%;" class="img" src="{% static 'img/hm52.png' %}" alt="Imagen de encuestas">
+                        <strong>Fabrica de Encuestas</strong>
+                    </a>
                     {% endif %}
-                    </div>
-                </nav>
-            </div>
+                    {% if request.user.is_authenticated %}
+                    {% if request.user.is_superuser %}
+                    <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
 
-{% block encuesta %}
-            <section class="mt-2">    
-                <div class="select-container">
-                    <div class="text-container">
-                        <div class="card mt-2 p-4 ">
+                    <form class="d-flex" style="margin-left: 10px;" method="GET" action="">
+                        <input class="form-control me-2 bg-light" type="search" name="q"
+                            placeholder="Buscar en encuestas" aria-label="Search">
+                        <button class="btn btn-outline-dark" type="submit">Buscar</button>
+                    </form>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-lg-0">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown"
+                                    role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-rectangle-list"></i> Modulo de Encuestas
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li>
+                                        <a class="dropdown-item" style="color: #4B4B4B;"
+                                            href="{% url 'encuesta:inicio_encuestas' %}">
+                                            <i class="fa-solid fa-house-chimney"></i> Inicio encuestas
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" style="color: #4B4B4B;" href="">
+                                            <i class="fa-solid fa-clipboard-question"></i> Respuestas
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-lg-0">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link text-white" href="{% url 'usuario:inicio_usuarios' %}" id="" role=""
+                                    data-bs-toggle="" aria-expanded="false">
+                                    <i class="fa-solid fa-users-rectangle"></i> Modulo de Usuarios
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                    <em style="position: absolute; right:0; top:0; margin-right: 70px; margin-top: 15px;">Direccion
+                        IP: {{ ip_address }}</em>
 
-                        <h1>Responde nuestras encuestas</h1>
-                        <p>Conoce nuestros tipos de encuestas</p>
-                        <div class="image-container ">
-                            <img style="width: 30%;" src="{% static 'img/encuestas.jpg' %}" alt="Imagen de encuestas">
-                        </div>
-                            {% if request.user.is_authenticated %}
-                            
-                            <a class="btn" style="background-color: #FF7411; width: 300px" href="">Encuestas
-                                Privadas</a>
-                            <p>haz click para ir a las encuestas privadas</p>   
-                            {% else %}
-                            <a class="btn " style="background-color: #007C75 ; width: 300px"
-                            href="">Encuestas Publicas</a>
-                            <p>haz click para ir las encuestas publicas</p>
-                            <a class="btn" style="background-color: #FF7411; width: 300px" href="{% url 'login' %}">Encuestas
-                                Privadas</a>
-                            <p>haz click para ir al login</p>
-                            {% endif %}
-                        
+                    <!-- Perfil navbar -->
+                    <div style="position: absolute; right: 0; top: 0; margin-top: 15px; margin-right: 18px;">
+                        <div style="all: initial;" class="dropdown">
+                            <a style="all: initial;" class="nav-link dropdown-toggle text-white" href="#" role="button"
+                                id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="text-white fa fa-user-check"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-light text-success dropdown-menu-end"
+                                aria-labelledby="profileDropdown">
+                                <li><a class="dropdown-item" href="{% url 'index' %}">
+                                        <i class="fa-solid fa-user-gear"> perfil</i>
+                                    </a></li>
+                                <li><a class="dropdown-item" href="{% url 'admin:index' %}">
+                                        <i class="fa-solid fa-screwdriver-wrench"> admin</i>
+                                    </a></li>
+                                <hr class="dropdown-divider">
+                                <li class="bg-danger"><a class="dropdown-item" href="{% url 'logout' %}">
+                                        <i class="fa fa-power-off"> logout</i>
+                                    </a></li>
+                            </ul>
                         </div>
                     </div>
+                    {% else %}
+                    <div style="position: absolute; right: 0; top: 0; margin-top: 15px; margin-right: 18px;">
+                        <div style="all: initial;" class="dropdown">
+                            <a style="all: initial;" class="nav-link dropdown-toggle" href="#" role="button"
+                                id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">Login
+                                <i class="fa fa-user"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-light dropdown-menu-end"
+                                aria-labelledby="profileDropdown">
+                                <li><a class="dropdown-item" href="{% url 'login' %}">
+                                        <i class="fa fa-power-off"></i>Iniciar Sesion
+                                    </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
-            </section>
-{% endblock encuesta %}
-</body>
+            </nav>
+        </div>
 
-{% endblock body %}
+        {% if request.user.is_staff%}
+        {% block navegacion %}
+        <div id="ruta_navegacion">
+            <em class="ruta">App/</em>
+        </div>
+        {% endblock navegacion %}
+        {% endif %}
+
+        <section class="mt-2 card card-body">
+            {% block encuesta %}
+            <h1>Responde nuestras encuestas</h1>
+            <p>Conoce nuestros tipos de encuestas</p>
+            <div class="image-container">
+                <img style="width: 30%;" src="{% static 'img/encuestas.jpg' %}" alt="Imagen de encuestas">
+            </div>
+            {% if request.user.is_authenticated %}
+            <a class="btn btn-private" href="">Encuestas Privadas</a>
+            <p>Haz click para ir a las encuestas privadas</p>
+            {% else %}
+            <a class="btn btn-public" href="">Encuestas Publicas</a>
+            <p>Haz click para ir las encuestas públicas</p>
+            <a class="btn btn-private" href="{% url 'login' %}">Encuestas Privadas</a>
+            <p>Haz click para ir al login</p>
+            {% endif %}
+            {% endblock encuesta %}
+        </section>
+
+        {% endblock body %}

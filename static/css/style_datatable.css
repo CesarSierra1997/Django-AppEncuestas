@@ -102,9 +102,12 @@
     position: absolute;
     margin-inline-start: 180px;
     background-color: #007C75;
-    max-height: 32px;
+    height: 35px;
     color: white;
     transition: transform 0.2s ease;
+    align-items: center;
+    border: none;
+    border-radius: 10px;
 }
 
 #agregar_usuario:hover {
@@ -117,4 +120,60 @@ div.dataTables_wrapper div.dataTables_filter {
     margin-top: 10px !important;
 }
 
+/* Ajustar tamaño de los botones en la columna "Opciones" */
+#cont_botones {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    height: 100% !important;
+    gap: 10px;
+}
 
+#boton_editar, #boton_eliminar {
+    transition: transform 0.15s ease;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20%;
+    font-size: 16px;
+    padding: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+#boton_editar i, #boton_eliminar i {
+    font-size: 20px;
+}
+
+#boton_editar {
+    background-color: #007C75;
+    color: white;
+}
+
+#boton_editar:hover {
+    background-color: white;
+    color: #007C75;
+    transform: scale(1.18);
+
+}
+
+#boton_eliminar {
+    background-color: red;
+    color: white;
+}
+
+#boton_eliminar:hover {
+    background-color: white;
+    color: red;
+    transform: scale(1.18);
+
+}
+
+/* Ajustar la visualización del ID */
+#tabla_usuarios td:first-child {
+    white-space: nowrap; /* Evitar que se corte el número de ID */
+    text-align: right; /* Alinearlo a la derecha */
+}

@@ -2,21 +2,42 @@
 {% block title %}
 Crear encuesta
 {% endblock title %}
-{% block encuesta %}
-<!-- crear_encuesta.html -->
+
 {% load static %}
 
-<div class="card-header p-1">
-    <em class="">Crear encuesta nueva/</em>
+{% block navegacion %}
+<div id="ruta_navegacion">
+    <em>App/ modulo encuestas/ crear encuesta/</em>
 </div>
-<div class="card card-body bg-light mt-2 p-4">    
-    <h5>Crear Encuesta</h5>
-    <form method="post">
+{% endblock navegacion %}
+
+{% block encuesta %}
+
+{% block modulo_encuestas %}
+<div id="contenedor_modulo_encuestas">
+    <h5>Modulo encuestas</h5>
+    <p>A continuación encontrará la sección para crear una nueva encuesta.</p>
+    <a id="volver_incio_encuestas" href="{% url 'encuesta:inicio_encuestas' %}"><i class="fa-solid fa-house"></i></a>
+</div>
+{% endblock modulo_encuestas %}
+
+<div class="alert alert-warning alert-dismissible" role="alert">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <strong>Recomendaciones:</strong>
+    <li>El titulo y tipo de encuesta <strong>¡No se puede cambiar!</strong></li>
+    <li>Recuerde marcar la encuesta como activa, para que los usuarios la puedan visualizar</li>
+    <li>Si esta realizando una prueba, puede crearla con estado inactivo</li>
+
+</div>
+
+<div id="section_detalle_encuesta">    
+    <h5 class="card-header">Crear Encuesta</h5>
+    <form class="card-body m-2 p-2" method="post">
         {% csrf_token %}
         <div class="mb-3">
             {{ form.as_p }}
         </div>
-        <button  class="btn btn-primary" style="width: 100%;" type="submit">Guardar</button>
+        <button  class="btn btn-primary" style="width: 100%;" type="submit">Crear encuesta</button>
         <a class="btn btn-danger mt-1" style="width: 100%;" href="{% url 'encuesta:inicio_encuestas'  %}" style="flex: 1; margin-left: 5px; margin-right: 5px;">
             Cancelar
         </a>

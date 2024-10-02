@@ -40,13 +40,13 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         ('PP', 'Pasaporte'),
         ('RC', 'Registro civil'),
     ]
-    tipoDocumento = models.CharField('Tipo de Documento', max_length=20, choices=TIPO_DOCUMENTO_CHOICES, default=False)
-    numeroDocumento = models.BigIntegerField('digite su número de documento', blank=False, null=False, unique =True )
-    username = models.CharField("Nombre de Usuario",unique=True, max_length=20)
-    email = models.EmailField('Correo Electrónico', max_length=30, unique =True)
+    tipoDocumento = models.CharField('Tipo de documento', max_length=20, choices=TIPO_DOCUMENTO_CHOICES, default=False)
+    numeroDocumento = models.BigIntegerField('Número de documento', blank=False, null=False, unique =True )
+    username = models.CharField("Nombre de usuario",unique=True, max_length=20)
+    email = models.EmailField('Correo electrónico', max_length=30, unique =True)
     nombres = models.CharField('Nombres', max_length=30, blank= True, null =True)
     apellidos= models.CharField('Apellidos ', max_length=30, blank= True, null =True)
-    imagen = models.ImageField('Imagen de Perfil', upload_to ='perfil/', max_length=200, blank= True, null=True)
+    imagen = models.ImageField('Imagen de perfil', upload_to ='perfil/', max_length=200, blank= True, null=True)
     is_active = models.BooleanField(default = True)
     is_staff = models.BooleanField(default = False)
     objects = UsuarioManager()

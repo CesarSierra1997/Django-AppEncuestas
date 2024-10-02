@@ -63,45 +63,76 @@ class ListadoUsuario(LoginSuperStaffMixin, ValidarPermisosMixin, ListView):
             return redirect('usuario:inicio_usuarios')
         
 
+
+#ERROR AL REGISTRAR USUARIO Y MOSTRAR ERRORES EN SWEIT ALERT
 class RegistrarUsuario(LoginSuperStaffMixin, ValidarPermisosMixin, CreateView):
     model = Usuario
     form_class = FormularioUsuario
     template_name = "usuario/registrar_usuario.html"
     permission_required = ('usuario.view_usuario', 'usuario.add_usuario', 'usuario.delete_usuario', 'usuario.change_usuario')
 
-
     def post(self, request, *args, **kwargs):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             form = self.form_class(request.POST)
             if form.is_valid():
-                nuevo_usuario = Usuario(
-                    nombres = form.cleaned_data.get('nombres'),
-                    apellidos = form.cleaned_data.get('apellidos'),
-                    email = form.cleaned_data.get('email'),
-                    username = form.cleaned_data.get('username'),
-                )  
-                nuevo_usuario.set_password(form.cleaned_data.get('password1'))
-                if nuevo_usuario.rol.rol == 'Administrador':
-                    nuevo_usuario.is_staff = True
-                    nuevo_usuario.is_superuser = True
-                    nuevo_usuario.save()
+                # Verificar el rol seleccionado
+                rol = form.cleaned_data.get('rol')
+                nombres = form.cleaned_data.get('nombres')
+                apellidos = form.cleaned_data.get('apellidos')
+                email = form.cleaned_data.get('email')
+                username = form.cleaned_data.get('username')
+                tipoDocumento = form.cleaned_data.get('tipoDocumento')
+                numeroDocumento = form.cleaned_data.get('numeroDocumento')
+                password = form.cleaned_data.get('password1')
+
+                # DEBUG: Print para verificar el rol
+                print(f"Rol seleccionado: {rol.rol}")
+
+                # Si el rol es 'Administrador', usar create_superuser
+                if rol.rol == 'administrador':
+                    print("Creando superusuario...")  # DEBUG
+                    nuevo_usuario = Usuario.objects.create_superuser(
+                        username=username,
+                        email=email,
+                        nombres=nombres,
+                        apellidos=apellidos,
+                        tipoDocumento=tipoDocumento,
+                        numeroDocumento=numeroDocumento,
+                        password=password,
+                        rol=rol
+                    )
+                    print(f"Superusuario creado: {nuevo_usuario}")  # DEBUG
                     mensaje = f'¡{self.model.__name__} Administrador registrado correctamente en el sistema!'
                 else:
-                    nuevo_usuario.save()
+                    # Para otros roles, usar create_user
+                    print("Creando usuario normal...")  # DEBUG
+                    nuevo_usuario = Usuario.objects.create_user(
+                        username=username,
+                        email=email,
+                        nombres=nombres,
+                        apellidos=apellidos,
+                        tipoDocumento=tipoDocumento,
+                        numeroDocumento=numeroDocumento,
+                        password=password,
+                        rol=rol
+                    )
+                    print(f"Usuario creado: {nuevo_usuario}")  # DEBUG
                     mensaje = f'¡{self.model.__name__} registrado correctamente!'
-                error = f'no hay error'
-                response = JsonResponse({'mensaje':mensaje, 'error':error})
+
+                error = 'no hay error'
+                response = JsonResponse({'mensaje': mensaje, 'error': error})
                 response.status_code = 201
                 return response
             else:
                 mensaje = f'{self.model.__name__} no se ha podido registrar'
                 error = form.errors
-                response = JsonResponse({'mensaje':mensaje, 'error':error})
+                response = JsonResponse({'mensaje': mensaje, 'error': error})
                 response.status_code = 400
                 return response
         else:
             return redirect('usuario:inicio_usuarios')
-        
+
+
 class EditarUsuario(LoginSuperStaffMixin, ValidarPermisosMixin, UpdateView):
     model = Usuario
     form_class = FormularioUsuario

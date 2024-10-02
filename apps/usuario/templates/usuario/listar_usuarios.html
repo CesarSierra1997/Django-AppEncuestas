@@ -14,14 +14,14 @@ Listado de Usuarios
 <script src="{% static 'js/index.js' %}"> </script>
 {% endblock extrajs %}
 
-<!-- Modal -->
-{% block encuesta %}
-<div class="card-header p-1">
-    <em class="">Modulo usuarios/</em>
+{% block navegacion %}
+<div id="ruta_navegacion">
+    <em>App/ modulo usuarios/</em>
 </div>
+{% endblock navegacion %}
 
-<main class="card card-body mt-2">
-        <button  id="agregar_usuario" class="btn" style="display: none;"
+{% block encuesta %}
+        <button  id="agregar_usuario" style="display: none;"
         onclick="abrir_modal_creacion('{% url 'usuario:registrar_usuario' %}')"><i class="fa-solid fa-user-plus"></i> Agregar usuario</button>
     <div class="talbe-stats order-table ov-h mt-2">
 
@@ -55,5 +55,4 @@ Listado de Usuarios
     </div>
     <div class="modal fade" id="eliminacion" role="dialog">
     </div>
-</main>
 {% endblock encuesta %}

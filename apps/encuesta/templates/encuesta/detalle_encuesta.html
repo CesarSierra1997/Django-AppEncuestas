@@ -1,86 +1,136 @@
 {% extends "encuestaHome.html" %}
 {% block title %}
-Encuesta detalle
+Detalle encuesta
 {% endblock title %}
+{% load static %}
+
+{% block navegacion %}
+<div id="ruta_navegacion">
+    <em>App/ modulo encuestas/ detalle encuesta</em>
+</div>
+{% endblock navegacion %}
+
 {% block encuesta %}
 
-<div class="card-header p-1">
-    <em class="">Detalle encuesta/preguntas/</em>
+{% block modulo_encuestas %}
+<div id="contenedor_modulo_encuestas">
+    <h5>Modulo encuestas</h5>
+    <p>A continuación encontrará la encuesta seleccionada a detalle, junto a sus preguntas y opciones.</p>
+    <a id="volver_incio_encuestas" href="{% url 'encuesta:inicio_encuestas' %}"><i class="fa-solid fa-house"></i></a>
 </div>
-<div class="card-body card bg-light bg-gradient border-solid text-dark mt-2">
-{% if messages %}
+{% endblock modulo_encuestas %}
+
+{% if not encuesta.estado %}
 <div>
-    {% for message in messages %}
-    <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+    <div class="alert alert-warning alert-dismissible" role="alert">
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        {{ message }}
+        <strong>Recomendaciones:</strong>
+        La encuesta no se encuentra disponible para los usuarios, cambie el estado.
+        <br>Estado actual: {{encuesta.estado}}
     </div>
-    {% endfor %}
 </div>
 {% endif %}
-        
-    {% if encuesta.estado %}
-    <h5>Detalle de encuesta {{ encuesta.titulo }} <a href="{% url 'encuesta:editar_encuesta' encuesta.id %}"><i class="text-primary fa-solid fa-pen-to-square"></i></a></h5>
-    <h6>Preguntas:</h6>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3"> <!-- Columnas responsivas -->
-        {% if preguntas_con_opciones %}
-        {% for pregunta_con_opciones in preguntas_con_opciones %}
-        <div class="col d-flex">
-            <div id="pregunta" class="card mt-2 p-2">
-                <div class="container">
-                    <!-- Mostrar el tipo de pregunta y el texto -->
-                    {{ pregunta_con_opciones.pregunta.get_tipoPregunta_display }}
-                    <br>
-                    {{ pregunta_con_opciones.pregunta.texto_pregunta }}
-                    
-                    <!-- Mostrar opciones si es selección múltiple -->
-                    {% if pregunta_con_opciones.pregunta.tipoPregunta == '4' and pregunta_con_opciones.opciones %}
-                        <ul>
-                            <P><strong>A.</strong> {{ pregunta_con_opciones.opciones.opcion_1 }}</P>
-                            <P><strong>B.</strong> {{ pregunta_con_opciones.opciones.opcion_2 }}</P>
-                            <P><strong>C.</strong> {{ pregunta_con_opciones.opciones.opcion_3 }}</P>
-                            <P><strong>D.</strong> {{ pregunta_con_opciones.opciones.opcion_4 }}</P>
-                        </ul>
-                    {% endif %}
-                    
-                    <div class="card-footer">
-                        <a class="btn btn-info mt-2" href=""><i class="fa-solid fa-pen-to-square"></i></a>
-                        <a class="btn btn-danger mt-2" href=""><i class="fa-solid fa-trash"></i></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-        {% else %}
-        <div class="card-body alert alert-warning alert-dismissible mt-2" style="margin-inline: 12px;" role="alert">
+
+<div id="section_detalle_encuesta">
+
+    <div id="centro_diseño">
+
+    </div>
+    <div class="info_text text-center">
+        <h3><strong>Infomarción encuesta</strong></h3>
+    </div>
+    <hr>
+    <h5><strong>Titulo </strong>{{ encuesta.titulo }}</h5>
+    <ul>
+        <h6>Tipo de encuesta <em>{{encuesta.tipoEncuesta}}</em>
+            {% if encuesta.tipoEncuesta == "Privada" %}
+            <i class="fa-solid fa-lock text-dark"></i>
+            {% else %}
+            <i class="fa-solid fa-lock-open text-dark"></i>
+            {% endif %}
+        </h6>
+
+        <h6>Fecha de inicio: <em>{{encuesta.fechaInicio}}</em> - Fecha de finalización: <em>{{encuesta.fechaFinal}}</em>
+        </h6>
+        <a id="editar_encuesta" href="{% url 'encuesta:editar_encuesta' encuesta.id %}"><i style="color: #FF7411;"
+                class="fa-solid fa-pen-to-square"></i></a>
+
+        {% if encuesta.fechaFinal|date:"Y-m-d H:i" <= hoy|date:"Y-m-d H:i" %} 
+        <div
+            class="alert alert-danger alert-dismissible" role="alert">
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            <p>No hay preguntas en esta encuesta.</p>
+            <strong>Alerta de visualización:</strong>
+            La fecha de finalización de la encuesta ya paso, su visualizacion se encuentra INACTIVA
         </div>
         {% endif %}
-    </div>
-    
-    <a class="btn btn-primary mt-4" href="{% url 'encuesta:agregar_pregunta' encuesta.id %}">Agregar Pregunta</a>
+
+        <h6>Estado
+            {% if encuesta.estado %}
+                Activada (Los usuarios pueden enviar respuestas)
+            {% else %}
+                Inactiva (Los usuarios NO pueden visualizar la encuesta)
+            {% endif %}
+        </h6>
+
+    </ul>
+
+<div id="section_grid_preguntas">
     <hr>
-    <div style="display: flex;">
-        <a class="btn btn-success" href=""
-            style="flex: 2; margin-right: 5px;">
-            Ver Encuesta
-        </a>
-        <a class="btn btn-danger" href="{% url 'encuesta:eliminar_encuesta' encuesta.id %}" style="width: 20%;">
-            Eliminar encuesta
-        </a>
-    </div>
-    {% else %}
-    <div>
-        <div class="alert alert-danger alert-dismissible" role="alert">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            La encuesta no se encuentra disponible. 
-            <br>Estado actual: 
-            {% if not encuesta.estado  %} <strong>Inactiva <i class="fa-solid fa-ban"></i> </strong> {% endif %}
+    <h5>Lista de preguntas <i class="fa-solid fa-list-ol"></i></h5>
+    {% if preguntas_con_opciones %}
+    {% for pregunta_con_opciones in preguntas_con_opciones %}
+    <div class="col d-flex">
+        <div id="pregunta">
+
+            <div class="container_pregunta">
+                <!-- Mostrar el tipo de pregunta y el texto -->
+                <strong>Tipo de pregunta </strong>{{ pregunta_con_opciones.pregunta.get_tipoPregunta_display }}
+                <br>
+                <strong>Pregunta </strong> ¿{{ pregunta_con_opciones.pregunta.texto_pregunta}}?
+                <br>
+                <strong>ID {{ pregunta_con_opciones.pregunta.id}} </strong> 
+            
+                <!-- Mostrar opciones si es selección múltiple -->
+                {% if pregunta_con_opciones.pregunta.tipoPregunta == '4' and pregunta_con_opciones.opciones %}
+                <br><strong>Opciones</strong>
+                <ul id="ul_opciones_pregunta">
+                    <P><strong>A.</strong> {{ pregunta_con_opciones.opciones.opcion_1 }}</P>
+                    <P><strong>B.</strong> {{ pregunta_con_opciones.opciones.opcion_2 }}</P>
+                    <P><strong>C.</strong> {{ pregunta_con_opciones.opciones.opcion_3 }}</P>
+                    <P><strong>D.</strong> {{ pregunta_con_opciones.opciones.opcion_4 }}</P>
+                </ul>
+                {% endif %}
+            
+                <!-- Botones de acción -->
+                <div class="cont_botones_preguntas">
+                    <a class="boton_pregunta editar" href="{% url 'encuesta:editar_pregunta' encuesta.id pregunta_con_opciones.pregunta.id %}"><i class="fa-solid fa-pen-to-square"></i></a>
+                    <a class="boton_pregunta eliminar" href="{% url 'encuesta:eliminar_pregunta' encuesta.id pregunta_con_opciones.pregunta.id %}"><i class="fa-solid fa-trash"></i></a>
+                </div>                
+            </div>
+            
         </div>
     </div>
-    {% endif %}
+    {% endfor %}
+    {% else %}
+    <div class="card-body alert alert-warning alert-dismissible mt-2" style="margin-inline: 12px;" role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <p>No hay preguntas en esta encuesta.</p>
     </div>
+    {% endif %}
+</div>
+
+<a class="btn btn-primary mt-4" href="{% url 'encuesta:agregar_pregunta' encuesta.id %}">Agregar Pregunta</a>
+<hr>
+<div style="display: flex;">
+    <a class="btn btn-success" href="" style="flex: 2; margin-right: 5px;">
+        Ver Encuesta
+    </a>
+    <a class="btn btn-danger" href="{% url 'encuesta:eliminar_encuesta' encuesta.id %}" style="width: 20%;">
+        Eliminar encuesta
+    </a>
+</div>
+
+</div>
 
 
 {% endblock encuesta %}

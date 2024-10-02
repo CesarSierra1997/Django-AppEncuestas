@@ -10,7 +10,7 @@ class UsuarioResource(resources.ModelResource):
     class Meta:
         model = Usuario
 
-class RolAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+class RolAdmin(admin.ModelAdmin):
     search_fields = ('rol__rol','')
     class Meta:
         model = Rol

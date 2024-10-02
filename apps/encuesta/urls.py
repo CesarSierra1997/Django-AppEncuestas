@@ -19,6 +19,6 @@ urlpatterns = [
     path('encuesta/<int:encuesta_id>/', views.EncuestaDetail.as_view(), name='encuesta_detail'),
     path('encuesta/agregar_pregunta/<int:encuesta_id>/', views.AgregarPregunta.as_view(), name='agregar_pregunta'),
     path('encuesta/agregar_pregunta_opciones/<int:pregunta_id>/', views.OpcionPregunta_SelectMultiple.as_view(), name='agregar_opciones'),
-    # path('encuesta/editar_pregunta/<int:encuesta_id>/pregunta/<int:pregunta_id>/', views.EditarPregunta.as_view(), name='editar_pregunta'),
-    # path('encuesta/eliminar_pregunta/<int:encuesta_id>/pregunta/<int:pregunta_id>/', views.EliminarPregunta.as_view(), name='eliminar_pregunta'),
+    path('encuesta/editar_pregunta/<int:encuesta_id>/pregunta/<int:pregunta_id>/', views.EditarPregunta.as_view(), name='editar_pregunta'),
+    path('encuesta/eliminar_pregunta/<int:encuesta_id>/pregunta/<int:pregunta_id>/', views.EliminarPregunta.as_view(), name='eliminar_pregunta'),
 ]

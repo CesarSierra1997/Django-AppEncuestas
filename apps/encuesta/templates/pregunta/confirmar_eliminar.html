@@ -1,0 +1,32 @@
+{% extends "encuestaHome.html" %}
+{% block title %}
+Eliminar pregunta
+{% endblock title %}
+{% load static %}
+
+{% block navegacion %}
+<div id="ruta_navegacion">
+    <em>App/ modulo encuestas/ detalle encuesta/ pregunta/ <strong>eliminar</strong></em>
+</div>
+{% endblock navegacion %}
+
+{% block encuesta %}
+<div class="card bg-light mt-2 p-4">
+    <div class="card-header">
+        <h5>Confirmación de <strong>eliminación</strong> de pregunta</h5>
+    </div>
+    <div class="text-center card card-body">
+        <form method="POST">
+            {% csrf_token %}
+            <h4>Eliminar pregunta</h4>
+            <h5>¿Desea eliminar la pregunta {{object.id}} "{{object.texto_pregunta}}" de la encuesta
+                <strong>{{object.encuesta.titulo}}</strong> ?</h5>
+            <div class="card-btn">
+                <button type="submit" class="btn btn-danger bg-gradient">Eliminar pregunta</button>
+                <a class="btn btn-dark bg-gradient" href="{% url 'encuesta:encuesta_detail' object.id %}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock encuesta %}

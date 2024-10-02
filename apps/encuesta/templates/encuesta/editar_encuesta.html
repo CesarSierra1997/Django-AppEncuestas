@@ -1,20 +1,52 @@
 {% extends "encuestaHome.html" %}
 {% block title %}
-Encuesta Edit
+Editar encuesta
 {% endblock title %}
-{% block encuesta %}
-<div class="card-header p-1">
-    <em class="">Detalle encuesta/editar encuesta/</em>
+
+{% load static %}
+
+{% block navegacion %}
+<div id="ruta_navegacion">
+    <em>App/ modulo encuestas/ detalle encuesta/ editar</em>
 </div>
-<div class="card card-body bg-light mt-2 p-4">
-    <h5 class="">Encuesta {{object.titulo}}</h5>
-    <form style="flex: 1;"  method="POST" >
+{% endblock navegacion %}
+
+{% block encuesta %}
+
+{% block modulo_encuestas %}
+<div id="contenedor_modulo_encuestas">
+    <h5>Modulo encuestas</h5>
+    <p>A continuación podrás editar la encuesta selecionada</p>
+    <a id="volver_incio_encuestas" href="{% url 'encuesta:inicio_encuestas' %}"><i class="fa-solid fa-house"></i></a>
+</div>
+{% endblock modulo_encuestas %}
+<div id="section_detalle_encuesta">
+<div class="card-body">
+    <div id="centro_diseño"></div>
+    <div class="info_text text-center"><h3><strong>Editar encuesta</strong></h3></div>
+    <hr>
+    <h5><strong>Titulo </strong>{{ encuesta.titulo }}</h5>
+    <h6>Tipo de encuesta <em>{{encuesta.tipoEncuesta}}</em>
+        {% if encuesta.tipoEncuesta == "Privada" %}
+        <i class="fa-solid fa-lock text-dark"></i>
+        {% else %}
+        <i class="fa-solid fa-lock-open text-dark"></i>
+        {% endif %}
+    </h6>
+    <h6>Fecha de inicio(actual): <em>{{encuesta.fechaInicio}}</em> - Fecha de finalización(actual): <em>{{encuesta.fechaFinal}}</em></h6>
+    <div class="alert alert-warning alert-dismissible" role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <strong>Alerta de visualización:</strong>
+        Recuerde marcar la encuesta como activa
+    </div>
+    <form class="mt-2 py-1 mx-4"   method="POST" >
         {% csrf_token %}
         {{ form.as_p }}
     <button  class="btn btn-primary" style="width: 100%;" type="submit">Actualizar</button>
-    <a class="btn btn-danger mt-1" style="width: 100%;" href="{% url 'encuesta:encuesta_detail' object.id %}" style="flex: 1; margin-left: 5px; margin-right: 5px;">
+    <a class="btn btn-danger mt-1" style="width: 100%;" href="{% url 'encuesta:encuesta_detail' object.id %}"  >
         Cancelar
     </a>
     </form>
+</div>
 </div>
 {% endblock encuesta %}

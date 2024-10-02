@@ -1,23 +1,43 @@
 {% extends "encuestaHome.html" %}
 {% block title %}
-Deshabilitar encuesta
+Eliminar encuesta
 {% endblock title %}
+{% load static %}
+
+{% block navegacion %}
+<div id="ruta_navegacion">
+    <em>App / modulo encuestas/ detalle encuesta/ <strong>eliminar</strong></em>
+</div>
+{% endblock navegacion %}
+
 {% block encuesta %}
 
-<div class="card-header p-1">
-    <em class="">Detalle encuesta/<strong>Eliminar encuesta</strong>/</em>
+{% block modulo_encuestas %}
+<div id="contenedor_modulo_encuestas">
+    <h5>Modulo encuestas</h5>
+    <p>A continuación podrás eliminar la encuesta</p>
+    <a id="volver_incio_encuestas" href="{% url 'encuesta:inicio_encuestas' %}"><i class="fa-solid fa-house"></i></a>
 </div>
-<div class="card bg-light mt-2 p-4">
-    <div class="card-header">
-        <h5>Confirmación de <strong>desactivación</strong> de encuesta</h5>
-    </div>
+{% endblock modulo_encuestas %}
+
+<div class="alert alert-warning alert-dismissible" role="alert">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <strong>¡Alerta!</strong>
+    <p>Esta acción no podra revertiser, si elimina la encuesta borrará todos los datos asociados a ella...</p>
+    <ul>
+        <li>Encuesta: preguntas, registro de respuestas</li>
+    </ul>
+</div>
+
+<div id="section_detalle_encuesta">
+    
     <div class="text-center card card-body">
         <form method="POST">
             {% csrf_token %}
-            <h4>Encuesta activa</h4>
-            <h5>¿Desea cambiar el estado de la encuesta "{{object.titulo}}" a <strong class="text-danger">inactivo</strong>?</h5>
+            <h4>Eliminar encuesta</h4>
+            <h5>¿Esta seguro de eliminar la encuesta <strike class="text-danger">"{{object.titulo}}" </strike>?</h5>
             <div class="card-btn">
-                <button type="submit" class="btn btn-danger bg-gradient">Desactivar</button>
+                <button type="submit" class="btn btn-danger bg-gradient">Estoy seguro, eliminar</button>
                 <a class="btn btn-dark bg-gradient" href="{% url 'encuesta:encuesta_detail' object.id %}">Cancelar</a>
             </div>
         </form>

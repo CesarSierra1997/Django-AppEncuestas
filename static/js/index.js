@@ -18,23 +18,25 @@ function listarUsuarios() {
             }
             for (let i = 0; i < response.length; i++) {
                 let fila = '<tr>';
-                fila += '<td>' + (i + 1) + '</td>';
+                fila += '<td>' + ('20' + ('0' + (i + 1)).slice(-3)) + '</td>';  // Ajustar el formato del número de ID
                 fila += '<td>' + response[i]["fields"]['username'] + '</td>';
                 fila += '<td>' + response[i]["fields"]['nombres'] + '</td>';
                 fila += '<td>' + response[i]["fields"]['apellidos'] + '</td>';
                 fila += '<td>' + response[i]["fields"]['email'] + '</td>';
-                if (response[i]["fields"]['rol'] == 1) {
-                    fila += '<td>Admin</td>';
-                } else {
-                    fila += '<td>Usuario</td>';
-                }
-                fila += '<td>' + '<button class="btn btn-outline-info btn-sm tableButtom"';
-                fila += 'onclick ="abrir_modal_edicion(\'/usuario/editar_usuario/' + response[i]['pk'] + '/\')" ><i class="fa-solid fa-user-pen"></i></button>'
-                fila += '<button class="btn btn-outline-danger btn-sm mx-1"';
-                fila += 'onclick ="abrir_modal_eliminacion(\'/usuario/eliminar_usuario/' + response[i]['pk'] + '/\')" ><i class="fa-solid fa-trash-can mx-1"></i></button>' + '</td>';
+                fila += '<td>' + (response[i]["fields"]['rol'] == 1 ? 'Admin' : 'Usuario') + '</td>';
+                fila += '<td>' + '<div id="cont_botones">' +
+                    '<button id="boton_editar" class="btn-opcion" onclick="abrir_modal_edicion(\'/usuario/editar_usuario/' + response[i]['pk'] + '/\')">' +
+                        '<i class="fa-solid fa-user-pen"></i></button>' +
+                        '<button id="boton_eliminar" class="btn-opcion" onclick="abrir_modal_eliminacion(\'/usuario/eliminar_usuario/' + response[i]['pk'] + '/\')">' +
+                        '<i class="fa-solid fa-trash-can"></i></button>' +
+                '</div>' +
+
+                '</td>';
+        
                 fila += '</tr>';
                 $('#tabla_usuarios').append(fila);
             }
+            
             $('#tabla_usuarios').DataTable({
                 responsive: true,
                 autoWidth: true,

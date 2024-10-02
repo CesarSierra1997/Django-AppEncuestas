@@ -2,12 +2,23 @@
 {% block title %}
 Agregar Pregunta
 {% endblock title %}
-{% block encuesta %}
-<div class="card-header">
-    <em class="">Detalle encuesta/preguntas/agregar pregunta/</em>
+{% load static %}
+
+{% block navegacion %}
+<div id="ruta_navegacion">
+    <em>App/ modulo encuestas/ detalle encuesta/ agregar pregunta</em>
 </div>
-<div class="card card-body bg-light mt-2 p-4">
-    
+{% endblock navegacion %}
+
+{% block encuesta %}
+{% block modulo_encuestas %}
+<div id="contenedor_modulo_encuestas">
+    <h5>Modulo encuestas</h5>
+    <p>A continuación podra agregar algun tipo de pregunta.</p>
+    <a id="volver_incio_encuestas" href="{% url 'encuesta:inicio_encuestas' %}"><i class="fa-solid fa-house"></i></a>
+</div>
+    {% endblock modulo_encuestas %}
+<div id="section_detalle_encuesta">
     <h5>Agregar pregunta</h5>
     <form method="POST" id="tipo-pregunta-form" onsubmit="return validateForm();">
         {% csrf_token %}
@@ -34,7 +45,8 @@ Agregar Pregunta
             </div>
         </div>
 
-        <button class="btn btn-dark mt-2" type="submit">Agregar</button>
+        <button class="btn btn-primary" type="submit">Agregar</button>
+        <a class="btn btn-dark bg-gradient" href="{% url 'encuesta:inicio_encuestas' %}">Cancelar</a>
     </form>
     <hr>
     
@@ -51,6 +63,14 @@ Agregar Pregunta
     });
 
     // Validar que las opciones no estén vacías antes de enviar el formulario
+    function notificacionOpciones(mensaje){
+        Swal.fire({
+            title:'Debe ingresar todas las opiones',
+            text: mensaje,
+            icon: 'warning'
+        })
+    }
+
     function validateForm() {
         const tipoPregunta = document.getElementById("id_tipoPregunta").value;
         if (tipoPregunta === "4") {  // Ajusta según tu choice para selección múltiple
@@ -60,7 +80,7 @@ Agregar Pregunta
             const opcion4 = document.getElementById("opcion_4").value.trim();
             
             if (!opcion1 || !opcion2 || !opcion3 || !opcion4) {
-                alert("Debe completar las 4 opciones para una pregunta de selección múltiple.");
+                notificacionOpciones();
                 return false;  // Prevenir el envío del formulario
             }
         }

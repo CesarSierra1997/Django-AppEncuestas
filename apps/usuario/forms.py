@@ -82,11 +82,11 @@ class FormularioUsuario(forms.ModelForm):
     def clean_numeroDocumento(self):
         numeroDoc = self.cleaned_data["numeroDocumento"]
         numeroDoc_str = str(numeroDoc)
-        if len(str(numeroDoc_str)) < 8:
-            raise ValidationError(_('El número de documento debe tener al menos 8 caracteres.'))
+        if len(str(numeroDoc_str)) < 10:
+            raise ValidationError(_('El número de documento debe tener al menos 10 caracteres.'))
         if not numeroDoc_str.isdigit():
             raise ValidationError(_('El número de documento debe ser un número entero.'))
-        return numeroDoc_str
+        return numeroDoc
     
 
     def clean_nombres(self):
