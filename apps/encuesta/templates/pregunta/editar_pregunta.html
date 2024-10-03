@@ -29,30 +29,33 @@ Pregunta custome
 
         {% if pregunta.tipoPregunta == '4' %}
             <!-- Si la pregunta es de selección múltiple, mostrar las opciones -->
-            <div>
-                <label for="opcion_1">Opción A:</label>
-                <input type="text" name="opcion_1" id="opcion_1" value="{{ opciones.opcion_1 }}" required>
+        <div class="opciones_pregunta_slect_mult">
+            <div id="opciones">
+                <label  for="opcion_1">Opción A:</label>
+                <input  type="text" name="opcion_1" id="opcion_1" value="{{ opciones.opcion_1 }}" required>
             </div>
 
-            <div>
+            <div id="opciones">
                 <label for="opcion_2">Opción B:</label>
                 <input type="text" name="opcion_2" id="opcion_2" value="{{ opciones.opcion_2 }}" required>
             </div>
 
-            <div>
+            <div id="opciones"> 
                 <label for="opcion_3">Opción C:</label>
                 <input type="text" name="opcion_3" id="opcion_3" value="{{ opciones.opcion_3 }}" required>
             </div>
 
-            <div>
+            <div id="opciones">
                 <label for="opcion_4">Opción D:</label>
                 <input type="text" name="opcion_4" id="opcion_4" value="{{ opciones.opcion_4 }}" required>
             </div>
+        </div>
         {% endif %}
-
-        <button type="submit">Guardar Cambios</button>
+        <div class="footer">
+            <button id="boton_crear_home52" class="boton-estilizado" type="submit">Guardar cambios</button>
+            <a id="boton_cancelar_home52" class="boton-estilizado" href="{% url 'encuesta:encuesta_detail'  pregunta.encuesta.id%}">Cancelar</a>
+        </div>
     </form>
 
-    <a href="{% url 'encuesta:encuesta_detail' pregunta.encuesta.id %}">Cancelar</a>
 </div>
 {% endblock encuesta %}

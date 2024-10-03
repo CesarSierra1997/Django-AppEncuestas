@@ -50,6 +50,7 @@ class CrearEncuesta(LoginSuperStaffMixin, ValidarPermisosMixin, CreateView):
     def form_valid(self, form):
         form.instance.administrador = self.request.user  # Asignar el administrador actual
         form.instance.fechaCreacion = timezone.now()
+        messages.success(self.request, '¡Encuesta creada correctamente!')
         return super().form_valid(form)
     
     def get_success_url(self):
@@ -69,10 +70,7 @@ class EncuestaDetail(LoginSuperStaffMixin, ValidarPermisosMixin, DetailView):
     def get(self, request, *args, **kwargs):
         """Maneja el flujo de redirección si la encuesta no está activa."""
         try:
-            encuesta = self.get_object()
-            # if not encuesta.estado:
-            #     messages.info(self.request, 'La encuesta no se encuentra activa.')
-            #     return redirect(self.success_url)
+            pass
         except Http404:
             messages.error(self.request, 'No se encontró ninguna encuesta coincidente con la consulta.')
             return redirect(self.success_url)
@@ -117,10 +115,7 @@ class EditarEncuesta(LoginSuperStaffMixin, ValidarPermisosMixin, UpdateView):
     def get(self, request, *args, **kwargs):
         """Maneja el flujo de redirección si la encuesta no está activa."""
         try:
-            encuesta = self.get_object()
-            # if not encuesta.estado:
-            #     messages.info(self.request, 'Esta encuesta no se encuesta no está activa')
-            #     return redirect(self.success_url)
+            pass
         except Http404:
             messages.error(self.request, 'No se encontró ninguna encuesta coincidente con la consulta.')
             return redirect('encuesta:inicio_encuestas')
@@ -153,6 +148,31 @@ class AgregarPregunta(LoginSuperStaffMixin, ValidarPermisosMixin, CreateView):
     form_class = PreguntaForm
     template_name = 'pregunta/agregar_pregunta.html'
     pk_url_kwarg = 'encuesta_id'
+    
+    def get_queryset(self):
+        # Filtrar por una encuesta específica, no por un conjunto
+        encuesta_id = self.kwargs['encuesta_id']
+        try:
+            encuesta = Encuesta.objects.get(id=encuesta_id, publicarEncuesta=False)
+        except Encuesta.DoesNotExist:
+            raise Http404('Encuesta no encontrada o ya publicada.')
+        # Retorna las preguntas asociadas a esa encuesta
+        return self.model.objects.filter(encuesta=encuesta)
+
+    def get(self, request, *args, **kwargs):
+        """Maneja el flujo de redirección si la encuesta ya fue publicada."""
+        encuesta_id = self.kwargs.get('encuesta_id')
+
+        try:
+            encuesta = Encuesta.objects.get(id=encuesta_id)
+            if encuesta.publicarEncuesta:
+                messages.warning(self.request, 'La encuesta ya fue publicada no puede agregar más preguntas.')
+                return redirect('encuesta:encuesta_detail', encuesta_id=encuesta_id)
+        except Encuesta.DoesNotExist:
+            messages.error(self.request, 'No se encontró ninguna encuesta coincidente con la consulta.')
+            return redirect('encuesta:inicio_encuestas')
+
+        return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
         # Asocia la pregunta con la encuesta correspondiente
@@ -185,6 +205,12 @@ class AgregarPregunta(LoginSuperStaffMixin, ValidarPermisosMixin, CreateView):
 
     def get_success_url(self):
         return reverse('encuesta:encuesta_detail', kwargs={'encuesta_id': self.object.encuesta.pk})
+    
+
+    def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context['encuesta'] = get_object_or_404(Encuesta, pk=self.kwargs['encuesta_id'])
+            return context
 
 class EditarPregunta(LoginSuperStaffMixin, ValidarPermisosMixin, UpdateView):
     permission_required = ('pregunta.add_pregunta', 'pregunta.view_pregunta', 'pregunta.change_pregunta', 'pregunta.delete_pregunta')
@@ -192,6 +218,33 @@ class EditarPregunta(LoginSuperStaffMixin, ValidarPermisosMixin, UpdateView):
     form_class = PreguntaForm
     template_name = 'pregunta/editar_pregunta.html'
     pk_url_kwarg = 'pregunta_id'
+
+    """" Validar si la encuesta ya esta publicada """
+    def get_queryset(self):
+        # Filtrar por una encuesta específica, no por un conjunto
+        encuesta_id = self.kwargs['encuesta_id']
+        try:
+            encuesta = Encuesta.objects.get(id=encuesta_id, publicarEncuesta=False)
+        except Encuesta.DoesNotExist:
+            raise Http404('Encuesta no encontrada o ya publicada.')
+        # Retorna las preguntas asociadas a esa encuesta
+        return self.model.objects.filter(encuesta=encuesta)
+
+    def get(self, request, *args, **kwargs):
+        """Maneja el flujo de redirección si la encuesta ya fue publicada."""
+        encuesta_id = self.kwargs.get('encuesta_id')
+
+        try:
+            encuesta = Encuesta.objects.get(id=encuesta_id)
+            if encuesta.publicarEncuesta:
+                messages.warning(self.request, 'La encuesta ya fue publicada no puede editar preguntas.')
+                return redirect('encuesta:encuesta_detail', encuesta_id=encuesta_id)
+        except Encuesta.DoesNotExist:
+            messages.error(self.request, 'No se encontró ninguna encuesta coincidente con la consulta.')
+            return redirect('encuesta:inicio_encuestas')
+
+        return super().get(request, *args, **kwargs)
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -201,7 +254,6 @@ class EditarPregunta(LoginSuperStaffMixin, ValidarPermisosMixin, UpdateView):
         if pregunta.tipoPregunta == '4':  # Ajusta según el valor que usas para "Selección múltiple"
             opciones = OpcionesPregunta.objects.filter(pregunta=pregunta).first()
             context['opciones'] = opciones
-
         return context
 
     def form_valid(self, form):
@@ -274,6 +326,31 @@ class EliminarPregunta(LoginSuperStaffMixin, ValidarPermisosMixin, DeleteView):
     model = Pregunta
     template_name = 'pregunta/confirmar_eliminar.html'
     pk_url_kwarg = 'pregunta_id'
+
+    def get_queryset(self):
+        # Filtrar por una encuesta específica, no por un conjunto
+        encuesta_id = self.kwargs['encuesta_id']
+        try:
+            encuesta = Encuesta.objects.get(id=encuesta_id, publicarEncuesta=False)
+        except Encuesta.DoesNotExist:
+            raise Http404('Encuesta no encontrada o ya publicada.')
+        # Retorna las preguntas asociadas a esa encuesta
+        return self.model.objects.filter(encuesta=encuesta)
+
+    def get(self, request, *args, **kwargs):
+        """Maneja el flujo de redirección si la encuesta ya fue publicada."""
+        encuesta_id = self.kwargs.get('encuesta_id')
+
+        try:
+            encuesta = Encuesta.objects.get(id=encuesta_id)
+            if encuesta.publicarEncuesta:
+                messages.warning(self.request, 'La encuesta ya fue publicada no puede eliminar preguntas.')
+                return redirect('encuesta:encuesta_detail', encuesta_id=encuesta_id)
+        except Encuesta.DoesNotExist:
+            messages.error(self.request, 'No se encontró ninguna encuesta coincidente con la consulta.')
+            return redirect('encuesta:inicio_encuestas')
+
+        return super().get(request, *args, **kwargs)
     
     def post(self, request, *args, **kwargs):
         # Obtenemos la pregunta y el id de la encuesta antes de eliminarla
@@ -292,14 +369,56 @@ class EliminarPregunta(LoginSuperStaffMixin, ValidarPermisosMixin, DeleteView):
     def get_context_data(self, **kwargs):
         # Añadir la pregunta al contexto para que el template tenga acceso a ella
         context = super().get_context_data(**kwargs)
+        context['encuesta'] = get_object_or_404(Encuesta, pk=self.kwargs['encuesta_id'])
         context['pregunta'] = self.get_object()
         return context
+  
+class PublicarEncuesta(LoginSuperStaffMixin, ValidarPermisosMixin, UpdateView):
+    permission_required = ('encuesta.view_encuesta', 'encuesta.add_encuesta', 'encuesta.delete_encuesta', 'encuesta.change_encuesta')
+    model = Encuesta
+    form_class = EncuestaForm
+    template_name = 'encuesta/publicar_encuesta.html'
+    pk_url_kwarg = 'encuesta_id'
+    success_url = reverse_lazy('encuesta:inicio_encuestas')
 
-class DesplegarEncuesta():
-    pass
+    def get_queryset(self):
+        """Retorna todas las encuestas no publicadas."""
+        return self.model.objects.filter(publicarEncuesta=False)
+
+    def get(self, request, *args, **kwargs):
+        """Maneja el flujo de redirección si la encuesta no está activa."""
+        try:
+            encuesta = Encuesta.objects.get(id=self.kwargs['encuesta_id'])
+            if encuesta.publicarEncuesta:
+                messages.warning(self.request, 'La encuesta ya fue publicada.')
+                return redirect('encuesta:encuesta_detail', encuesta_id=encuesta.id)
+        except Http404:
+            messages.error(self.request, 'No se encontró ninguna encuesta coincidente con la consulta.')
+            return redirect('encuesta:inicio_encuestas')
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        encuesta = self.get_object()
+        
+        # Validar si la encuesta tiene al menos una pregunta
+        if encuesta.pregunta_set.count() == 0:
+            messages.error(self.request, 'La encuesta debe tener al menos una pregunta antes de publicarse.')
+            return redirect('encuesta:encuesta_detail', encuesta_id=encuesta.id)
+
+        # Publicar encuesta
+        encuesta.publicarEncuesta = True
+        encuesta.save()
+        messages.success(self.request, '¡ENCUESTA PUBLICADA EXITOSAMENTE!.')
+        
+        return redirect('encuesta:encuesta_detail', encuesta_id=encuesta.id)
+
+
+    def get_success_url(self):
+        return reverse('encuesta:encuesta_detail', kwargs={'encuesta_id': self.object.pk})
+
 
 class EncuestaPublica():
     pass
-
+    
 class EncuestaPrivada():
     pass

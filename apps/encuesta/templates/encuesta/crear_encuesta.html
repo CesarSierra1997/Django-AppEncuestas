@@ -27,6 +27,7 @@ Crear encuesta
     <li>El titulo y tipo de encuesta <strong>¡No se puede cambiar!</strong></li>
     <li>Recuerde marcar la encuesta como activa, para que los usuarios la puedan visualizar</li>
     <li>Si esta realizando una prueba, puede crearla con estado inactivo</li>
+    <li>Una vez creada, verifiqué todos los datos esten correctos, antes de <strong> publicarla la encuesta </strong>en el sistema</li>
 
 </div>
 
@@ -34,13 +35,16 @@ Crear encuesta
     <h5 class="card-header">Crear Encuesta</h5>
     <form class="card-body m-2 p-2" method="post">
         {% csrf_token %}
-        <div class="mb-3">
+        <div class="p-2">
             {{ form.as_p }}
+
+            <div class="footer">
+                <button id="boton_crear_home52" class="boton-estilizado" type="submit">Crear encuesta</button>
+                <a id="boton_cancelar_home52" class="boton-estilizado" href="{% url 'encuesta:inicio_encuestas'  %}">Cancelar</a>
+            </div>
+            
         </div>
-        <button  class="btn btn-primary" style="width: 100%;" type="submit">Crear encuesta</button>
-        <a class="btn btn-danger mt-1" style="width: 100%;" href="{% url 'encuesta:inicio_encuestas'  %}" style="flex: 1; margin-left: 5px; margin-right: 5px;">
-            Cancelar
-        </a>
+
         
     </form>
 </div>

@@ -14,6 +14,7 @@ urlpatterns = [
     path('crear_encuesta/', views.CrearEncuesta.as_view(), name='crear_encuesta'),
     path('editar_encuesta/<int:encuesta_id>/', views.EditarEncuesta.as_view(), name='editar_encuesta'),
     path('eliminar_encuesta/<int:encuesta_id>/', views.EliminarEncuesta.as_view(), name='eliminar_encuesta'),
+    path('publicar_encuesta/<int:encuesta_id>/', views.PublicarEncuesta.as_view(), name='publicar_encuesta'),
 
     # Rutas para las preguntas de una encuesta específica
     path('encuesta/<int:encuesta_id>/', views.EncuestaDetail.as_view(), name='encuesta_detail'),

@@ -18,7 +18,7 @@ function listarUsuarios() {
             }
             for (let i = 0; i < response.length; i++) {
                 let fila = '<tr>';
-                fila += '<td>' + ('20' + ('0' + (i + 1)).slice(-3)) + '</td>';  // Ajustar el formato del número de ID
+                fila += '<td>' + ('' + ('' + (i + 1)).slice(-3)) + '</td>';  // Ajustar el formato del número de ID
                 fila += '<td>' + response[i]["fields"]['username'] + '</td>';
                 fila += '<td>' + response[i]["fields"]['nombres'] + '</td>';
                 fila += '<td>' + response[i]["fields"]['apellidos'] + '</td>';

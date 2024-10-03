@@ -20,16 +20,6 @@ Detalle encuesta
 </div>
 {% endblock modulo_encuestas %}
 
-{% if not encuesta.estado %}
-<div>
-    <div class="alert alert-warning alert-dismissible" role="alert">
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        <strong>Recomendaciones:</strong>
-        La encuesta no se encuentra disponible para los usuarios, cambie el estado.
-        <br>Estado actual: {{encuesta.estado}}
-    </div>
-</div>
-{% endif %}
 
 <div id="section_detalle_encuesta">
 
@@ -55,22 +45,50 @@ Detalle encuesta
         <a id="editar_encuesta" href="{% url 'encuesta:editar_encuesta' encuesta.id %}"><i style="color: #FF7411;"
                 class="fa-solid fa-pen-to-square"></i></a>
 
-        {% if encuesta.fechaFinal|date:"Y-m-d H:i" <= hoy|date:"Y-m-d H:i" %} 
-        <div
-            class="alert alert-danger alert-dismissible" role="alert">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            <strong>Alerta de visualización:</strong>
-            La fecha de finalización de la encuesta ya paso, su visualizacion se encuentra INACTIVA
-        </div>
-        {% endif %}
 
-        <h6>Estado
+
+        <div><h6><strong>Estado de la encuesta</strong></h6>
             {% if encuesta.estado %}
-                Activada (Los usuarios pueden enviar respuestas)
+                <h6 >Activa (Encuesta visible para los usuarios)</h6>
             {% else %}
-                Inactiva (Los usuarios NO pueden visualizar la encuesta)
+                <h6 ><strong>Inactiva*</strong> (Encuesta oculata para los usuarios)</h6>
             {% endif %}
-        </h6>
+
+            {% if encuesta.publicarEncuesta %}
+                <h6 > Encuesta publicada </h6>
+            {% else %}
+                <h6 ><strong>La encuesta no esta publicada**</strong> (No disponible en el sitema) </h6>
+
+                <ul> 
+                    <li>Verifique la información de la encuesta y las preguntas de antes de publicarla.</li>
+                    <li>Una vez confirme publicar, la encuesta estará disponible en el sistema y las preguntas no tienen modificación.</li>
+                    <li>Recuerde que para que la encuesta sea visible al publico, debe validar la fecha de finalización y el estado activado</li>
+                </ul>
+
+                {% if encuesta.fechaFinal|date:"Y-m-d H:i" <= hoy|date:"Y-m-d H:i" %} 
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <strong>Alerta de visualización</strong><br>
+                    La fecha de finalización de la encuesta ya paso, su visualizacion se encuentra OCULTA
+                </div>
+                {% endif %}
+    
+                {% if not encuesta.estado %}
+                <div>
+                    <div class="alert alert-warning alert-dismissible" role="alert">
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <strong>Recomendaciones</strong><br>
+                        Cambie el estado de la encuesta, seleccione el campo Encuesta activada <a href="{% url 'encuesta:editar_encuesta' encuesta.id %}">editar</a>
+                        <br>Estado actual: <strong>Inactiva*</strong>
+                    </div>
+                </div>
+                {% endif %}
+                
+            {% endif %}
+            <!-- Alertas de estado de la encuesta -->
+
+
+        </div>
 
     </ul>
 
@@ -79,7 +97,7 @@ Detalle encuesta
     <h5>Lista de preguntas <i class="fa-solid fa-list-ol"></i></h5>
     {% if preguntas_con_opciones %}
     {% for pregunta_con_opciones in preguntas_con_opciones %}
-    <div class="col d-flex">
+    <div class="col d-flex mt-2">
         <div id="pregunta">
 
             <div class="container_pregunta">
@@ -102,10 +120,14 @@ Detalle encuesta
                 {% endif %}
             
                 <!-- Botones de acción -->
+                {% if not encuesta.publicarEncuesta %}
                 <div class="cont_botones_preguntas">
                     <a class="boton_pregunta editar" href="{% url 'encuesta:editar_pregunta' encuesta.id pregunta_con_opciones.pregunta.id %}"><i class="fa-solid fa-pen-to-square"></i></a>
-                    <a class="boton_pregunta eliminar" href="{% url 'encuesta:eliminar_pregunta' encuesta.id pregunta_con_opciones.pregunta.id %}"><i class="fa-solid fa-trash"></i></a>
-                </div>                
+                    <a class="boton_pregunta eliminar" href="{% url 'encuesta:eliminar_pregunta' encuesta.id pregunta_con_opciones.pregunta.id %}"><i class="fa-solid fa-trash-can"></i></a>
+                </div>    
+                {% else %}
+                {% endif %}
+            
             </div>
             
         </div>
@@ -119,16 +141,17 @@ Detalle encuesta
     {% endif %}
 </div>
 
-<a class="btn btn-primary mt-4" href="{% url 'encuesta:agregar_pregunta' encuesta.id %}">Agregar Pregunta</a>
-<hr>
-<div style="display: flex;">
-    <a class="btn btn-success" href="" style="flex: 2; margin-right: 5px;">
-        Ver Encuesta
-    </a>
-    <a class="btn btn-danger" href="{% url 'encuesta:eliminar_encuesta' encuesta.id %}" style="width: 20%;">
-        Eliminar encuesta
-    </a>
+{% if not encuesta.publicarEncuesta %}
+<div class="footer">
+    <a id="boton_crear_home52" class="boton-estilizado" href="{% url 'encuesta:agregar_pregunta' encuesta.id %}">Agregar Pregunta</a>
+    <a id="boton_eliminar_home52" class="boton-estilizado" href="{% url 'encuesta:eliminar_encuesta' encuesta.id %}">Eliminar todo</a>
 </div>
+<hr>
+<a id="boton_publicarEncuesta_home52" class="boton-publicar" href="{% url 'encuesta:publicar_encuesta' encuesta.id %}">PUBLICAR ENCUESTA</a>
+{% else %}
+<a id="boton_crear_home52" class="boton-publicar" href="{% url 'encuesta:publicar_encuesta' encuesta.id %}">VER ENCUESTA</a>
+{% endif %}
+
 
 </div>
 

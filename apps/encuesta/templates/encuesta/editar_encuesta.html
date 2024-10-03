@@ -39,13 +39,15 @@ Editar encuesta
         <strong>Alerta de visualización:</strong>
         Recuerde marcar la encuesta como activa
     </div>
-    <form class="mt-2 py-1 mx-4"   method="POST" >
+    <form class="mt-2 py-1 mx-4" method="POST" >
         {% csrf_token %}
         {{ form.as_p }}
-    <button  class="btn btn-primary" style="width: 100%;" type="submit">Actualizar</button>
-    <a class="btn btn-danger mt-1" style="width: 100%;" href="{% url 'encuesta:encuesta_detail' object.id %}"  >
-        Cancelar
-    </a>
+
+    <div class="footer">
+        <button id="boton_crear_home52" class="boton-estilizado" type="submit">Guardar cambios</button>
+        <a id="boton_cancelar_home52" class="boton-estilizado" href="{% url 'encuesta:encuesta_detail' encuesta.id%}">Cancelar</a>
+    </div>
+    
     </form>
 </div>
 </div>

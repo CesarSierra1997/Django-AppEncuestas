@@ -11,12 +11,12 @@ Agregar Pregunta
 {% endblock navegacion %}
 
 {% block encuesta %}
-{% block modulo_encuestas %}
-<div id="contenedor_modulo_encuestas">
-    <h5>Modulo encuestas</h5>
-    <p>A continuación podra agregar algun tipo de pregunta.</p>
-    <a id="volver_incio_encuestas" href="{% url 'encuesta:inicio_encuestas' %}"><i class="fa-solid fa-house"></i></a>
-</div>
+    {% block modulo_encuestas %}
+    <div id="contenedor_modulo_encuestas">
+        <h5>Modulo encuestas</h5>
+        <p>A continuación podra agregar algun tipo de pregunta.</p>
+        <a id="volver_incio_encuestas" href="{% url 'encuesta:inicio_encuestas' %}"><i class="fa-solid fa-house"></i></a>
+    </div>
     {% endblock modulo_encuestas %}
 <div id="section_detalle_encuesta">
     <h5>Agregar pregunta</h5>
@@ -25,29 +25,32 @@ Agregar Pregunta
         {{ form.as_p }}
         
         <!-- Contenedor para las opciones múltiples -->
-        <div id="opciones-container" style="display: none;">
+        <div class="opciones_pregunta_slect_mult" id="opciones-container" style="display: none;">
             <h5>Agregar Opciones</h5>
-            <div class="form-group">
+            <div class="form-group" id="opciones">
                 <label for="opcion_1">Opción 1</label>
-                <input type="text" class="form-control" id="opcion_1" name="opcion_1">
+                <input type="text"  id="opcion_1" name="opcion_1">
             </div>
-            <div class="form-group">
+            <div class="form-group" id="opciones">
                 <label for="opcion_2">Opción 2</label>
-                <input type="text" class="form-control" id="opcion_2" name="opcion_2">
+                <input type="text"  id="opcion_2" name="opcion_2">
             </div>
-            <div class="form-group">
+            <div class="form-group" id="opciones">
                 <label for="opcion_3">Opción 3</label>
-                <input type="text" class="form-control" id="opcion_3" name="opcion_3">
+                <input type="text"  id="opcion_3" name="opcion_3">
             </div>
-            <div class="form-group">
+            <div class="form-group" id="opciones">
                 <label for="opcion_4">Opción 4</label>
-                <input type="text" class="form-control" id="opcion_4" name="opcion_4">
+                <input type="text"  id="opcion_4" name="opcion_4">
             </div>
         </div>
 
-        <button class="btn btn-primary" type="submit">Agregar</button>
-        <a class="btn btn-dark bg-gradient" href="{% url 'encuesta:inicio_encuestas' %}">Cancelar</a>
+        <div class="footer">
+            <button id="boton_crear_home52" class="boton-estilizado" type="submit">Agregar pregunta</button>
+            <a id="boton_cancelar_home52" class="boton-estilizado" href="{% url 'encuesta:encuesta_detail'  encuesta.id%}">Cancelar</a>
+        </div>
     </form>
+
     <hr>
     
 </div>
@@ -71,15 +74,30 @@ Agregar Pregunta
         })
     }
 
+    function notificacionTexto(mensaje){
+        Swal.fire({
+            title:'El texto de la pregunta debe tener al menos 10 caracteres.',
+            text: mensaje,
+            icon: 'error'
+        })
+    }
+
     function validateForm() {
         const tipoPregunta = document.getElementById("id_tipoPregunta").value;
+        const textoPregunta = document.getElementById("id_texto_pregunta").value;
         if (tipoPregunta === "4") {  // Ajusta según tu choice para selección múltiple
             const opcion1 = document.getElementById("opcion_1").value.trim();
             const opcion2 = document.getElementById("opcion_2").value.trim();
             const opcion3 = document.getElementById("opcion_3").value.trim();
             const opcion4 = document.getElementById("opcion_4").value.trim();
             
-            if (!opcion1 || !opcion2 || !opcion3 || !opcion4) {
+
+            if (textoPregunta.length < 10){
+                notificacionTexto();
+                return false;  // Prevenir el envío del formulario
+            }
+
+            if (!opcion1 || !opcion2 || !opcion3 || !opcion4){
                 notificacionOpciones();
                 return false;  // Prevenir el envío del formulario
             }

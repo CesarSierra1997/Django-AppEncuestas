@@ -17,7 +17,7 @@ class Encuesta(models.Model):
     fechaCreacion = models.DateTimeField('Fecha de creación',auto_now_add=True)
     fechaModificacion = models.DateTimeField(auto_now_add=False, null=True)
     estado = models.BooleanField('Estado', default=True)
-    # encuestaDesplegada = models.BooleanField('Despliegue de encuesta', default=False)
+    publicarEncuesta = models.BooleanField('Visibilidad', default=False)
 
     def __str__ (self):
         return f'{self.titulo} - tipo {self.tipoEncuesta}'

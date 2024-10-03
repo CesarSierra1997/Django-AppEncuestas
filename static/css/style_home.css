@@ -14,9 +14,9 @@
 }
 
 /* Main modules section */
-#section_modules {
+/* #section_modules {
     padding: 20px;
-}
+} */
 
 /* Grid layout for survey cards */
 #section_grid_encuestas {
@@ -262,45 +262,179 @@ em {
 }
 
 .cont_botones_preguntas {
-    position: relative; /* Necesario para que position: absolute funcione dentro del contenedor */
-    height: 50px; /* Ajusta la altura según lo que necesites */
+    position: relative; 
+    height: 50px; 
     gap: 50px;
 }
 
 .container_pregunta {
-    position: relative;           /* Necesario para posicionar los botones dentro del contenedor */
+    position: relative;           
     padding: 10px;
     margin-bottom: 15px;
 }
 
+/* botones de edicion y eliminar pregunta - detalle_encuesta.html */
 .cont_botones_preguntas {
-    position: absolute;           /* Posicionar absolutamente los botones */
-    top: 10px;                    /* Alinea los botones 10px desde la parte superior */
-    right: 10px;                  /* Alinea los botones 10px desde la parte derecha */
-    display: flex;                /* Alinea los botones en una fila */
-    gap: 5px;                     /* Espacio entre los botones */
+    position: absolute;          
+    top: 10px;                    
+    right: 10px;                  
+    display: flex;                
+    gap: 5px;                     
 }
 
-
 .boton_pregunta {
-    display: inline-flex;         /* Asegura que los íconos se alineen correctamente */
+    display: inline-flex;         
     justify-content: center;
     align-items: center;
-    width: 30px;                  /* Ajusta el tamaño del botón */
-    height: 30px;                 /* Ajusta el tamaño del botón */
-    background-color: #007bff;    /* Color de fondo */
-    color: white;                 /* Color del ícono */
-    text-decoration: none;        /* Elimina el subrayado */
-    border-radius: 50%;           /* Hacer botones redondos */
-    font-size: 16px;              /* Tamaño del ícono */
-    transition: background-color 0.3s ease;
+    width: 40px;                  
+    height: 40px;                 
+    color: white;                 
+    border-radius: 50%;           
+    font-size: 18px;              
 }
 
 .boton_pregunta.editar {
-    background-color: #FF7411;    /* Color para el botón de editar */
+    background-color: #FF7411;   
 }
 
 .boton_pregunta.eliminar {
-    background-color: #dc3545;    /* Color para el botón de eliminar */
+    background-color: #dc3545;    
 }
 
+.cont_botones_preguntas :hover {
+    background-color: #ffd6b9;  
+    color: #000000; 
+}
+
+/* Opciones de preguntas - agregar_pregunta.hmtl editar_pregunta.hmtl*/
+
+.opciones_pregunta_slect_mult div{
+    display: block;
+    padding-left: 20px;
+}
+
+#opciones{
+    padding-block: 2px !important;
+}
+
+/* BOTONES crear o agregar - cancelar - eliminar HOME 52 */
+
+.footer {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+    width: 100%; 
+    margin-top: 20px; 
+    gap: 10px;
+}
+
+.boton-estilizado {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    padding: 10px; /* Ajuste para darle más espacio y hacerlo más prominente */
+    font-size: 16px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 50%;
+    text-align: center;
+    display: inline-block; /* Para que el <a> se comporte como botón */
+    cursor: pointer;
+    text-decoration: none; /* Eliminar subrayado de los enlaces */
+}
+
+/* <button> - Crear */
+#boton_crear_home52 {
+    background-color: #FF7411;
+    color: white;
+    border: none; 
+}
+
+#boton_crear_home52:hover {
+    background-color: #FF741180;
+    transform: scale(1.05);
+}
+
+/* <a> - Cancelar */
+#boton_cancelar_home52 {
+    background-color: #4B4B4B;
+    color: white;
+    border: none; 
+}
+
+#boton_cancelar_home52:hover {
+    background-color: #4B4B4B80;
+    transform: scale(1.05);
+}
+
+/* <a> - eliminar */
+#boton_eliminar_home52 {
+    background-color: #d30303;
+    color: white;
+    border: none; 
+}
+
+#boton_eliminar_home52:hover {
+    background-color: #d303038c;
+    transform: scale(1.05);
+}
+
+.boton-publicar {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 18px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    width: 100%;
+    display: inline-block;
+    height: 60px;
+    text-decoration: none;
+    align-content: center;
+    text-align: center;
+}
+
+/* Detalle encuesta - boton publicar encuesta*/
+
+#boton_publicarEncuesta_home52{
+    background-color: #00a59d;
+    color: white;
+    border: none; 
+    font-weight: bolder;
+    font-size: 20px;
+    box-shadow: 2px 2px 3px #000;
+    letter-spacing: 2px;
+}
+
+#boton_publicarEncuesta_home52:hover{
+    background-color: #49ff115d;
+    transform: scale(1.01);
+    font-size: 25px;
+    cursor: pointer;
+    border-color: #000;
+    letter-spacing: 5px;
+} 
+
+
+/* Botones registro y edicion de usuario*/
+
+#boton_creacion{
+    background-color: #FF7411;
+    color: white;
+    border: none; 
+}
+
+#boton_creacion:hover {
+    background-color: #FF741180;
+    transform: scale(1.05);
+}
+
+#boton_edicion{
+    background-color: #FF7411;
+    color: white;
+    border: none; 
+}
+
+#boton_edicion:hover {
+    background-color: #FF741180;
+    transform: scale(1.05);
+}

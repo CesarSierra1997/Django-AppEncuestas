@@ -11,7 +11,7 @@ class EncuestaForm(forms.ModelForm):
             'tipoEncuesta': 'Seleccione el tipo de encuesta',
             'fechaInicio': 'Fecha de inicio',
             'fechaFinal': 'Fecha de finalización',
-            'estado': '¿Encuesta activada?',
+            'estado': 'Encuesta activada',
         }
         widgets = {
             'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el titulo de la encuesta'}),
@@ -60,10 +60,6 @@ class ActualizarEncuestaForm(forms.ModelForm):
         if not titulo.replace(" ", "").isalpha():
             raise forms.ValidationError("El título solo puede contener letras.")
         return titulo.lower()
-
-    
-
-# class EncuestaModificarForm(forms.ModelForm):
 
 class PreguntaForm(forms.ModelForm):
     class Meta:

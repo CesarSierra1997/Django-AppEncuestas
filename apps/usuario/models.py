@@ -3,9 +3,10 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 
 # Create your models here.
 class UsuarioManager(BaseUserManager):
-        def _create_user(self, username, email, nombres, apellidos, password, is_staff, is_superuser, **extra_fields):
+        def _create_user(self, username, numeroDocumento, email, nombres, apellidos, password, is_staff, is_superuser, **extra_fields):
             user = self.model(
                 username = username,
+                numeroDocumento = numeroDocumento,
                 email = email,
                 nombres = nombres,
                 apellidos = apellidos,
@@ -17,11 +18,11 @@ class UsuarioManager(BaseUserManager):
             user.save(using=self.db)
             return user
         
-        def create_user(self, username, email, nombres, apellidos, password = None, **extra_fields):
-             return self._create_user(username, email, nombres, apellidos, password, False, False, **extra_fields)
+        def create_user(self, username, numeroDocumento, email, nombres, apellidos, password = None, **extra_fields):
+             return self._create_user(username, numeroDocumento, email, nombres, apellidos, password, False, False, **extra_fields)
         
-        def create_superuser(self, username, email, nombres, apellidos, password = None, **extra_fields):
-             return self._create_user(username, email, nombres, apellidos, password, True, True, **extra_fields)
+        def create_superuser(self, username, numeroDocumento, email, nombres, apellidos, password = None, **extra_fields):
+             return self._create_user(username, numeroDocumento, email, nombres, apellidos, password, True, True, **extra_fields)
 
 class Rol(models.Model):
     rol = models.CharField('Nombre del Rol', max_length=100, unique = True)
@@ -41,7 +42,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         ('RC', 'Registro civil'),
     ]
     tipoDocumento = models.CharField('Tipo de documento', max_length=20, choices=TIPO_DOCUMENTO_CHOICES, default=False)
-    numeroDocumento = models.BigIntegerField('Número de documento', blank=False, null=False, unique =True )
+    numeroDocumento = models.BigIntegerField('Número de documento', blank=False, null=False, unique=True )
     username = models.CharField("Nombre de usuario",unique=True, max_length=20)
     email = models.EmailField('Correo electrónico', max_length=30, unique =True)
     nombres = models.CharField('Nombres', max_length=30, blank= True, null =True)
@@ -50,12 +51,12 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default = True)
     is_staff = models.BooleanField(default = False)
     objects = UsuarioManager()
-    rol = models.ForeignKey(Rol, on_delete=models.SET_NULL, null=True, default=2)
+    rol = models.ForeignKey(Rol, on_delete=models.SET_NULL, blank=True, null=True)
 
     
     
     USERNAME_FIELD  = 'username'
-    REQUIRED_FIELDS = ['email', 'nombres', 'apellidos']
+    REQUIRED_FIELDS = ['email', 'nombres', 'apellidos', 'numeroDocumento']
 
     def __str__ (self):
         return f'{self.nombres} {self.apellidos}'
