@@ -23,7 +23,7 @@ urlpatterns = [
     path('encuesta/eliminar_pregunta/<int:encuesta_id>/pregunta/<int:pregunta_id>/', views.EliminarPregunta.as_view(), name='eliminar_pregunta'),
 
     # Ruta para ver las encuestas publicadas, activas y vigentes
-    path('encuestas/', views.VerEncuestasPublicas.as_view(), name='ver_encuestas_publicas'),
+    path('encuestas_publicas/', views.VerEncuestasPublicas.as_view(), name='ver_encuestas_publicas'),
     path('encuesta/encuestas_privadas', views.VerEncuestasPrivadas.as_view(), name='ver_encuestas_privadas'),
 
 
@@ -34,4 +34,5 @@ urlpatterns = [
     path('responder_encuesta_privada/<int:encuesta_id>/', views.ResponderEncuestaPrivada.as_view(), name='responder_encuesta_privada'),
 
     path('ver_respuestas/', views.VerRespuestas.as_view(), name='ver_respuestas'),
+    path('exportar-respuestas-publicas/', views.ExportarRespuestasPublicasExcel.as_view(), name='exportar_respuestas_publicas'),
 ]

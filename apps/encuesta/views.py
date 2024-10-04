@@ -1,10 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView, CreateView, DetailView, ListView, UpdateView, DeleteView, FormView
+from django.views import View
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
-from django.http import Http404
+from django.http import Http404,HttpResponse
 from django.utils import timezone
 from django.contrib import messages
+from openpyxl import Workbook
 from datetime import datetime
 from ..usuario.mixin import *
 from .models import *
@@ -421,8 +423,8 @@ class VerEncuestasPublicas(ListView):
         return self.model.objects.filter(estado=True, publicarEncuesta=True, tipoEncuesta="Publica")
 
     def get_context_data(self, **kwargs):
-        """ Añade encuestas y sus preguntas al contexto del template."""
         context = super().get_context_data(**kwargs)
+        context['hoy'] = timezone.now()  # Añadimos la fecha y hora actual al contexto
         return context
     
 class VerEncuestasPrivadas(LoginRequiredMixin, ListView):
@@ -519,7 +521,8 @@ class ResponderEncuestaPublica(FormView):
             messages.error(self.request, 'Debe responder todas las preguntas antes de enviar la encuesta.')
             encuesta_publica.delete()  # Elimina el registro de la encuesta pública creado
             return self.form_invalid(form)  # Retorna el formulario inválido
-
+        
+        messages.success(self.request, 'Respuesta envida de manera exitosa.')
         return super().form_valid(form)
 
 class ResponderEncuestaPrivada(LoginRequiredMixin, FormView):
@@ -608,3 +611,59 @@ class VerRespuestas(LoginRequiredMixin, ListView):
         context['respuestas_privadas'] = Respuesta.objects.filter(respuestaEncuestaPrivada__isnull=False)
         
         return context
+
+class ExportarRespuestasPublicasExcel(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        # Crear un nuevo libro de trabajo Excel
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Respuestas de Encuestas Públicas"
+
+        # Encabezados de las columnas
+        # Cabeceras de la hoja de Excel
+        ws.append([
+            "Encuesta", "Tipo de pregunta", "Pregunta", "Respuesta", "Tipo de Usuario", 
+            "Nombre", "Número de Documento", "Correo Electrónico"
+        ])
+
+        # Obtener las respuestas públicas
+        respuestas_publicas = Respuesta.objects.filter(respuestaEncuestaPublica__isnull=False)
+
+        # Llenar las filas con datos
+        for respuesta in respuestas_publicas:
+            numero_documento = respuesta.respuestaEncuestaPublica.numeroDocumento
+            # Intentar convertir numeroDocumento a número, si es posible
+            try:
+                numero_documento = int(numero_documento)  # Convertir a entero
+            except ValueError:
+                numero_documento = respuesta.respuestaEncuestaPublica.numeroDocumento
+
+            # Obtener el tipo de pregunta y convertir la respuesta si es numérica
+            tipo_pregunta = respuesta.pregunta.tipoPregunta  # Obtener el tipo de pregunta
+            respuesta_converted = respuesta.texto_respuesta  # Respuesta original
+
+            # Verificar si el tipo de pregunta es numérica
+            if tipo_pregunta == '3':  # Supongamos que '3' es el código para 'Numérica'
+                try:
+                    respuesta_converted = float(respuesta.texto_respuesta)  # Convertir a número (flotante)
+                except ValueError:
+                    respuesta_converted = respuesta.texto_respuesta  # Si falla, mantener el texto original
+
+            ws.append([
+                respuesta.respuestaEncuestaPublica.encuesta.titulo,
+                respuesta.pregunta.get_tipoPregunta_display(),
+                respuesta.pregunta.texto_pregunta,
+                respuesta_converted,  # Aquí se usa la respuesta convertida
+                respuesta.respuestaEncuestaPublica.get_tipoUsuario_display(),
+                respuesta.respuestaEncuestaPublica.nombre,
+                numero_documento,
+                respuesta.respuestaEncuestaPublica.email
+            ])
+
+
+        # Generar el archivo Excel para la respuesta HTTP
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=Respuestas_Publicas.xlsx'
+        wb.save(response)
+        return response
+

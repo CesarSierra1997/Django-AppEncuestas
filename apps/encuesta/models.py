@@ -77,8 +77,8 @@ class RespuestaEncuestaPublica(models.Model):
         ('REGISTRO_CIVIL', 'Registro civil'),
     ]
     tipoDocumento = models.CharField('Tipo de Documento', max_length=20, choices=TIPO_DOCUMENTO_CHOICES)
-    numeroDocumento = models.CharField('Digite su número de documento', max_length=12,blank=False, null=False, unique=True)
-    nombre = models.CharField('Digite su nombre completo', max_length=50, blank=False, null=False)
+    numeroDocumento = models.CharField('Número de documento', max_length=12,blank=False, null=False, unique=True)
+    nombre = models.CharField('Nombre completo', max_length=50, blank=False, null=False)
     email = models.EmailField('Correo Electrónico', max_length=254, blank=False, null=False, unique=True)
     encuesta = models.ForeignKey(Encuesta, on_delete=models.CASCADE, related_name='encuesta_preguntas_publica')
 

@@ -1,69 +1,122 @@
 {% extends "encuestaHome.html" %}
 {% block title %}
-    Ver Respuestas
+    Respuestas
 {% endblock title %}
+{% load static %}
+{% block navegacion %}
+<div id="ruta_navegacion">
+    <em>App/ modulo encuestas/ respuestas</em>
+</div>
+{% endblock navegacion %}
+
 {% block encuesta %}
-<!-- ver_respuestas.html -->
 
-<h2>Respuestas para la Encuesta: {{ encuesta.titulo }}</h2>
+{% block modulo_encuestas %}
+<div id="contenedor_modulo_encuestas">
+    <h5>Módulo encuestas</h5>
+    <p>A continuación podrás ver las respuestas enviadas por los usuarios</p>
+    <a id="volver_incio_encuestas" href="{% url 'encuesta:inicio_encuestas' %}"><i class="fa-solid fa-house"></i></a>
+</div>
+{% endblock modulo_encuestas %}
 
-<!-- Respuestas Públicas -->
-<h3>Respuestas Públicas</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Encuesta</th>
-            <th>Pregunta</th>
-            <th>Respuesta</th>
-            <th>Tipo de Encuesta</th>
-            <th>Nombre del Usuario</th>
-            <th>Documento del Usuario</th>
-            <th>Correo Electrónico</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for respuesta in respuestas_publicas %}
-        <tr>
-            <td>{{ respuesta.respuestaEncuestaPublica.encuesta.titulo }}</td>
-            <td>{{ respuesta.pregunta.texto_pregunta }}</td>
-            <td>{{ respuesta.texto_respuesta }}</td>
-            <td>Pública</td>
-            <!-- Mostrar datos del usuario público -->
-            <td>{{ respuesta.respuestaEncuestaPublica.nombre }}</td>
-            <td>{{ respuesta.respuestaEncuestaPublica.numeroDocumento }}</td>
-            <td>{{ respuesta.respuestaEncuestaPublica.email }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="table-container">
+    <h3>Respuestas Públicas</h3>
+    
+    <div class="busqueda_exportar_respuestas">
+        <input type="text" id="publicSearch" placeholder="Buscar en respuestas públicas...">
+        <a id="exportarExcel" href="{% url 'encuesta:exportar_respuestas_publicas' %}" class="btn-excel">
+            <img src="{% static 'img/excel.webp' %}" alt="Excel Logo" class="excel-icon">
+            Exportar a Excel
+        </a>
+    </div>
 
-<div class="divisor">
-    <hr>
+    <table id="publicTable">
+        <thead>
+            <tr>
+                <th>Encuesta</th>
+                <th>Pregunta</th>
+                <th>Respuesta</th>
+                <th>Tipo de Usuario</th>
+                <th>Nombre del Usuario</th>
+                <th>Correo Electrónico</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for respuesta in respuestas_publicas %}
+            <tr>
+                <td>{{ respuesta.respuestaEncuestaPublica.encuesta.titulo }}</td>
+                <td>{{ respuesta.pregunta.texto_pregunta }}</td>
+                <td>{{ respuesta.texto_respuesta }}</td>
+                <td>{{ respuesta.respuestaEncuestaPublica.get_tipoUsuario_display }}</td>
+                <td>{{ respuesta.respuestaEncuestaPublica.nombre }}</td>
+                <td>{{ respuesta.respuestaEncuestaPublica.email }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 
-<!-- Respuestas Privadas -->
-<h3>Respuestas Privadas</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Encuesta</th>
-            <th>Pregunta</th>
-            <th>Respuesta</th>
-            <th>Tipo de Encuesta</th>
-            <th>Usuario Registrado</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for respuesta in respuestas_privadas %}
-        <tr>
-            <td>{{ respuesta.respuestaEncuestaPrivada.encuesta.titulo }}</td>
-            <td>{{ respuesta.pregunta.texto_pregunta }}</td>
-            <td>{{ respuesta.texto_respuesta }}</td>
-            <td>Privada</td>
-            <td>{{ respuesta.respuestaEncuestaPrivada.usuario.username }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="table-container">
+    <h3>Respuestas Privadas</h3>
+    
+    <input type="text" id="privateSearch" placeholder="Buscar en respuestas privadas...">
+    
+    <table id="privateTable">
+        <thead>
+            <tr>
+                <th>Encuesta</th>
+                <th>Pregunta</th>
+                <th>Respuesta</th>
+                <th>Usuario</th>
+                <th>Documento</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for respuesta in respuestas_privadas %}
+            <tr>
+                <td>{{ respuesta.respuestaEncuestaPrivada.encuesta.titulo }}</td>
+                <td>{{ respuesta.pregunta.texto_pregunta }}</td>
+                <td>{{ respuesta.texto_respuesta }}</td>
+                <td>{{ respuesta.respuestaEncuestaPrivada.usuario.username }}</td>
+                <td>{{ respuesta.respuestaEncuestaPrivada.usuario.numeroDocumento }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Filtro para respuestas públicas
+    document.getElementById("publicSearch").addEventListener("keyup", function() {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#publicTable tbody tr");
+
+        rows.forEach(row => {
+            let match = false;
+            row.querySelectorAll("td").forEach(td => {
+                if (td.textContent.toLowerCase().includes(filter)) {
+                    match = true;
+                }
+            });
+            row.style.display = match ? "" : "none";
+        });
+    });
+
+    // Filtro para respuestas privadas
+    document.getElementById("privateSearch").addEventListener("keyup", function() {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#privateTable tbody tr");
+
+        rows.forEach(row => {
+            let match = false;
+            row.querySelectorAll("td").forEach(td => {
+                if (td.textContent.toLowerCase().includes(filter)) {
+                    match = true;
+                }
+            });
+            row.style.display = match ? "" : "none";
+        });
+    });
+</script>
 
 {% endblock encuesta %}

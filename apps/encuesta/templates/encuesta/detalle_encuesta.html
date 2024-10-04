@@ -52,9 +52,9 @@ Detalle encuesta
 
                 <!-- Alertas estado ENCUESTA PUBLICADA  -->
                 {% if encuesta.estado and encuesta.fechaFinal|date:"Y-m-d H:i" >= hoy|date:"Y-m-d H:i" %}
-                <h6><strong>Activa</strong> <i class="fa-solid fa-eye text-info"></i> (Encuesta visible)</h6>
+                <h6><strong>Visible</strong> <i class="fa-solid fa-eye text-info"></i> (Encuesta visible)</h6>
                 {% else %}
-                    <h6><strong>Inactiva**</strong> <i class="fa-solid fa-eye-slash text-info"></i> (Encuesta oculta)</h6>
+                    <h6><strong>Oculta**</strong> <i class="fa-solid fa-eye-slash text-info"></i> (Encuesta oculta)</h6>
                     <div class="alert alert-warning alert-dismissible" role="alert">
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         <strong>Alerta de visualización</strong><br>                      

@@ -1,6 +1,6 @@
 {% extends "encuestaHome.html" %}
 {% block title %}
-    Admin publicas
+    responder encuesta publica
 {% endblock title %}
 {% block encuesta %}
 
@@ -114,11 +114,11 @@
         </div>
         
         <!-- Campos de datos personales -->
-        <div class="mb-3">{{ form.tipoUsuario.label_tag }} {{ form.tipoUsuario }} <div class="text-danger">{{ form.tipoUsuario.errors }}</div></div>
-        <div class="mb-3">{{ form.tipoDocumento.label_tag }} {{ form.tipoDocumento }} <div class="text-danger">{{ form.tipoDocumento.errors }}</div></div>
-        <div class="mb-3">{{ form.numeroDocumento.label_tag }} {{ form.numeroDocumento }} <div class="text-danger">{{ form.numeroDocumento.errors }}</div></div>
-        <div class="mb-3">{{ form.nombre.label_tag }} {{ form.nombre }} <div class="text-danger">{{ form.nombre.errors }}</div></div>
-        <div class="mb-3">{{ form.email.label_tag }} {{ form.email }} <div class="text-danger">{{ form.email.errors }}</div></div>
+        <div class="mb-3">{{ form.tipoUsuario.label_tag }} {{ form.tipoUsuario }} <div id="erroresRespuestas">{{ form.tipoUsuario.errors }}</div></div>
+        <div class="mb-3">{{ form.tipoDocumento.label_tag }} {{ form.tipoDocumento }} <div id="erroresRespuestas">{{ form.tipoDocumento.errors }}</div></div>
+        <div class="mb-3">{{ form.numeroDocumento.label_tag }} {{ form.numeroDocumento }} <div id="erroresRespuestas">{{ form.numeroDocumento.errors }}</div></div>
+        <div class="mb -3">{{ form.nombre.label_tag }} {{ form.nombre }} <div id="erroresRespuestas">{{ form.nombre.errors }}</div></div>
+        <div class="mb-3">{{ form.email.label_tag }} {{ form.email }} <div id="erroresRespuestas">{{ form.email.errors }}</div></div>
 
         <div class="divisor">
             <hr>
@@ -132,14 +132,14 @@
 
                 <!-- Condiciones para diferentes tipos de preguntas -->
                 {% if pregunta.tipoPregunta == '1' %}
-                    <input type="number" name="respuesta_{{ pregunta.id }}" class="form-control" placeholder="Ingrese un número">
+                    <input type="text" name="respuesta_{{ pregunta.id }}" class="form-control" placeholder="Ingrese su respuesta">
 
                 {% elif pregunta.tipoPregunta == '2' %}
-                    <div><input type="checkbox" name="respuesta_{{ pregunta.id }}" value="Sí"> Sí</div>
-                    <div><input type="checkbox" name="respuesta_{{ pregunta.id }}" value="No"> No</div>
+                    <div><input type="radio" name="respuesta_{{ pregunta.id }}" value="Sí"> Sí</div>
+                    <div><input type="radio" name="respuesta_{{ pregunta.id }}" value="No"> No</div>
 
                 {% elif pregunta.tipoPregunta == '3' %}
-                    <input type="text" name="respuesta_{{ pregunta.id }}" class="form-control" placeholder="Ingrese su respuesta">
+                <input type="number" min="1" max="99999999999" name="respuesta_{{ pregunta.id }}" class="form-control" placeholder="Ingrese un número">
 
                 {% elif pregunta.tipoPregunta == '4' %}
                     {% for opcion in pregunta.opciones.all %}
@@ -149,7 +149,7 @@
                         <div><input type="radio" name="respuesta_{{ pregunta.id }}" value="{{ opcion.opcion_4 }}"> {{ opcion.opcion_4 }}</div>
                     {% endfor %}
                 {% else %}
-                    <input type="text" name="respuesta_{{ pregunta.id }}" class="form-control" placeholder="Ingrese su respuesta">
+                    <p>Tipo de pregunta desconocido: {{ pregunta.tipoPregunta }}</p>        
                 {% endif %}
             </div>
             {% endfor %}
