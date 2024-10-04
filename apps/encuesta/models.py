@@ -18,6 +18,8 @@ class Encuesta(models.Model):
     fechaModificacion = models.DateTimeField(auto_now_add=False, null=True)
     estado = models.BooleanField('Estado', default=True)
     publicarEncuesta = models.BooleanField('Visibilidad', default=False)
+    # fechaPublicacion = models.DateTimeField(auto_now_add=False, null=True)
+
 
     def __str__ (self):
         return f'{self.titulo} - tipo {self.tipoEncuesta}'
@@ -56,6 +58,18 @@ class OpcionesPregunta(models.Model):
 
 # RESPUESTA ENCUESTA PÚBLICA
 class RespuestaEncuestaPublica(models.Model):
+    TIPO_USUARIO_CHOICES = [
+        ('1', 'Ciudadano'),
+        ('2', 'Aprendiz'),
+        ('3', 'Estudiante'),
+        ('4', 'Profecional'),
+        ('5', 'Area administrativa'),
+        ('6', 'Area de servicios'),
+        ('7', 'Area de seguridad'),
+        ('8', 'Sena'),
+        ('9', 'Otros'),
+    ]
+    tipoUsuario = models.CharField('Tipo de usuario', max_length=30, choices=TIPO_USUARIO_CHOICES)
     TIPO_DOCUMENTO_CHOICES = [
         ('CC', 'Cédula de Ciudadanía'),
         ('TI', 'Tarjeta de Identidad'),
@@ -63,9 +77,9 @@ class RespuestaEncuestaPublica(models.Model):
         ('REGISTRO_CIVIL', 'Registro civil'),
     ]
     tipoDocumento = models.CharField('Tipo de Documento', max_length=20, choices=TIPO_DOCUMENTO_CHOICES)
-    numeroDocumento = models.CharField('Digite su número de documento', max_length=20, blank=False, null=False, unique=True)
+    numeroDocumento = models.CharField('Digite su número de documento', max_length=12,blank=False, null=False, unique=True)
     nombre = models.CharField('Digite su nombre completo', max_length=50, blank=False, null=False)
-    email = models.EmailField('Correo Electrónico', max_length=254)
+    email = models.EmailField('Correo Electrónico', max_length=254, blank=False, null=False, unique=True)
     encuesta = models.ForeignKey(Encuesta, on_delete=models.CASCADE, related_name='encuesta_preguntas_publica')
 
 # RESPUESTA ENCUESTA PRIVADA
@@ -76,9 +90,9 @@ class RespuestaEncuestaPrivada(models.Model):
 # RESPUESTA A PREGUNTAS
 class Respuesta(models.Model):
     texto_respuesta = models.CharField('Digite su respuesta', max_length=200, blank=False, null=False)
-    pregunta = models.ForeignKey(Pregunta, on_delete=models.CASCADE, related_name='respuesta_pregunta')
-    respuestaEncuestaPublica = models.ForeignKey(RespuestaEncuestaPublica, on_delete=models.CASCADE, related_name='respuesta_encuesta_publica', null=True, blank=True)
-    respuestaEncuestaPrivada = models.ForeignKey(RespuestaEncuestaPrivada, on_delete=models.CASCADE, related_name='respuesta_encuesta_privada', null=True, blank=True)
+    pregunta = models.ForeignKey(Pregunta, on_delete=models.CASCADE, related_name='respuestas')
+    respuestaEncuestaPublica = models.ForeignKey(RespuestaEncuestaPublica, on_delete=models.CASCADE, related_name='respuestas_publicas', null=True, blank=True)
+    respuestaEncuestaPrivada = models.ForeignKey(RespuestaEncuestaPrivada, on_delete=models.CASCADE, related_name='respuestas_privadas', null=True, blank=True)
 
     def clean(self):
         """Valida que una respuesta pertenezca solo a una encuesta pública o privada."""

@@ -18,11 +18,10 @@
     padding: 20px;
 } */
 
-/* Grid layout for survey cards */
 #section_grid_encuestas {
     display: grid;
     grid-template-columns: repeat(1, 1fr); /* 1 columna por defecto */
-    gap: 18px; /* Espacio entre las columnas */
+    gap: 18px; 
     padding: 5px;
 }
 
@@ -42,17 +41,33 @@
 #encuesta_pop {
     width: 100%;
     height: 95%;
-    transition: transform 0.3s ease;
-    background-color: #007c75;
-    color: lightcyan;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    background-color: #007c76e5;
+    color: #000000;
+    text-decoration: none;
 }
 
 #encuesta_pop:hover {
-    transform: scale(1.12);
-    z-index: 1000;
-    background-color: #afafafb0;
-    box-shadow: 2px 2px 8px #FF7411;
-    color: #000;
+    transform: scale(1.1);
+    background-color: #008d8696;
+    box-shadow: 2px 2px 8px #000000;
+    color: black
+}
+
+#encuesta_pop_publica {
+    width: 100%;
+    height: 95%;
+    transition: transform 0.3s ease;
+    background-color: #ff7e21e3;
+    text-decoration: none;
+    color: #000000;
+}
+
+#encuesta_pop_publica:hover {
+    transform: scale(1.1);
+    background-color: #ff7411af;
+    box-shadow: 2px 2px 8px #000000;
+    color: black;
 }
 
 /* Section for survey details */
@@ -100,14 +115,25 @@
     margin: -6px 0;
 }
 
-/* Back button to survey list */
+/* Icon CASA volver */
 #volver_incio_encuestas {
     position: absolute;
-    top: -10px;
-    right: 10px;
+    top: 5px;
+    right: 25px;
     padding: 5px;
     font-size: 40px;
+    color: #FF7411;
+    transition: transform 0.3s ease;
+}
+
+#volver_incio_encuestas:hover {
+    text-align: center;
+    border-radius: 10px;
+    background-color: #ff7411be;
     color: #4B4B4B;
+    border: solid 1px black;
+    transform: scale(1.05);
+
 }
 
 #crear_encuesta {
@@ -131,19 +157,24 @@
 
 #crear_encuesta:hover {
     color: #FF7411;
-    background-color: #4b4b4b3a;
-    transform: scale(1.05);
+    background-color: #4b4b4b5d;
+    transform: scale(1.3);
 }
 
 
-
-/* Edit survey icon */
+/* Icono boton editar*/
 #editar_encuesta {
+    color: #757575;
     position: absolute;
     top: 180px;
     right: 50px;
     padding: 5px;
-    font-size: 24px;
+    font-size: 40px;
+    transition: transform 0.3s ease;
+}
+#editar_encuesta:hover {
+    color: #FF7411;
+    transform: scale(1.05);
 }
 
 /* General body styles */
@@ -377,9 +408,32 @@ em {
     background-color: #d303038c;
     transform: scale(1.05);
 }
+#boton_publicas_home52 {
+    background-color: #FF7411;
+    color: white;
+    border: none; 
+    height: 60px;
+    font-size: 20px;
 
+}
+
+#boton_publicas_home52:hover {
+    background-color: #FF741180;
+    transform: scale(1.05);
+}
+#boton_privadas_home52 {
+    background-color: #007C75;
+    color: white;
+    border: none; 
+    height: 60px;
+    font-size: 20px;
+}
+
+#boton_privadas_home52:hover {
+    background-color: #007c7665;
+    transform: scale(1.05);
+}
 .boton-publicar {
-    margin-top: 10px;
     margin-bottom: 5px;
     border-radius: 5px;
     padding: 10px;
@@ -437,4 +491,21 @@ em {
 #boton_edicion:hover {
     background-color: #FF741180;
     transform: scale(1.05);
+}
+
+#pop_ver_encuestas{
+    width: 100%;
+    height: 95%;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    background-color: #007c76e5;
+    color: #000000;
+    text-decoration: none;
+
+}
+
+#pop_ver_encuestas:hover {
+    transform: scale(1.1);
+    background-color: #008d8696;
+    box-shadow: 2px 2px 8px #000000;
+    color: black
 }

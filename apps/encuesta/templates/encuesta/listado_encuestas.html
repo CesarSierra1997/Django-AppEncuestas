@@ -36,34 +36,76 @@ Inicio encuestas
     {% if encuestas %}
     <p>A continuación encontrará el listado de encuestas públicas y privadas, creadas en el sistema.</p>
     <p>Haga click en alguna de las cuestas...</p>
+<div class="card-body">
+
+    <h5 class="text-center card-header">Encuestas en preparación</h5>
     <div id="section_grid_encuestas">
         {% for encuesta in encuestas %}
+        {% if not encuesta.publicarEncuesta %}
         <div class="col">
             <a id="encuesta_pop" href="{% url 'encuesta:encuesta_detail' encuesta.id %}" class="card mt-2 p-2">
                 <div class="container">
-                    <p>Titulo encuesta <strong>{{encuesta.titulo.upper}}</strong></p><em
-                        class="text-info ">{{encuesta.id}}<i class="fa-solid fa-file mx-2"></i></em>
+                    <p><i class="fa-solid fa-file mx-2"> {{encuesta.id}}</i> <strong>{{encuesta.titulo}}</strong></p>
                     <ul>
-                        <li>Tipo <strong>{{ encuesta.tipoEncuesta }}</strong> </li>
-                        <li>Estado <strong>{{ encuesta.estado }}</strong> </li>
-                        <li>Cantidad de preguntas <strong></strong> </li>
+                        <li>tipo <strong>{{ encuesta.tipoEncuesta }}</strong> </li>
+                        <li>cantidad de preguntas: {{ encuesta.pregunta_set.count }}</li>
+                        <hr>
+                        <li>fecha de creacion <strong>{{ encuesta.fechaCreacion }}</strong> </li>
                     </ul>
-                </div>
-                <div class="position-relative">
-                    {% if cantidad_respuestas == 0 %}
-                    <em class="text-danger "> respuestas</em>
-                    {% else %}
-                    <em class="text-info "> respuestas <i class="fa-solid fa-bell"></i> </em>
-                    {% endif %}
                 </div>
             </a>
         </div>
+        {% endif %}
+
+        {% empty %}
+        <div class="text-start alert alert-warning alert-dismissible" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <p><strong>¡Alerta!</strong></p>
+            <p>No hay encuestas en preparación</p>
+        </div>
         {% endfor %}
     </div>
-    {% else %}
-    <p>Bienvenido en este modulo encontrará el listado de encuestas públicas y privadas, creadas en el sistema.</p>
-    <p>Haga click en el boton crear, para agregar una encuesta a la lista.</p>
 
+    <h5 class="text-center card-header">Encuestas publicadas en el sistema</h5>
+    <div id="section_grid_encuestas">
+        {% for encuesta in encuestas %}
+        {% if encuesta.publicarEncuesta %}
+        <div class="col">
+            <a id="encuesta_pop_publica" href="{% url 'encuesta:encuesta_detail' encuesta.id %}" class="card mt-2 p-2">
+                <div class="container">
+                    <p><i class="fa-solid fa-file mx-2"> {{encuesta.id}}</i> <strong>{{encuesta.titulo}}</strong>
+                    
+                        {% if encuesta.estado and encuesta.fechaFinal >= hoy %}
+                            <i class="fa-solid fa-eye" style="color:#007C75; font-size: 30px; position: absolute; top:30px; right: 50px;"></i> 
+                        {% else %}
+                            <i class="fa-solid fa-eye-slash" style="color:#007C75; font-size: 30px; position: absolute; top:30px; right: 50px;"></i>
+                        {% endif %}
+                    </p>
+                    <ul>
+                        <li>
+                            tipo <strong>{{ encuesta.tipoEncuesta }} </strong>
+                                {% if encuesta.tipoEncuesta == "Privada" %} 
+                                    <i class="fa-solid fa-key"></i>
+                                {% else %}
+                                    <i class="fa-solid fa-lock-open"></i>
+                                {% endif %} 
+                        </li>
+                        <li>cantidad de preguntas: {{ encuesta.pregunta_set.count }}</li>
+                        <hr>
+                        <li>respuestas enviadas: ENDESARROLLO </li>
+                        <li>fecha de publicación <strong>ENDESARROLLO</strong> </li>
+                    </ul>
+                </div>
+            </a>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+        
+</div>
+    {% else %}
+    <p>Bienvenido al inicio de encuestas, donde podrá ver todas las encuestas del sistema.</p>
+    <p>Haga click en el boton crear, para agregar una encuesta.  <i style="font-size: 35px; position: absolute; top: 75px; ;" class="fa-regular fa-hand-point-right"></i></p>
     <div class="alert alert-danger alert-dismissible" role="alert">
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         <p>No hay encuestas creadas en el sistema, comuníquese con el administrador</p>

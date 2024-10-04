@@ -34,11 +34,15 @@ Editar encuesta
         {% endif %}
     </h6>
     <h6>Fecha de inicio(actual): <em>{{encuesta.fechaInicio}}</em> - Fecha de finalización(actual): <em>{{encuesta.fechaFinal}}</em></h6>
-    <div class="alert alert-warning alert-dismissible" role="alert">
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        <strong>Alerta de visualización:</strong>
-        Recuerde marcar la encuesta como activa
-    </div>
+        
+        {% if not encuesta.estado %}
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <strong>Alerta de visualización:</strong>
+            Recuerde marcar la encuesta como activa
+        </div>
+        {% endif %}
+            
     <form class="mt-2 py-1 mx-4" method="POST" >
         {% csrf_token %}
         {{ form.as_p }}

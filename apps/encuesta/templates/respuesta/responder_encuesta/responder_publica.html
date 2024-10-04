@@ -1,0 +1,162 @@
+{% extends "encuestaHome.html" %}
+{% block title %}
+    Admin publicas
+{% endblock title %}
+{% block encuesta %}
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.querySelector("form").addEventListener("submit", function(event) {
+        let valid = true;
+        let respuestasGuardadas = {}; // Objeto para guardar las respuestas ingresadas
+    
+        // Validar campos de tipo numérico
+        document.querySelectorAll('input[type="number"]').forEach(function(input) {
+            respuestasGuardadas[input.name] = input.value;  // Guardar la respuesta temporalmente
+            if (input.value === "") {
+                Swal.fire("Por favor, responde todas las preguntas numéricas.");
+                valid = false;
+            }
+        });
+    
+        // Validar campos de tipo texto
+        document.querySelectorAll('input[type="text"]').forEach(function(input) {
+            respuestasGuardadas[input.name] = input.value;  // Guardar la respuesta temporalmente
+            if (input.value === "") {
+                Swal.fire("Por favor, responde todas las preguntas de tipo texto.");
+                valid = false;
+            }
+        });
+    
+        // Validar campos de tipo checkbox (Sí/No)
+        const preguntasCheckbox = document.querySelectorAll('input[type="checkbox"]');
+        const agrupadasCheckbox = agruparPreguntasPorName(preguntasCheckbox);
+        for (const [name, checkboxes] of Object.entries(agrupadasCheckbox)) {
+            if (![...checkboxes].some(chk => chk.checked)) {
+                Swal.fire("Por favor, responde todas las preguntas de tipo Sí/No.");
+                valid = false;
+            } else {
+                respuestasGuardadas[name] = [...checkboxes].filter(chk => chk.checked).map(chk => chk.value);  // Guardar las respuestas seleccionadas
+            }
+        }
+    
+        // Validar campos de tipo radio (Selección múltiple)
+        const preguntasRadio = document.querySelectorAll('input[type="radio"]');
+        const agrupadasRadio = agruparPreguntasPorName(preguntasRadio);
+        for (const [name, radios] of Object.entries(agrupadasRadio)) {
+            if (![...radios].some(radio => radio.checked)) {
+                Swal.fire("Por favor, selecciona una opción para todas las preguntas de selección múltiple.");
+                valid = false;
+            } else {
+                respuestasGuardadas[name] = [...radios].find(radio => radio.checked).value;  // Guardar la respuesta seleccionada
+            }
+        }
+    
+        // Guardar las respuestas en localStorage
+        localStorage.setItem("respuestasGuardadas", JSON.stringify(respuestasGuardadas));
+
+        // Si no es válido, evitar que se envíe el formulario
+        if (!valid) {
+            event.preventDefault();
+        }
+    });
+
+    // Al cargar la página, recuperar las respuestas guardadas y rellenar los campos
+    document.addEventListener("DOMContentLoaded", function() {
+        const respuestasGuardadas = JSON.parse(localStorage.getItem("respuestasGuardadas"));
+        if (respuestasGuardadas) {
+            Object.keys(respuestasGuardadas).forEach(function(name) {
+                const input = document.querySelector(`[name="${name}"]`);
+                if (input.type === "checkbox" || input.type === "radio") {
+                    respuestasGuardadas[name].forEach(value => {
+                        const inputToCheck = document.querySelector(`[name="${name}"][value="${value}"]`);
+                        if (inputToCheck) inputToCheck.checked = true;
+                    });
+                } else {
+                    input.value = respuestasGuardadas[name];
+                }
+            });
+        }
+    });
+    
+    // Función para agrupar inputs por el atributo "name"
+    function agruparPreguntasPorName(inputs) {
+        const agrupadas = {};
+        inputs.forEach(function(input) {
+            if (!agrupadas[input.name]) {
+                agrupadas[input.name] = [];
+            }
+            agrupadas[input.name].push(input);
+        });
+        return agrupadas;
+    }
+</script>
+
+{% block modulo_encuestas %}
+<div id="contenedor_modulo_encuestas">
+    <h5>Encuesta - <strong>{{ encuesta.titulo }}</strong> </h5>
+    <p>A continuación podrás visualizar las preguntas de la encuesta</p>
+    <a id="volver_incio_encuestas" href="{% url 'encuesta:ver_encuestas_publicas' %}"><i class="fa-solid fa-circle-arrow-left"></i></a>
+</div>
+{% endblock modulo_encuestas %}
+
+<div id="section_detalle_encuesta" class="p-4">
+    <h4 class="text-center text-light card-header">Responder encuesta</h4>
+
+    <!-- Formulario -->
+    <form method="POST" class="card-form p-3">
+        {% csrf_token %}
+        {{ form.non_field_errors }}  <!-- Errores generales del formulario -->
+        
+        <div>
+            <h5>Datos personales</h5>
+        </div>
+        
+        <!-- Campos de datos personales -->
+        <div class="mb-3">{{ form.tipoUsuario.label_tag }} {{ form.tipoUsuario }} <div class="text-danger">{{ form.tipoUsuario.errors }}</div></div>
+        <div class="mb-3">{{ form.tipoDocumento.label_tag }} {{ form.tipoDocumento }} <div class="text-danger">{{ form.tipoDocumento.errors }}</div></div>
+        <div class="mb-3">{{ form.numeroDocumento.label_tag }} {{ form.numeroDocumento }} <div class="text-danger">{{ form.numeroDocumento.errors }}</div></div>
+        <div class="mb-3">{{ form.nombre.label_tag }} {{ form.nombre }} <div class="text-danger">{{ form.nombre.errors }}</div></div>
+        <div class="mb-3">{{ form.email.label_tag }} {{ form.email }} <div class="text-danger">{{ form.email.errors }}</div></div>
+
+        <div class="divisor">
+            <hr>
+        </div>
+        
+        <!-- Preguntas de la encuesta -->
+        <div id="preguntas_encuesta" class="p-3">
+            {% for pregunta in preguntas %}
+            <div class="mb-4">
+                <label>{{ pregunta.texto_pregunta }}</label>
+
+                <!-- Condiciones para diferentes tipos de preguntas -->
+                {% if pregunta.tipoPregunta == '1' %}
+                    <input type="number" name="respuesta_{{ pregunta.id }}" class="form-control" placeholder="Ingrese un número">
+
+                {% elif pregunta.tipoPregunta == '2' %}
+                    <div><input type="checkbox" name="respuesta_{{ pregunta.id }}" value="Sí"> Sí</div>
+                    <div><input type="checkbox" name="respuesta_{{ pregunta.id }}" value="No"> No</div>
+
+                {% elif pregunta.tipoPregunta == '3' %}
+                    <input type="text" name="respuesta_{{ pregunta.id }}" class="form-control" placeholder="Ingrese su respuesta">
+
+                {% elif pregunta.tipoPregunta == '4' %}
+                    {% for opcion in pregunta.opciones.all %}
+                        <div><input type="radio" name="respuesta_{{ pregunta.id }}" value="{{ opcion.opcion_1 }}"> {{ opcion.opcion_1 }}</div>
+                        <div><input type="radio" name="respuesta_{{ pregunta.id }}" value="{{ opcion.opcion_2 }}"> {{ opcion.opcion_2 }}</div>
+                        <div><input type="radio" name="respuesta_{{ pregunta.id }}" value="{{ opcion.opcion_3 }}"> {{ opcion.opcion_3 }}</div>
+                        <div><input type="radio" name="respuesta_{{ pregunta.id }}" value="{{ opcion.opcion_4 }}"> {{ opcion.opcion_4 }}</div>
+                    {% endfor %}
+                {% else %}
+                    <input type="text" name="respuesta_{{ pregunta.id }}" class="form-control" placeholder="Ingrese su respuesta">
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <button id="boton_crear_home52" class="boton-estilizado" style="width: 100%;" type="submit">Responder encuesta</button>
+    </form>
+</div>
+
+{% endblock encuesta %}

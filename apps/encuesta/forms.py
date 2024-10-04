@@ -96,3 +96,65 @@ class OpcionPreguntaForm(forms.Form):
         widgets = {
             'texto_opcion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese la opción'}),
         }
+
+class EncuestaPublicaForm(forms.ModelForm):
+    class Meta:
+        model = RespuestaEncuestaPublica
+        fields = ['tipoUsuario', 'tipoDocumento', 'numeroDocumento', 'nombre', 'email']
+        labels = {
+            'tipoUsuario': 'Ingrese tipo de usuario',
+            'tipoDocumento': 'Ingrese el tipo de documento',
+            'numeroDocumento': 'Ingrese el número de documento',
+            'nombre': 'Ingrese el nombre completo',
+            'email': 'Ingrese su dirección de email',
+        }
+        widgets = {
+            'tipoUsuario': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Ingrese tipo de usuario'}),
+            'tipoDocumento': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Ingrese el tipo de documento'}),
+            'numeroDocumento': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el número de documento'}),
+            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el nombre completo'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su dirección de email'}),
+        }
+        error_messages = {
+            'tipoUsuario': {
+                'required': 'Por favor seleccione un tipo de usuario.',
+            },
+            'tipoDocumento': {
+                'required': 'Por favor seleccione un tipo de documento.',
+            },
+            'numeroDocumento': {
+                'required': 'Por favor ingrese su número de documento.',
+            },
+            'nombre': {
+                'required': 'Por favor ingrese su nombre completo.',
+            },
+            'email': {
+                'required': 'Por favor ingrese su email.',
+                'invalid': 'Ingrese una dirección de correo válida.',
+            },
+        }
+
+
+class EncuestaPrivadaForm(forms.ModelForm):
+    class Meta:
+        model = RespuestaEncuestaPrivada
+        fields = ['usuario']
+        labels = {
+            'usuario': 'Seleccione el usuario',
+        }
+        widgets = {
+            'usuario': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecione el usuario'}),
+        }
+
+class RespuestaForm(forms.ModelForm):
+    class Meta:
+        model = Respuesta
+        fields = ['texto_respuesta']
+        labels = {
+            'texto_respuesta': 'Ingrese su respuesta',
+        }
+        widgets = {
+            'texto_respuesta': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su respuesta'}),
+        }
+
+    

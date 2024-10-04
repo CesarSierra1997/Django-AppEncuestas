@@ -42,22 +42,37 @@ Detalle encuesta
 
         <h6>Fecha de inicio: <em>{{encuesta.fechaInicio}}</em> - Fecha de finalización: <em>{{encuesta.fechaFinal}}</em>
         </h6>
-        <a id="editar_encuesta" href="{% url 'encuesta:editar_encuesta' encuesta.id %}"><i style="color: #FF7411;"
+        <a id="editar_encuesta" href="{% url 'encuesta:editar_encuesta' encuesta.id %}"><i
                 class="fa-solid fa-pen-to-square"></i></a>
 
 
-
-        <div><h6><strong>Estado de la encuesta</strong></h6>
-            {% if encuesta.estado %}
-                <h6 >Activa (Encuesta visible para los usuarios)</h6>
-            {% else %}
-                <h6 ><strong>Inactiva*</strong> (Encuesta oculata para los usuarios)</h6>
-            {% endif %}
-
+            <h5><strong>Estado de la encuesta</strong></h5>
             {% if encuesta.publicarEncuesta %}
-                <h6 > Encuesta publicada </h6>
+                <strong > Encuesta publicada </strong>
+
+                <!-- Alertas estado ENCUESTA PUBLICADA  -->
+                {% if encuesta.estado and encuesta.fechaFinal|date:"Y-m-d H:i" >= hoy|date:"Y-m-d H:i" %}
+                <h6><strong>Activa</strong> <i class="fa-solid fa-eye text-info"></i> (Encuesta visible)</h6>
+                {% else %}
+                    <h6><strong>Inactiva**</strong> <i class="fa-solid fa-eye-slash text-info"></i> (Encuesta oculta)</h6>
+                    <div class="alert alert-warning alert-dismissible" role="alert">
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <strong>Alerta de visualización</strong><br>                      
+                            {% if not encuesta.estado and encuesta.fechaFinal|date:"Y-m-d H:i" <= hoy|date:"Y-m-d H:i" %}
+                            El estado de la encuesta se encuestra inactivo y La fecha de finalización ya paso <br> ¡su visualizacion se encuentra OCULTA!
+                            {% elif encuesta.fechaFinal|date:"Y-m-d H:i" <= hoy|date:"Y-m-d H:i" %}
+                            La fecha de finalización de la encuesta ya paso, su visualizacion se encuentra OCULTA
+                            {% else %} 
+                            El estado de la encuesta se encuestra inactivo su visualizacion se encuentra OCULTA
+                            {% endif %}
+                            considere <a href="{% url 'encuesta:editar_encuesta' encuesta.id %}">editar</a> la encuesta
+                    </div>
+                {% endif %}
+
+
+
             {% else %}
-                <h6 ><strong>La encuesta no esta publicada**</strong> (No disponible en el sitema) </h6>
+                <h6 ><strong>La encuesta no publicada***</strong> (No disponible en el sitema) </h6>
 
                 <ul> 
                     <li>Verifique la información de la encuesta y las preguntas de antes de publicarla.</li>
@@ -65,31 +80,7 @@ Detalle encuesta
                     <li>Recuerde que para que la encuesta sea visible al publico, debe validar la fecha de finalización y el estado activado</li>
                 </ul>
 
-                {% if encuesta.fechaFinal|date:"Y-m-d H:i" <= hoy|date:"Y-m-d H:i" %} 
-                <div class="alert alert-danger alert-dismissible" role="alert">
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    <strong>Alerta de visualización</strong><br>
-                    La fecha de finalización de la encuesta ya paso, su visualizacion se encuentra OCULTA
-                </div>
-                {% endif %}
-    
-                {% if not encuesta.estado %}
-                <div>
-                    <div class="alert alert-warning alert-dismissible" role="alert">
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        <strong>Recomendaciones</strong><br>
-                        Cambie el estado de la encuesta, seleccione el campo Encuesta activada <a href="{% url 'encuesta:editar_encuesta' encuesta.id %}">editar</a>
-                        <br>Estado actual: <strong>Inactiva*</strong>
-                    </div>
-                </div>
-                {% endif %}
-                
             {% endif %}
-            <!-- Alertas de estado de la encuesta -->
-
-
-        </div>
-
     </ul>
 
 <div id="section_grid_preguntas">
@@ -149,7 +140,7 @@ Detalle encuesta
 <hr>
 <a id="boton_publicarEncuesta_home52" class="boton-publicar" href="{% url 'encuesta:publicar_encuesta' encuesta.id %}">PUBLICAR ENCUESTA</a>
 {% else %}
-<a id="boton_crear_home52" class="boton-publicar" href="{% url 'encuesta:publicar_encuesta' encuesta.id %}">VER ENCUESTA</a>
+<a id="boton_crear_home52" class="boton-publicar" href="#">VER ENCUESTA</a>
 {% endif %}
 
 

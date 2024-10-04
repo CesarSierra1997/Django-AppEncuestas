@@ -10,7 +10,6 @@ from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth import login, logout
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView, TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
 from apps.usuario.models import Usuario
 from apps.usuario.forms import *
 from apps.usuario.mixin import *

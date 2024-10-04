@@ -1,0 +1,30 @@
+{% extends "encuestaHome.html" %}
+{% block title %}
+Admin publicas
+{% endblock title %}
+{% block encuesta %}
+                    
+{% block modulo_encuestas %}
+<div id="contenedor_modulo_encuestas">
+    <h5>Encuesta privada</h5>
+    <p>A continuación podrás visualizar las preguntas de la encuesta</p>
+</div>
+{% endblock modulo_encuestas %}
+
+<div id="section_detalle_encuesta" class=" p-4">
+
+    <h4 class="text-center text-light card-header ">Responder encuesta</h4>
+
+    <form method="post" class="p-2">
+        {% csrf_token %}
+        {% for pregunta in preguntas %}
+        <div class="form-group">
+            <label>{{ pregunta.texto_pregunta }}</label>
+            <input type="text" name="respuesta_{{ pregunta.id }}" class="form-control">
+        </div>
+        {% endfor %}
+        <button id="boton_crear_home52" class="boton-estilizado" style="width: 100%;" type="submit">Responder encuesta</button>
+    </form>
+</div>
+
+{% endblock encuesta %}

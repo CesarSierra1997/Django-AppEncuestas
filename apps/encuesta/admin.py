@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Encuesta, Pregunta, OpcionesPregunta
+from .models import *
 
 # Inline para agregar preguntas relacionadas a la Encuesta
 class PreguntaInline(admin.TabularInline):
@@ -31,3 +31,10 @@ class PreguntaAdmin(admin.ModelAdmin):
 class OpcionesPreguntaAdmin(admin.ModelAdmin):
     list_display = ('pregunta', 'opcion_1', 'opcion_2', 'opcion_3', 'opcion_4')  # Campos mostrados en la lista
     search_fields = ('pregunta__texto_pregunta',)  # Búsqueda por el texto de la pregunta asociada
+
+
+admin.site.register(Respuesta),
+
+admin.site.register(RespuestaEncuestaPublica),
+
+admin.site.register(RespuestaEncuestaPrivada),
