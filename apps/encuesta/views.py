@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.contrib import messages
 from openpyxl import Workbook
 from datetime import datetime
+from django.db.models import Q
 from ..usuario.mixin import *
 from .models import *
 from .forms import *
@@ -667,3 +668,34 @@ class ExportarRespuestasPublicasExcel(LoginRequiredMixin, View):
         wb.save(response)
         return response
 
+
+from django.views.generic import ListView
+from django.db.models import Q
+from django.urls import reverse
+
+class BuscarView(TemplateView):
+    template_name = 'busqueda_resultados.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query = self.request.GET.get('q', '')
+        context['query'] = query
+
+        # Filtrar encuestas usando el campo 'titulo' en lugar de 'descripcion'
+        context['encuestas'] = Encuesta.objects.filter(Q(titulo__icontains=query))
+        context['preguntas'] = Pregunta.objects.filter(Q(texto_pregunta__icontains=query))
+        context['respuestas'] = Respuesta.objects.filter(Q(texto_respuesta__icontains=query))
+
+        # Filtrar rutas
+        rutas = [
+            {'name': 'crear_encuesta', 'url': reverse('encuesta:crear_encuesta'), 'descripcion': 'Crear una nueva encuesta'},
+            {'name': 'inicio_encuestas', 'url': reverse('encuesta:inicio_encuestas'), 'descripcion': 'Ver inicio de encuestas'},
+            {'name': 'ver_encuestas_publicas', 'url': reverse('encuesta:ver_encuestas_publicas'), 'descripcion': 'Ver encuestas públicas'},
+            {'name': 'ver_respuestas', 'url': reverse('encuesta:ver_respuestas'), 'descripcion': 'Ver respuestas de encuestas'},
+            # {'name': 'exportar_respuestas_publicas', 'url': reverse('encuesta:exportar_respuestas_publicas'), 'descripcion': 'Exportar respuestas públicas'},
+        ]
+
+        # Filtrar rutas que coincidan con la búsqueda
+        context['rutas'] = [ruta for ruta in rutas if query.lower() in ruta['descripcion'].lower() or query.lower() in ruta['name'].lower()]
+        
+        return context

@@ -4,63 +4,70 @@ Pregunta Tipe
 {% endblock title %}
 {% block encuesta %}
 
-<body>
-    {% if query %}
-    <h5 class="card-header">Resultados de busqueda para "<em class="text-success">{{query}}</em>" </h5>
-        {% if encuestas or preguntas_generales or preguntas_select_multiple or preguntas_si_o_no or preguntas_numericas%}
-        {% if encuestas %}
-            <h6>Encuestas</h6>
-            <ul>
-                {% for encuesta in encuestas %}
-                <li>{{ encuesta.titulo }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-        {% if preguntas_generales %}
-            <h6>Preguntas Generales</h6>
-            <ul>
-                {% for pregunta in preguntas_generales %}
-                <li>{{ pregunta.texto_pre }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-        {% if preguntas_select_multiple %}
-            <h6>Preguntas de Selección Múltiple</h6>
-            <ul>
-                {% for pregunta in preguntas_select_multiple %}
-                <li>{{ pregunta.texto_pre }}</li>
-                <p><strong>A. </strong>{{ pregunta.opcion_a }} <br><strong>B. </strong>{{ pregunta.opcion_b }}<br> <strong>C.
-                    </strong>{{ pregunta.opcion_c }} <br><strong>D. </strong>{{ pregunta.opcion_d }}</p>
-                {% endfor %}
-            </ul>
-        {% endif %}
-        {% if preguntas_si_o_no %}
-            <h6>Preguntas Sí o No</h6>
-            <ul>
-                {% for pregunta in preguntas_si_o_no %}
-                <li>{{ pregunta.texto_pre }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-        {% if preguntas_numericas %}
-            <h6>Preguntas Numéricas</h6>
-            <ul>
-                {% for pregunta in preguntas_numericas %}
-                <li>{{ pregunta.texto_pre }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-        {% else %}
-        <div class="alert alert-danger alert-dismissible mt-2" role="alert">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            <p>No se encontraron resultados para: "<em>{{query}}</em>"</p>
-        </div>
-        {% endif %}
+
+<div class="container mt-4">
+    <h2>Resultados de la búsqueda: "{{ query }}"</h2>
+
+    <!-- Sección de Encuestas -->
+    <h3>Encuestas</h3>
+    {% if encuestas %}
+        <ul class="list-group">
+            {% for encuesta in encuestas %}
+                <li class="list-group-item">
+                    <strong>Título:</strong> {{ encuesta.titulo }}<br>
+                    <strong>Tipo:</strong> {{ encuesta.tipoEncuesta }}
+                </li>
+            {% endfor %}
+        </ul>
     {% else %}
-    <div class="alert alert-warning alert-dismissible mt-2" role="alert">
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        <p>No se ha realizado ninguna búsqueda.</p>
-    </div>
+        <p>No se encontraron encuestas.</p>
     {% endif %}
-</body>
+
+    <!-- Sección de Preguntas -->
+    <h3>Preguntas</h3>
+    {% if preguntas %}
+        <ul class="list-group">
+            {% for pregunta in preguntas %}
+                <li class="list-group-item">
+                    <strong>Texto de la pregunta:</strong> {{ pregunta.texto_pregunta }}<br>
+                    <strong>Tipo de pregunta:</strong> {{ pregunta.get_tipoPregunta_display }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No se encontraron preguntas.</p>
+    {% endif %}
+
+    <!-- Sección de Respuestas -->
+    <h3>Respuestas</h3>
+    {% if respuestas %}
+        <ul class="list-group">
+            {% for respuesta in respuestas %}
+                <li class="list-group-item">
+                    <strong>Texto de la respuesta:</strong> {{ respuesta.texto_respuesta }}<br>
+                    <strong>Pregunta asociada:</strong> {{ respuesta.pregunta.texto_pregunta }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No se encontraron respuestas.</p>
+    {% endif %}
+
+    <!-- Sección de Rutas -->
+    <h3>Rutas</h3>
+    {% if rutas %}
+        <ul class="list-group">
+            {% for ruta in rutas %}
+                <li class="list-group-item">
+                    <strong>{{ ruta.descripcion }}</strong><br>
+                    <a href="{{ ruta.url }}" class="btn btn-link">Ir a {{ ruta.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No se encontraron rutas relevantes.</p>
+    {% endif %}
+
+</div>
+
 {% endblock encuesta %}

@@ -1,5 +1,8 @@
 from django.urls import path
 from . import views
+from django.contrib.auth.decorators import login_required
+from .views import BuscarView
+
 
 app_name = 'encuesta'  # Nombre del grupo de URLs para la app encuesta
 
@@ -35,4 +38,8 @@ urlpatterns = [
 
     path('ver_respuestas/', views.VerRespuestas.as_view(), name='ver_respuestas'),
     path('exportar-respuestas-publicas/', views.ExportarRespuestasPublicasExcel.as_view(), name='exportar_respuestas_publicas'),
+
+
+    path('buscar/', views.BuscarView.as_view(), name='buscar'),
+
 ]

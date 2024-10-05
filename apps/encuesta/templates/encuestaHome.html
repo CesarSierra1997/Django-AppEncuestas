@@ -39,7 +39,7 @@ Encuestas Home
                         <span class="navbar-toggler-icon"></span>
                     </button>
 
-                    <form class="d-flex" style="margin-left: 10px;" method="GET" action="">
+                    <form class="d-flex" style="margin-left: 10px;" method="GET" action="{% url 'encuesta:buscar' %}">
                         <input class="form-control me-2 bg-light" type="search" name="q"
                             placeholder="Buscar en encuestas" aria-label="Search">
                         <button class="btn btn-outline-dark" type="submit">Buscar</button>

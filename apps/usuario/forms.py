@@ -12,6 +12,7 @@ class FormularioLogin(AuthenticationForm):
         super(FormularioLogin, self).__init__(*args, **kwargs)
         self.fields['username'].widget.attrs['class']='form-control'
         self.fields['username'].widget.attrs['placeholder']='Nombre de usuario'
+        self.fields['username'].widget.attrs['id'] = 'username-mejorado'
         self.fields['password'].widget.attrs['class']='form-control'
         self.fields['password'].widget.attrs['placeholder']='Contraseña'
 
