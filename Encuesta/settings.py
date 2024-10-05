@@ -20,12 +20,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(mhqig^jyg@^i=7!0n%!6*h-c^*_8%7+wk(dp#!%66rnkn)3a&'
+# SECRET_KEY = 'django-insecure-(mhqig^jyg@^i=7!0n%!6*h-c^*_8%7+wk(dp#!%66rnkn)3a&'
+SECRET_KEY = os.environ.get('SECRET_KEY', default='your secret key')#RENDER
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = 'RENDER' not in os.environ #RENDER
 
-ALLOWED_HOSTS = ['django-appencuestas.onrender.com']
+ALLOWED_HOSTS = []#Render
+
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 
 # Application definition
@@ -140,8 +146,16 @@ LOGOUT_REDIRECT_URL = reverse_lazy('login')
 STATIC_URL = '/static/'
 # Agregar STATIC_ROOT para producción
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/')]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-APPEND_SLASH = True
+
+if not DEBUG:#RENDER
+    # Tell Django to copy statics to the `staticfiles` directory
+    # in your application directory on Render.
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    # Turn on WhiteNoise storage backend that takes care of compressing static files
+    # and creating unique names for each version so they can safely be cached forever.
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# APPEND_SLASH = True
 
 # Configurar WhiteNoise para la compresión y el caché en producción
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
