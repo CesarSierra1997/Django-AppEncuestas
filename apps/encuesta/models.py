@@ -1,71 +1,100 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from apps.usuario.models import Usuario
 
-# MODELOS PARA EL ADMINISTRADOR QUE CREA ENCUESTAS
-#ENCUESTA
+
+# ENCUESTA
 class Encuesta(models.Model):
-    titulo = models.CharField('Titulo de la encuesta', max_length=200, blank=False, null=False)
+    titulo = models.CharField('Título', max_length=50, blank=False, null=False)
     TIPO_ENCUESTA = [
         ('Publica', 'Encuesta pública'),
         ('Privada', 'Encuesta privada'),
     ]
-    tipoEncuesta = models.CharField('Tipo de Encuesta', max_length=50, choices=TIPO_ENCUESTA, default=False)
-#TIPOS DE PREGUNTAS:
-class PreguntaGeneral(models.Model):
-    texto_pre = models.CharField('Digite la pregunta general', max_length=200, blank=False, null=False)
+    tipoEncuesta = models.CharField('Tipo de Encuesta', max_length=50, choices=TIPO_ENCUESTA, default='Publica')
+    administrador = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    fechaInicio = models.DateTimeField(null=False)
+    fechaFinal = models.DateTimeField(null=True)
+    fechaCreacion = models.DateTimeField('Fecha de creación',auto_now_add=True)
+    fechaModificacion = models.DateTimeField(auto_now_add=False, null=True)
+    estado = models.BooleanField('Estado', default=True)
+    publicarEncuesta = models.BooleanField('Visibilidad', default=False)
+    # fechaPublicacion = models.DateTimeField(auto_now_add=False, null=True)
+
+
+    def __str__ (self):
+        return f'{self.titulo} - tipo {self.tipoEncuesta}'
+    
+    class Meta:
+        verbose_name_plural = 'Encuestas'
+        ordering = ['-id']
+        verbose_name = 'Encuesta'
+
+# PREGUNTA
+class Pregunta(models.Model):
+    TIPO_PREGUNTA_CHOICES = [
+        ('1', 'General'),
+        ('2', 'Sí o no'),
+        ('3', 'Numérica'),
+        ('4', 'Selección múltiple'),
+    ]
+    tipoPregunta = models.CharField('Tipo de pregunta', max_length=30, choices=TIPO_PREGUNTA_CHOICES)
+    texto_pregunta = models.CharField('Pregunta', max_length=200, blank=False, null=False)
     encuesta = models.ForeignKey(Encuesta, on_delete=models.CASCADE)
 
-class PreguntaSelectMultiple(models.Model):
-    texto_pre = models.CharField('Digite la pregunta de selección multiple', max_length=200, blank=False, null=False)
-    encuesta = models.ForeignKey(Encuesta, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.texto_pregunta
 
-class OpcionPreguntaSelectMultiple(models.Model):
-    opcion = models.CharField('Opción', max_length=255)
-    pregunta = models.ForeignKey(PreguntaSelectMultiple, on_delete=models.CASCADE)
+# OPCION DE PREGUNTA
+class OpcionesPregunta(models.Model):
+    opcion_1 = models.CharField('Opción 1', max_length=50, blank=False, null=False)
+    opcion_2 = models.CharField('Opción 2', max_length=50, blank=False, null=False)
+    opcion_3 = models.CharField('Opción 3', max_length=50, blank=False, null=False)
+    opcion_4 = models.CharField('Opción 4', max_length=50, blank=False, null=False)
+    pregunta = models.ForeignKey(Pregunta, on_delete=models.CASCADE, related_name="opciones")
 
-class PreguntaSiONo(models.Model):
-    texto_pre = models.CharField('Digite la pregunta de sí o no', max_length=200, blank=False, null=False)
-    encuesta = models.ForeignKey(Encuesta, on_delete=models.CASCADE)
+    def __str__(self):
+        return f"Opciones para la pregunta: {self.pregunta.texto_pregunta}"
 
-class PreguntaNumerica(models.Model):
-    texto_pre = models.CharField('Digite la pregunta numérica', max_length=200, blank=False, null=False)
-    rango = models.IntegerField('Rango de la encuesta: mínimo 1 rango, maximo 10', default=1)
-    encuesta = models.ForeignKey(Encuesta, on_delete=models.CASCADE)
 
-#RESPUESTA ENCUESTA
-#Tipo de encuestas
+# RESPUESTA ENCUESTA PÚBLICA
 class RespuestaEncuestaPublica(models.Model):
+    TIPO_USUARIO_CHOICES = [
+        ('1', 'Ciudadano'),
+        ('2', 'Aprendiz'),
+        ('3', 'Estudiante'),
+        ('4', 'Profecional'),
+        ('5', 'Area administrativa'),
+        ('6', 'Area de servicios'),
+        ('7', 'Area de seguridad'),
+        ('8', 'Sena'),
+        ('9', 'Otros'),
+    ]
+    tipoUsuario = models.CharField('Tipo de usuario', max_length=30, choices=TIPO_USUARIO_CHOICES)
     TIPO_DOCUMENTO_CHOICES = [
-        ('CC', 'Cedula de Ciudadania'),
+        ('CC', 'Cédula de Ciudadanía'),
         ('TI', 'Tarjeta de Identidad'),
         ('PASAPORTE', 'Pasaporte'),
-        ('REGISTRO CIVIL', 'Registro civil'),
+        ('REGISTRO_CIVIL', 'Registro civil'),
     ]
     tipoDocumento = models.CharField('Tipo de Documento', max_length=20, choices=TIPO_DOCUMENTO_CHOICES)
-    numeroDocumento = models.IntegerField('Digite su numero de documento', blank=False, null=False)
-    nombre = models.CharField('Digite su nombre completo', max_length=200, blank=False, null=False)
-    email = models.EmailField('Correo Electrónico', max_length=254)
-    encuesta = models.ForeignKey(Encuesta, on_delete=models.CASCADE, related_name='encuesta_preguntas')
+    numeroDocumento = models.CharField('Número de documento', max_length=12,blank=False, null=False, unique=True)
+    nombre = models.CharField('Nombre completo', max_length=50, blank=False, null=False)
+    email = models.EmailField('Correo Electrónico', max_length=254, blank=False, null=False, unique=True)
+    encuesta = models.ForeignKey(Encuesta, on_delete=models.CASCADE, related_name='encuesta_preguntas_publica')
 
+# RESPUESTA ENCUESTA PRIVADA
 class RespuestaEncuestaPrivada(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, related_name='usuario_encuesta')
     encuesta = models.ForeignKey(Encuesta, on_delete=models.CASCADE, related_name='encuesta_preguntas_privada')
 
-#RESPUESTAS DE TIPOS DE PREGUNTAS
-#Tipos de respuestas
-class RespuestaPreguntaGeneral(models.Model):
-    pregunta = models.ForeignKey(PreguntaGeneral, on_delete=models.CASCADE, related_name='respuesta_pregunta_general')
-    respuesta =  models.CharField('Digite su respuesta', max_length=200, blank=False, null=False)
+# RESPUESTA A PREGUNTAS
+class Respuesta(models.Model):
+    texto_respuesta = models.CharField('Digite su respuesta', max_length=200, blank=False, null=False)
+    pregunta = models.ForeignKey(Pregunta, on_delete=models.CASCADE, related_name='respuestas')
+    respuestaEncuestaPublica = models.ForeignKey(RespuestaEncuestaPublica, on_delete=models.CASCADE, related_name='respuestas_publicas', null=True, blank=True)
+    respuestaEncuestaPrivada = models.ForeignKey(RespuestaEncuestaPrivada, on_delete=models.CASCADE, related_name='respuestas_privadas', null=True, blank=True)
 
-class RespuestaPreguntaSelectMultiple(models.Model):
-    pregunta = models.ForeignKey(PreguntaSelectMultiple, on_delete=models.CASCADE, related_name='respuesta_pregunta_selectMultiple')
-    respuesta =  models.CharField('Seleccione una opción', max_length=200, blank=False, null=False)
-
-class RespuestaPreguntaSiONo(models.Model):
-    pregunta = models.ForeignKey(PreguntaSiONo, on_delete=models.CASCADE, related_name='respuesta_pregunta_siOno')
-    respuesta =  models.BooleanField('Seleccione Si o No', max_length=200, blank=False, null=False)
-
-class RespuestaPreguntaNumerica(models.Model):
-    pregunta = models.ForeignKey(PreguntaNumerica, on_delete=models.CASCADE, related_name='respuesta_pregunta_numerica')
-    respuesta =  models.IntegerField('Digite un numero de respuesta', blank=False, null=False)
-
+    def clean(self):
+        """Valida que una respuesta pertenezca solo a una encuesta pública o privada."""
+        if self.respuestaEncuestaPublica and self.respuestaEncuestaPrivada:
+            raise ValidationError("Una respuesta solo puede estar vinculada a una encuesta pública o privada, no a ambas.")

@@ -1,0 +1,98 @@
+{% extends "encuestaHome.html" %}
+{% block title %}
+Ver Respuestas
+{% endblock title %}
+{% block encuesta %}
+<!-- ver_respuestas.html -->
+
+<body>
+    <h5 class="card-header">Lista de encuestas, preguntas y respuestas</h5>
+    <div class="card card-body mt-2">
+        {% for encuesta in encuestas %}
+        <h4>Encuesta || {{ encuesta.titulo }}</h4>
+        <table>
+            <thead class="card-header p-3 bg-dark bg-gradient text-white">
+                <tr>
+                    <th>Preguntas</th>
+                    <th>Respuestas</th>
+                    <th>Encuestado</th>
+                </tr>
+            </thead>
+            <tbody class="bg-light">
+                
+                {% for  encuestado in  encuesta.encuesta_preguntas.all %}
+                    {% for  pregunta_general in encuesta.preguntageneral_set.all %}
+                    <tr >
+                        <td>{{ pregunta_general.texto_pre }}</td>
+                        <td>
+                            {% for respuesta_general in pregunta_general.respuesta_pregunta_general.all %}
+                            {{ respuesta_general.respuesta }}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <p class="text-primary">{{encuestado.nombre}}</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% for pregunta_select in encuesta.preguntaselectmultiple_set.all %}
+                    <tr>
+                        <td>{{ pregunta_select.texto_pre }}</td>
+                        <td class="text-warning">
+                            {{pregunta_select.opcion_a}}
+                            {{pregunta_select.opcion_b}}
+                            {{pregunta_select.opcion_c}}
+                            {{pregunta_select.opcion_d}}
+                            <!-- {% for respuesta_select in pregunta_select.respuesta_pregunta_selectMultiple.all %}
+                            {{ respuesta_select.pregunta.opcion_a}}
+                            {% endfor %} -->
+                        </td>
+                        <td>
+                            <p class="text-primary">{{encuestado.nombreUsuario}}</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% for pregunta_si_no in encuesta.preguntasiono_set.all %}
+                    <tr>
+                        <td>{{ pregunta_si_no.texto_pre }}</td>
+                        <td>
+                            {% for respuesta_si_no in pregunta_si_no.respuesta_pregunta_siOno.all %}
+                            {{ respuesta_si_no.respuesta }}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <p class="text-primary">{{encuestado.nombreUsuario}}</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% for pregunta_num in encuesta.preguntanumerica_set.all %}
+                    <tr>
+                        <td>{{ pregunta_num.texto_pre }}</td>
+                        <td>
+                            {% for respuesta_num in pregunta_num.respuesta_pregunta_numerica.all %}
+                            {{ respuesta_num.respuesta }}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <p class="text-primary">{{encuestado.nombreUsuario}}</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if encuesta.preguntageneral_set.all %}
+            <em class="text-center">end table</em>
+        {% else %}
+            <div class="alert alert-warning alert-dismissible mt-2" role="alert">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <p>Esta encuesta no tiene preguntas</p>
+            </div>
+        {% endif %}
+        <hr>
+        {% endfor %}
+    </div>
+
+
+</body>
+
+{% endblock encuesta %}

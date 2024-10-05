@@ -1,0 +1,48 @@
+{% extends "encuestaHome.html" %}
+{% block title %}
+Eliminar encuesta
+{% endblock title %}
+{% load static %}
+
+{% block navegacion %}
+<div id="ruta_navegacion">
+    <em>App / modulo encuestas/ detalle encuesta/ <strong>eliminar</strong></em>
+</div>
+{% endblock navegacion %}
+
+{% block encuesta %}
+
+{% block modulo_encuestas %}
+<div id="contenedor_modulo_encuestas">
+    <h5>Modulo encuestas</h5>
+    <p>A continuación podrás eliminar la encuesta</p>
+    <a id="volver_incio_encuestas" href="{% url 'encuesta:inicio_encuestas' %}"><i class="fa-solid fa-house"></i></a>
+</div>
+{% endblock modulo_encuestas %}
+
+<div class="alert alert-warning alert-dismissible" role="alert">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <strong>¡Alerta!</strong>
+    <p>Esta acción no podra revertiser, si elimina la encuesta borrará todos los datos asociados a ella...</p>
+    <ul>
+        <li>Encuesta: preguntas, registro de respuestas</li>
+    </ul>
+</div>
+
+<div id="section_detalle_encuesta">
+    
+    <div class="text-center">
+        <form method="POST">
+            {% csrf_token %}
+            <h4>Eliminar encuesta</h4>
+            <h5>¿Esta seguro de eliminar la encuesta <strong> "{{object.titulo}}" </strong>?</h5>
+
+            <div class="footer">
+                <button id="boton_eliminar_home52" class="boton-estilizado" type="submit">Estoy seguro, eliminar</button>
+                <a id="boton_cancelar_home52" class="boton-estilizado" href="{% url 'encuesta:encuesta_detail'  encuesta.id%}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock encuesta %}

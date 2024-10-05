@@ -1,17 +1,53 @@
 {% extends "encuestaHome.html" %}
 {% block title %}
-Encuesta Create
+Crear encuesta
 {% endblock title %}
+
+{% load static %}
+
+{% block navegacion %}
+<div id="ruta_navegacion">
+    <em>App/ modulo encuestas/ crear encuesta/</em>
+</div>
+{% endblock navegacion %}
+
 {% block encuesta %}
+
+{% block modulo_encuestas %}
+<div id="contenedor_modulo_encuestas">
+    <h5>Modulo encuestas</h5>
+    <p>A continuación encontrará la sección para crear una nueva encuesta.</p>
+    <a id="volver_incio_encuestas" href="{% url 'encuesta:inicio_encuestas' %}"><i class="fa-solid fa-house"></i></a>
+</div>
+{% endblock modulo_encuestas %}
+
+<div class="alert alert-warning alert-dismissible" role="alert">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <strong>Recomendaciones:</strong>
+    <li>El titulo y tipo de encuesta <strong>¡No se puede cambiar!</strong></li>
+    <li>Recuerde marcar la encuesta como activa, para que los usuarios la puedan visualizar</li>
+    <li>Si esta realizando una prueba, puede crearla con estado inactivo</li>
+    <li>Una vez creada, verifiqué todos los datos esten correctos, antes de <strong> publicarla la encuesta </strong>en el sistema</li>
+
+</div>
+
+<div id="section_detalle_encuesta">    
     <h5 class="card-header">Crear Encuesta</h5>
-    <div style="display: flex;" class="card card-body bg-light mt-2 p-4">
-        <form style="flex: 1;"  method="POST">
-            {% csrf_token %}
+    <form class="card-body m-2 p-2" method="post">
+        {% csrf_token %}
+        <div class="p-2">
             {{ form.as_p }}
-        <button  class="btn btn-primary" style="width: 100%;" type="submit">Guardar</button>
-        <a class="btn btn-danger mt-1" style="width: 100%;" href="{% url 'encuestaHome'  %}" style="flex: 1; margin-left: 5px; margin-right: 5px;">
-            Cancelar
-        </a>
-       </form>
-    </div>
+
+            <div class="footer">
+                <button id="boton_crear_home52" class="boton-estilizado" type="submit">Crear encuesta</button>
+                <a id="boton_cancelar_home52" class="boton-estilizado" href="{% url 'encuesta:inicio_encuestas'  %}">Cancelar</a>
+            </div>
+            
+        </div>
+
+        
+    </form>
+</div>
 {% endblock encuesta %}
+
+

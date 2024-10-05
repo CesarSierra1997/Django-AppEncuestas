@@ -1,129 +1,160 @@
 from django import forms
+from django.utils import timezone
 from .models import *
 
 class EncuestaForm(forms.ModelForm):
     class Meta:
         model = Encuesta
-        fields = ['titulo','tipoEncuesta']
+        fields = ['titulo', 'tipoEncuesta', 'fechaInicio', 'fechaFinal', 'estado']
         labels = {
             'titulo': 'Título de la encuesta',
             'tipoEncuesta': 'Seleccione el tipo de encuesta',
+            'fechaInicio': 'Fecha de inicio',
+            'fechaFinal': 'Fecha de finalización',
+            'estado': 'Encuesta activada',
         }
         widgets = {
             'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el titulo de la encuesta'}),
             'tipoEncuesta': forms.Select(attrs={'class': 'form-control'}),
+            'fechaInicio': forms.SelectDateWidget(attrs={'class': 'form-control'}),
+            'fechaFinal': forms.SelectDateWidget(attrs={'class': 'form-control'}),
+            'estado': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
-class PreguntaGeneralForm(forms.ModelForm):
+    def clean(self):
+        cleaned_data = super().clean()
+        fecha_inicio = cleaned_data.get('fechaInicio')
+        fecha_final = cleaned_data.get('fechaFinal')
+
+        if fecha_inicio and fecha_final and fecha_inicio >= fecha_final:
+            raise forms.ValidationError("La fecha de finalización debe ser posterior a la de incio.")
+        return cleaned_data
+    
+class ActualizarEncuestaForm(forms.ModelForm):
     class Meta:
-        model = PreguntaGeneral
-        fields = ['texto_pre']
+        model = Encuesta
+        fields = ['fechaInicio', 'fechaFinal', 'estado']
         labels = {
-            'texto_pre': 'Digite la pregunta General',
+            'fechaInicio': 'Fecha de inicio',
+            'fechaFinal': 'Fecha de finalización',
+            'estado': '¿Encuesta activada?',
         }
         widgets = {
-            'texto_pre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese la pregunta aquí'}),
+            'fechaInicio': forms.SelectDateWidget(attrs={'class': 'form-control'}),
+            'fechaFinal': forms.SelectDateWidget(attrs={'class': 'form-control'}),
+            'estado': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
-class PreguntaSelectMultipleForm(forms.ModelForm):
+    def clean(self):
+        cleaned_data = super().clean()
+        fecha_inicio = cleaned_data.get('fechaInicio')
+        fecha_final = cleaned_data.get('fechaFinal')
+
+        if fecha_inicio and fecha_final and fecha_inicio >= fecha_final:
+            raise forms.ValidationError("La fecha de finalización debe ser posterior a la de incio.")
+        return cleaned_data
+    
+    def clean_titulo_data(self):
+        titulo = self.cleaned_data.get('titulo')
+        # Validar que el título no contenga caracteres especiales
+        if not titulo.replace(" ", "").isalpha():
+            raise forms.ValidationError("El título solo puede contener letras.")
+        return titulo.lower()
+
+class PreguntaForm(forms.ModelForm):
     class Meta:
-        model = PreguntaSelectMultiple
-        fields = ['texto_pre']
+        model = Pregunta
+        fields = ['tipoPregunta', 'texto_pregunta']  
         labels = {
-            'texto_pre': 'Digite la pregunta de selección múltiple',
+            'tipoPregunta': 'Seleccione el tipo de pregunta',
+            'texto_pregunta': 'Ingrese el texto de la pregunta',
         }
         widgets = {
-            'texto_pre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese la pregunta aquí'}),
+            'tipoPregunta': forms.Select(attrs={'class': 'form-control'}),
+            'texto_pregunta': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el texto de la pregunta'}),
         }
 
-class OpcionPreguntaSelectMultipleForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.encuesta_id = kwargs.pop('encuesta_id', None)  # Obtener el id de la encuesta
+        super().__init__(*args, **kwargs)
+
+    def clean_texto_pregunta(self):
+        cleaned_data = super().clean()
+        texto_pregunta = cleaned_data.get('texto_pregunta')
+        # Validar que la longitud del texto de la pregunta sea mayor a 10
+        if len(texto_pregunta) < 10:
+            raise forms.ValidationError("El texto de la pregunta debe tener al menos 10 caracteres.")
+        return texto_pregunta
+    
+class OpcionPreguntaForm(forms.Form):
     class Meta:
-        model = OpcionPreguntaSelectMultiple
-        fields = ['opcion']
+        model = OpcionesPregunta
+        fields = ['oncion_1', 'oncion_2', 'oncion_3', 'oncion_4']
         labels = {
-            'opcion': 'Digite la pregunta de selección múltiple',
+            'texto_opcion': 'Ingrese la opción',
         }
         widgets = {
-            'opcion': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Sleccione una opción'}),
+            'texto_opcion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese la opción'}),
         }
 
-class PreguntaSiONoForm(forms.ModelForm):
+class EncuestaPublicaForm(forms.ModelForm):
     class Meta:
-        model = PreguntaSiONo
-        fields = ['texto_pre',]
+        model = RespuestaEncuestaPublica
+        fields = ['tipoUsuario', 'tipoDocumento', 'numeroDocumento', 'nombre', 'email']
         labels = {
-            'texto_pre': 'Digite la pregunta de sí o no',
+            'tipoUsuario': 'Ingrese tipo de usuario',
+            'tipoDocumento': 'Ingrese el tipo de documento',
+            'numeroDocumento': 'Ingrese el número de documento',
+            'nombre': 'Ingrese el nombre completo',
+            'email': 'Ingrese su dirección de email',
         }
-        widgets = {'texto_pre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese la pregunta de sí o no'}),
+        widgets = {
+            'tipoUsuario': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Ingrese tipo de usuario'}),
+            'tipoDocumento': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Ingrese el tipo de documento'}),
+            'numeroDocumento': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el número de documento'}),
+            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese el nombre completo'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su dirección de email'}),
+        }
+        error_messages = {
+            'tipoUsuario': {
+                'required': 'Por favor seleccione un tipo de usuario.',
+            },
+            'tipoDocumento': {
+                'required': 'Por favor seleccione un tipo de documento.',
+            },
+            'numeroDocumento': {
+                'required': 'Por favor ingrese su número de documento.',
+            },
+            'nombre': {
+                'required': 'Por favor ingrese su nombre completo.',
+            },
+            'email': {
+                'required': 'Por favor ingrese su email.',
+                'invalid': 'Ingrese una dirección de correo válida.',
+            },
         }
 
-class PreguntaNumericaForm(forms.ModelForm):
+
+class EncuestaPrivadaForm(forms.ModelForm):
     class Meta:
-        model = PreguntaNumerica
-        fields = ['texto_pre', 'rango']
+        model = RespuestaEncuestaPrivada
+        fields = ['usuario']
         labels = {
-            'texto_pre': 'Digite la pregunta numérica',
-            'rango': 'Rango (mínimo 1, máximo 10)',
+            'usuario': 'Seleccione el usuario',
         }
         widgets = {
-            'texto_pre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese la pregunta aquí'}),
-            'rango': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Rango'}),
+            'usuario': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecione el usuario'}),
         }
 
-class RespuestaEncuestaPublicaForm(forms.ModelForm):
+class RespuestaForm(forms.ModelForm):
     class Meta:
-        model = RespuestaEncuestaPublica  
-        fields = ['tipoDocumento','numeroDocumento','nombre','email']
+        model = Respuesta
+        fields = ['texto_respuesta']
         labels = {
-            'tipoDocumento': 'Digite el tipo de documento',
-            'numeroDocumento': 'Digite el numero de documento',
-            'nombre': 'Digite el nombre completo',
-            'email': 'Digite su direccion de email',
+            'texto_respuesta': 'Ingrese su respuesta',
         }
         widgets = {
-            'tipoDocumento': forms.Select(attrs={'class': 'form-control','placeholder': 'Tipo de documento'}),
-            'numeroDocumento': forms.NumberInput(attrs={'class': 'form-control','placeholder': 'Numero de documento'}),
-            'nombre': forms.TextInput(attrs={'class': 'form-control','placeholder': 'Nombres y apellidos'}),
-            'email': forms.EmailInput(attrs={'class':'form-control','placeholder':'Correo electrónico'}),
+            'texto_respuesta': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su respuesta'}),
         }
 
-class RespuestaEncuestaPrivadaForm(forms.ModelForm):
-    class Meta:
-        model = RespuestaEncuestaPrivada 
-        fields = ['usuario','encuesta']
-        widgets = {
-            'usuario': forms.Select(attrs={'class': 'form-control','placeholder': 'Selecione el usuario'}),
-            'encuesta': forms.Select(attrs={'class': 'form-control','placeholder': 'Selecione la encuesta'}),
-        }
-
-class RespuestaPreguntaGeneralForm(forms.ModelForm):
-    class Meta:
-        model = RespuestaPreguntaGeneral
-        fields = ['respuesta']
-        widgets = {
-            'respuesta': forms.TextInput(attrs={'class': 'form-control'}),
-        }
-
-class RespuestaPreguntaSelectMultipleForm(forms.ModelForm):
-    class Meta:
-        model = RespuestaPreguntaSelectMultiple
-        fields = ['respuesta']
-        widgets = {
-            'respuesta': forms.Select(attrs={'class': 'form-control'}),
-        }
-
-class RespuestaPreguntaSiONoForm(forms.ModelForm):
-    class Meta:
-        model = RespuestaPreguntaSiONo
-        fields = ['respuesta']
-        widgets = {
-            'respuesta': forms.Select(choices=[(True, 'Si'), (False, 'No')], attrs={'class': 'form-control'}),
-        }
-
-class RespuestaPreguntaNumericaForm(forms.ModelForm):
-    class Meta:
-        model = RespuestaPreguntaNumerica
-        fields = ['respuesta']
-        widgets = {
-            'respuesta': forms.NumberInput(attrs={'class': 'form-control'}),
-        }
+    

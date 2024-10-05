@@ -1,12 +1,53 @@
-{% comment %} {% extends "encuestaHome.html" %}
+{% extends "encuestaHome.html" %}
 {% block title %}
-Ecuesta List
+Encuestas publicas
 {% endblock title %}
 {% block encuesta %}
-    <h1>Lista de encuestas</h1>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button class="btn btn-primary m-line" type="submit">Guardar</button>
-    </form>
-{% endblock encuesta %} {% endcomment %}
+
+
+<div class="card-body">
+
+    <h5>Encuestas publicas</h5>
+    {% if encuestas %}
+    <p>A continuación encontrará el listado de encuestas públicas disponibles en el sistema.</p>
+    <p>Haga click en alguna de las cuestas para ir a ella...</p>
+    <a id="volver_incio_encuestas" href="{% url 'encuesta:encuestaHome' %}"><i class="fa-solid fa-circle-arrow-left"></i></a>
+    <h5 class="text-center card-header">Encuestas disponibles</h5>
+    <div id="section_grid_encuestas">
+
+
+            {% for encuesta in encuestas %}
+
+                {% if encuesta.fechaFinal >= hoy %}
+
+                <div class="col">
+                    <a id="pop_ver_encuestas" href="{% url 'encuesta:responder_encuesta_publica' encuesta.id %}" class="card mt-2 p-2">
+                        <div class="container">
+                            <p><i class="fa-solid fa-file mx-2"> {{encuesta.id}}</i> <strong>{{encuesta.titulo}}</strong>
+                            
+                            </p>
+                            <ul>
+
+                                <li>cantidad de preguntas: {{ encuesta.pregunta_set.count }}</li>
+                                <hr>
+                                <li>fecha de publicación <strong>ENDESARROLLO</strong> </li>
+                            </ul>
+                        </div>
+                    </a>
+                </div>
+                    
+                {% endif %}
+    
+            {% endfor %}
+        </div>
+    </div>
+
+    {% else %}
+    <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <p>No hay encuestas creadas en el sistema, comuníquese con el administrador</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock encuesta %}

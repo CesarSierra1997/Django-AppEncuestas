@@ -1,269 +1,701 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import TemplateView, CreateView, DetailView, ListView, UpdateView, DeleteView, FormView
+from django.views import View
+from django.shortcuts import redirect, get_object_or_404
+from django.urls import reverse_lazy, reverse
+from django.http import Http404,HttpResponse
+from django.utils import timezone
 from django.contrib import messages
-from django.shortcuts import render, redirect, get_object_or_404
+from openpyxl import Workbook
+from datetime import datetime
+from django.db.models import Q
+from ..usuario.mixin import *
 from .models import *
 from .forms import *
-#BUSQUEDA EN MODELOS
-def buscar(request):
-    if 'q' in request.GET:
-        query = request.GET['q']
-        encuestas = Encuesta.objects.filter(titulo__icontains=query)
-        preguntas_generales = PreguntaGeneral.objects.filter(texto_pre__icontains=query)
-        preguntas_select_multiple = PreguntaSelectMultiple.objects.filter(texto_pre__icontains=query)
-        preguntas_si_o_no = PreguntaSiONo.objects.filter(texto_pre__icontains=query)
-        preguntas_numericas = PreguntaNumerica.objects.filter(texto_pre__icontains=query)
-        respuestas_generales = RespuestaPreguntaGeneral.objects.filter(respuesta__icontains=query)
-        return render(request, 'busqueda_resultados.html', {'encuestas': encuestas, 'preguntas_generales': preguntas_generales,
-                                                            'preguntas_select_multiple': preguntas_select_multiple,
-                                                            'preguntas_si_o_no': preguntas_si_o_no,
-                                                            'preguntas_numericas': preguntas_numericas,
-                                                            'respuestas_generales':respuestas_generales,
-                                                            'query': query})
-    else:
-        return render(request, 'busqueda_resultados.html')
 
-from django.shortcuts import render
+#Muestra la vista principal de la app encuesta publica y opcion de login
+class EncuestaHomeApp(TemplateView):
+    model = Encuesta
+    template_name = 'encuestaHome.html'
 
-from django.shortcuts import render
+#Vistas de encuestas - administration
+class InicioEncuestas(LoginSuperStaffMixin, ValidarPermisosMixin, ListView):
+    permission_required = ('encuesta.view_encuesta', 'encuesta.add_encuesta', 'encuesta.delete_encuesta', 'encuesta.change_encuesta')
+    model = Encuesta
+    context_object_name = 'encuestas'
+    template_name = 'encuesta/listado_encuestas.html'  # El template que muestra la lista de encuestas
 
-def obtener_direccion_ip(request):
-    # Si tu aplicación se ejecuta detrás de un proxy, la dirección IP puede estar en otro encabezado
-    ip_address = request.META.get('HTTP_X_FORWARDED_FOR', None)
-    if ip_address:
-        # Si hay múltiples direcciones IP (debido a proxies anidados), toma la primera
-        ip_address = ip_address.split(',')[0]
-    else:
-        # Si no hay proxy, obtén la dirección IP del cliente normalmente
-        ip_address = request.META.get('REMOTE_ADDR', None)
-    return ip_address
+    def get_queryset(self):
+        """ Retorna todas las encuestas con sus preguntas pre-cargadas."""
+        return self.model.objects.prefetch_related('pregunta_set').all()
 
-#INDEX FABRICA DE SOFTWARE 
-def inicio(request):
-    ip_address = obtener_direccion_ip(request)
-    print("su direccion ip: ",ip_address)
-    return render(request, 'index.html',{'ip_address': ip_address})
-
-#CRUD ENCUESTA
-def crear_encuesta(request):
-    if request.method == 'POST':
-        form = EncuestaForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('encuesta', encuesta_id=form.instance.id)
-    else:
-        form = EncuestaForm()
-    return render(request, 'encuesta/crear_encuesta.html', {'form': form})
-
-def encuesta(request, encuesta_id):
-    encuesta = get_object_or_404(Encuesta, pk=encuesta_id)
-    preguntas = []
-    # Recorremos cada tipo de pregunta y las agregamos a la lista de preguntas
-    for tipo_pregunta in ['general', 'select_multiple', 'si_o_no', 'numerica']:
-        preguntas_tipo = None
-        if tipo_pregunta == 'general':
-            preguntas_tipo = PreguntaGeneral.objects.filter(encuesta=encuesta)
-        elif tipo_pregunta == 'select_multiple':
-            preguntas_tipo = PreguntaSelectMultiple.objects.filter(encuesta=encuesta)
-        elif tipo_pregunta == 'si_o_no':
-            preguntas_tipo = PreguntaSiONo.objects.filter(encuesta=encuesta)
-        elif tipo_pregunta == 'numerica':
-            preguntas_tipo = PreguntaNumerica.objects.filter(encuesta=encuesta)
-        # Agregamos las preguntas de este tipo a la lista general de preguntas
-        for pregunta in preguntas_tipo:
-            preguntas.append((tipo_pregunta, pregunta))
-
-    return render(request, 'encuesta/encuesta.html', {'encuesta': encuesta, 'preguntas': preguntas})
-
-def eliminar_encuesta(request, encuesta_id):
-    try:
-        encuesta = Encuesta.objects.get(pk=encuesta_id)
-        if request.method == "POST":
-            encuesta.delete()
-            messages.success(request, 'Encuesta eliminada correctamente')
-            return redirect('encuestaHome')
-    except Encuesta.DoesNotExist:
-        messages.error(request, 'La encuesta que intenta eliminar no existe')
-    except Exception as e:
-        messages.error(request, f'Error al eliminar la encuesta: {e}')
-    return redirect('encuestaHome')
-
-def editar_encuesta(request, encuesta_id):
-    encuesta = get_object_or_404(Encuesta, pk=encuesta_id)
-    if request.method == 'POST':
-        form = EncuestaForm(request.POST, instance=encuesta)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Encuesta editada correctamente')
-            return redirect('encuestaHome')
-    else:
-        form = EncuestaForm(instance=encuesta)
-    return render(request, 'encuesta/editar_encuesta.html', {'form': form})
-
-#CRUD PREGUNTA - TIPO PREGUNTA
-class PreguntaFactory: 
-    @staticmethod
-    def crear_pregunta(tipo, *args, **kwargs):
-        if tipo == 'general':
-            return PreguntaGeneralForm(*args, **kwargs)
-        elif tipo == 'select_multiple':
-            return PreguntaSelectMultipleForm(*args, **kwargs)
-        elif tipo == 'si_o_no':
-            return PreguntaSiONoForm(*args, **kwargs)
-        elif tipo == 'numerica':
-            return PreguntaNumericaForm(*args, **kwargs)
-        else:
-            raise ValueError('Tipo de pregunta no válido RAISE class - PreguntaFactory : {}'.format(tipo))
-
-def agregar_pregunta(request, encuesta_id):
-    encuesta = Encuesta.objects.get(pk=encuesta_id)
-    if request.method == 'POST':
-        tipo_pregunta = request.POST.get('tipo_pregunta')
-        form = PreguntaFactory.crear_pregunta(tipo_pregunta, request.POST)
-        print("El tipo de pregunta en el BACK",tipo_pregunta)
-        if form.is_valid():
-            pregunta = form.save(commit=False)
-            pregunta.encuesta = encuesta
-            pregunta.save()
-            messages.success(request, 'Pregunta agregada correctamente a la encuesta')
-            return redirect('encuesta', encuesta_id=encuesta_id)
-        else:
-            messages.error(request, 'Hubo un error al agregar la pregunta. Por favor, verifica los datos ingresados.')
-    else:
-        form = PreguntaFactory.crear_pregunta('si_o_no')  # Formulario por defecto
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['hoy'] = timezone.now()  # Añadimos la fecha y hora actual al contexto
+        return context
     
-    return render(request, 'pregunta/agregar_pregunta.html', {'form': form})
 
-def pregunta(request, encuesta_id):
-    tipo_pregunta = request.GET.get('type', '') 
-    form = PreguntaFactory.crear_pregunta(tipo_pregunta)
-    return render(request, 'pregunta/pregunta.html', {'tipo_pregunta': tipo_pregunta, 'form':form, 'encuesta_id': encuesta_id,})
+class CrearEncuesta(LoginSuperStaffMixin, ValidarPermisosMixin, CreateView):
+    permission_required = ('encuesta.view_encuesta', 'encuesta.add_encuesta', 'encuesta.delete_encuesta', 'encuesta.change_encuesta')
+    model = Encuesta
+    form_class = EncuestaForm
+    template_name = 'encuesta/crear_encuesta.html'
+    success_url = reverse_lazy('encuesta_detail')
+    pk_url_kwarg = 'encuesta_id'
 
-def editar_pregunta(request, encuesta_id, pregunta_id):
-    encuesta = get_object_or_404(Encuesta, pk=encuesta_id)
-    pregunta = None
-    tipo_pregunta = request.GET.get('type', '')  # Obtener el tipo de pregunta
-    try:
-        if tipo_pregunta == 'general':
-            pregunta = PreguntaGeneral.objects.get(pk=pregunta_id, encuesta=encuesta)
-        elif tipo_pregunta == 'select_multiple':
-            pregunta = PreguntaSelectMultiple.objects.get(pk=pregunta_id, encuesta=encuesta)
-        elif tipo_pregunta == 'si_o_no':
-            pregunta = PreguntaSiONo.objects.get(pk=pregunta_id, encuesta=encuesta)
-        elif tipo_pregunta == 'numerica':
-            pregunta = PreguntaNumerica.objects.get(pk=pregunta_id, encuesta=encuesta)
-    except (PreguntaGeneral.DoesNotExist, PreguntaSelectMultiple.DoesNotExist, PreguntaSiONo.DoesNotExist, PreguntaNumerica.DoesNotExist):
-        messages.error(request, 'La pregunta que intenta editar no existe.')
-        return redirect('encuestaHome')
 
-    form = PreguntaFactory.crear_pregunta(tipo_pregunta, instance=pregunta)
-
-    if request.method == 'POST':
-        form = PreguntaFactory.crear_pregunta(tipo_pregunta, request.POST, instance=pregunta)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Pregunta editada correctamente')
-            return redirect('encuesta', encuesta_id=encuesta_id)
-        else:
-            messages.error(request, 'Hubo un error al editar la pregunta. Por favor, verifica los datos ingresados.')
+    def form_valid(self, form):
+        form.instance.administrador = self.request.user  # Asignar el administrador actual
+        form.instance.fechaCreacion = timezone.now()
+        messages.success(self.request, '¡Encuesta creada correctamente!')
+        return super().form_valid(form)
     
-    return render(request, 'pregunta/editar_pregunta.html', {'form': form, 'encuesta_id': encuesta_id})
+    def get_success_url(self):
+        return reverse('encuesta:encuesta_detail', kwargs={'encuesta_id': self.object.pk})
 
-def eliminar_pregunta(request, encuesta_id, pregunta_id):
-    encuesta = get_object_or_404(Encuesta, pk=encuesta_id)
-    tipo_pregunta = request.GET.get('type', '')  # Obtener el tipo de pregunta
-    try:
-        if tipo_pregunta == 'general':
-            pregunta = PreguntaGeneral.objects.get(pk=pregunta_id, encuesta=encuesta)
-        elif tipo_pregunta == 'select_multiple':
-            pregunta = PreguntaSelectMultiple.objects.get(pk=pregunta_id, encuesta=encuesta)
-        elif tipo_pregunta == 'si_o_no':
-            pregunta = PreguntaSiONo.objects.get(pk=pregunta_id, encuesta=encuesta)
-        elif tipo_pregunta == 'numerica':
-            pregunta = PreguntaNumerica.objects.get(pk=pregunta_id, encuesta=encuesta)
-    except (PreguntaGeneral.DoesNotExist, PreguntaSelectMultiple.DoesNotExist, PreguntaSiONo.DoesNotExist, PreguntaNumerica.DoesNotExist):
-        messages.error(request, 'La pregunta que intenta eliminar no existe.')
-        return redirect('pagina_de_error')
+class EncuestaDetail(LoginSuperStaffMixin, ValidarPermisosMixin, DetailView):
+    permission_required = ('encuesta.view_encuesta', 'encuesta.add_encuesta', 'encuesta.delete_encuesta', 'encuesta.change_encuesta')
+    model = Encuesta
+    template_name = 'encuesta/detalle_encuesta.html'
+    pk_url_kwarg = 'encuesta_id'
+    success_url = reverse_lazy('encuesta:inicio_encuestas')
 
-    pregunta.delete()
-    messages.success(request, 'Pregunta eliminada correctamente')
-    return redirect('encuesta', encuesta_id=encuesta_id)
+    def get_queryset(self):
+        """Retorna todas las encuestas activas disponibles en la base de datos."""
+        return self.model.objects.all()
+    
+    def get(self, request, *args, **kwargs):
+        """Maneja el flujo de redirección si la encuesta no está activa."""
+        try:
+            pass
+        except Http404:
+            messages.error(self.request, 'No se encontró ninguna encuesta coincidente con la consulta.')
+            return redirect(self.success_url)
 
-#INICIO APP ENCUESTAS - LISTA DE ENCUESTAS
-def encuestaHome(request):
-    encuestas = Encuesta.objects.all()
-    preguntas_por_encuesta = []
-    for encuesta in encuestas:
-        cantidad_preguntas = 0
-        cantidad_respuestas = 0
-        cantidad_respuestas += RespuestaEncuestaPublica.objects.filter(encuesta=encuesta).count()
-        # Contar la cantidad de preguntas de cada tipo para esta encuesta
-        cantidad_preguntas += PreguntaGeneral.objects.filter(encuesta=encuesta).count()
-        cantidad_preguntas += PreguntaSelectMultiple.objects.filter(encuesta=encuesta).count()
-        cantidad_preguntas += PreguntaSiONo.objects.filter(encuesta=encuesta).count()
-        cantidad_preguntas += PreguntaNumerica.objects.filter(encuesta=encuesta).count()
-        preguntas_por_encuesta.append((encuesta, cantidad_preguntas, cantidad_respuestas))
+        return super().get(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Obtener las preguntas relacionadas con la encuesta actual
+        preguntas = Pregunta.objects.filter(encuesta=self.get_object())
+
+        # Obtener la fecha de hoy y pasarla al contexto
+        hoy = datetime.now()
+        context['hoy'] = hoy
+
+        # Para cada pregunta, busca las opciones si es una pregunta de selección múltiple
+        preguntas_con_opciones = []
+        for pregunta in preguntas:
+            opciones = None
+            if pregunta.tipoPregunta == '4':  # '4' es la selección múltiple en tu modelo
+                opciones = OpcionesPregunta.objects.filter(pregunta=pregunta).first()
+            preguntas_con_opciones.append({
+                'pregunta': pregunta,
+                'opciones': opciones
+            })
         
-    return render(request, 'encuestaHome.html', {'encuestas': encuestas, 'preguntas_por_encuesta': preguntas_por_encuesta})
+        context['preguntas_con_opciones'] = preguntas_con_opciones
+        return context
 
-#CRUD RESPUESTA DE ENCUESTA
-def responder_encuesta(request, encuesta_id):
-    encuesta = Encuesta.objects.get(pk=encuesta_id)
-    preguntas = []
+class EditarEncuesta(LoginSuperStaffMixin, ValidarPermisosMixin, UpdateView):
+    permission_required = ('encuesta.view_encuesta', 'encuesta.add_encuesta', 'encuesta.delete_encuesta', 'encuesta.change_encuesta')
+    model = Encuesta
+    template_name = 'encuesta/editar_encuesta.html'
+    form_class = ActualizarEncuestaForm
+    success_url = reverse_lazy('encuesta:inicio_encuestas')
+    pk_url_kwarg = 'encuesta_id'
 
-    # Obtener todas las preguntas de la encuesta
-    preguntas_general = PreguntaGeneral.objects.filter(encuesta=encuesta)
-    preguntas_select_multiple = PreguntaSelectMultiple.objects.filter(encuesta=encuesta)
-    preguntas_si_o_no = PreguntaSiONo.objects.filter(encuesta=encuesta)
-    preguntas_numerica = PreguntaNumerica.objects.filter(encuesta=encuesta)
+    def get_queryset(self):
+        """Retorna todas las encuestas activas disponibles en la base de datos."""
+        return self.model.objects.all()
 
-    # Manejar el envío del formulario
-    if request.method == 'POST':
-        nombre = request.POST.get('nombre')
-        tipoDocumento = request.POST.get('tipoDocumento')
-        numeroDocumento = request.POST.get('numeroDocumento')
+    def get(self, request, *args, **kwargs):
+        """Maneja el flujo de redirección si la encuesta no está activa."""
+        try:
+            pass
+        except Http404:
+            messages.error(self.request, 'No se encontró ninguna encuesta coincidente con la consulta.')
+            return redirect('encuesta:inicio_encuestas')
+        return super().get(request, *args, **kwargs)
+    
+    def form_valid(self, form):
+        form.instance.administrador == self.request.user
+        form.instance.fechaModificacion = timezone.now()
+        messages.success(self.request, 'Encuesta actualizada exitosamente')
+        return super().form_valid(form)
 
-        # Crear una instancia de RespuestaEncuesta y guardarla
-        respuesta_encuesta = RespuestaEncuestaPublica(nombre=nombre, tipoDocumento=tipoDocumento, numeroDocumento=numeroDocumento, encuesta=encuesta)
-        respuesta_encuesta.save()
+    def get_success_url(self):
+        return reverse('encuesta:encuesta_detail', kwargs={'encuesta_id': self.object.pk})
 
-        # Guardar las respuestas para cada tipo de pregunta
-        for pregunta_general in preguntas_general:
-            respuesta_texto = request.POST.get(f"respuesta_general_{pregunta_general.id}")
-            respuesta_pregunta_general = RespuestaPreguntaGeneral(pregunta=pregunta_general, respuesta=respuesta_texto)
-            respuesta_pregunta_general.save()
+class EliminarEncuesta(LoginSuperStaffMixin, ValidarPermisosMixin, DeleteView):
+    permission_required = ('encuesta.view_encuesta', 'encuesta.add_encuesta', 'encuesta.delete_encuesta', 'encuesta.change_encuesta')
+    model = Encuesta
+    template_name = 'encuesta/confirmar_eliminar.html'
+    pk_url_kwarg = 'encuesta_id'
+    
+    def post(self, request, *args, **kwargs):
+        encuesta = self.get_object()
+        encuesta.delete()
+        messages.success(request,'Encuesta eliminada correctamente')
+        return redirect('encuesta:inicio_encuestas')
 
-        for pregunta_select_multiple in preguntas_select_multiple:
-            respuesta_opcion = request.POST.get(f"respuesta_select_multiple_{pregunta_select_multiple.id}")
-            respuesta_pregunta_select_multiple = RespuestaPreguntaSelectMultiple(pregunta=pregunta_select_multiple, respuesta=respuesta_opcion)
-            respuesta_pregunta_select_multiple.save()
+#Vistas de preguntas - administration
+class AgregarPregunta(LoginSuperStaffMixin, ValidarPermisosMixin, CreateView):
+    permission_required = ('pregunta.add_pregunta', 'pregunta.view_pregunta', 'pregunta.change_pregunta', 'pregunta.delete_pregunta')
+    model = Pregunta
+    form_class = PreguntaForm
+    template_name = 'pregunta/agregar_pregunta.html'
+    pk_url_kwarg = 'encuesta_id'
+    
+    def get_queryset(self):
+        # Filtrar por una encuesta específica, no por un conjunto
+        encuesta_id = self.kwargs['encuesta_id']
+        try:
+            encuesta = Encuesta.objects.get(id=encuesta_id, publicarEncuesta=False)
+        except Encuesta.DoesNotExist:
+            raise Http404('Encuesta no encontrada o ya publicada.')
+        # Retorna las preguntas asociadas a esa encuesta
+        return self.model.objects.filter(encuesta=encuesta)
 
-        for pregunta_si_o_no in preguntas_si_o_no:
-            respuesta_opcion = request.POST.get(f"respuesta_si_o_no_{pregunta_si_o_no.id}")
-            respuesta_pregunta_si_o_no = RespuestaPreguntaSiONo(pregunta=pregunta_si_o_no, respuesta=respuesta_opcion)
-            respuesta_pregunta_si_o_no.save()
+    def get(self, request, *args, **kwargs):
+        """Maneja el flujo de redirección si la encuesta ya fue publicada."""
+        encuesta_id = self.kwargs.get('encuesta_id')
 
-        for pregunta_numerica in preguntas_numerica:
-            respuesta_numero = request.POST.get(f"respuesta_numerica_{pregunta_numerica.id}")
-            respuesta_pregunta_numerica = RespuestaPreguntaNumerica(pregunta=pregunta_numerica, respuesta=respuesta_numero)
-            respuesta_pregunta_numerica.save()
+        try:
+            encuesta = Encuesta.objects.get(id=encuesta_id)
+            if encuesta.publicarEncuesta:
+                messages.warning(self.request, 'La encuesta ya fue publicada no puede agregar más preguntas.')
+                return redirect('encuesta:encuesta_detail', encuesta_id=encuesta_id)
+        except Encuesta.DoesNotExist:
+            messages.error(self.request, 'No se encontró ninguna encuesta coincidente con la consulta.')
+            return redirect('encuesta:inicio_encuestas')
 
-        messages.success(request, 'Respuestas guardadas correctamente')
-        return redirect('encuestaHome')
+        return super().get(request, *args, **kwargs)
 
-    # Preparar los datos para enviar a la plantilla
-    for pregunta in preguntas_general:
-        preguntas.append({'tipo_pregunta': 'general', 'pregunta': pregunta})
+    def form_valid(self, form):
+        # Asocia la pregunta con la encuesta correspondiente
+        form.instance.encuesta = get_object_or_404(Encuesta, pk=self.kwargs['encuesta_id'])
+        response = super().form_valid(form)
 
-    for pregunta in preguntas_select_multiple:
-        preguntas.append({'tipo_pregunta': 'select_multiple', 'pregunta': pregunta})
+        # Si la pregunta es de tipo "Selección múltiple", guardar las opciones en un único objeto
+        if form.instance.tipoPregunta == '4':  # Ajusta según tu choice para "Selección múltiple"
+            opcion_1 = self.request.POST.get('opcion_1')
+            opcion_2 = self.request.POST.get('opcion_2')
+            opcion_3 = self.request.POST.get('opcion_3')
+            opcion_4 = self.request.POST.get('opcion_4')
+            
+            # Verificar que las 4 opciones estén presentes
+            if not all([opcion_1, opcion_2, opcion_3, opcion_4]):
+                messages.error(self.request, 'No se encontró ninguna encuesta coincidente con la consulta.')
+                form.add_error(None, "Debe completar todas las opciones para una pregunta de selección múltiple.")
+                return self.form_invalid(form)
+            
+            # Crear un solo objeto de OpcionesPregunta con las 4 opciones
+            OpcionesPregunta.objects.create(
+                pregunta=form.instance,
+                opcion_1=opcion_1,
+                opcion_2=opcion_2,
+                opcion_3=opcion_3,
+                opcion_4=opcion_4
+            )
+        
+        return response
 
-    for pregunta in preguntas_si_o_no:
-        preguntas.append({'tipo_pregunta': 'si_o_no', 'pregunta': pregunta})
+    def get_success_url(self):
+        return reverse('encuesta:encuesta_detail', kwargs={'encuesta_id': self.object.encuesta.pk})
+    
 
-    for pregunta in preguntas_numerica:
-        preguntas.append({'tipo_pregunta': 'numerica', 'pregunta': pregunta})
+    def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context['encuesta'] = get_object_or_404(Encuesta, pk=self.kwargs['encuesta_id'])
+            return context
 
-    return render(request, 'respuesta/responder_encuesta.html', {'encuesta': encuesta, 'preguntas': preguntas})
+class EditarPregunta(LoginSuperStaffMixin, ValidarPermisosMixin, UpdateView):
+    permission_required = ('pregunta.add_pregunta', 'pregunta.view_pregunta', 'pregunta.change_pregunta', 'pregunta.delete_pregunta')
+    model = Pregunta
+    form_class = PreguntaForm
+    template_name = 'pregunta/editar_pregunta.html'
+    pk_url_kwarg = 'pregunta_id'
 
-def ver_respuestas(request):
-    encuestas = Encuesta.objects.all()
-    return render(request, 'respuesta/ver_respuestas.html', {'encuestas': encuestas})
+    """" Validar si la encuesta ya esta publicada """
+    def get_queryset(self):
+        # Filtrar por una encuesta específica, no por un conjunto
+        encuesta_id = self.kwargs['encuesta_id']
+        try:
+            encuesta = Encuesta.objects.get(id=encuesta_id, publicarEncuesta=False)
+        except Encuesta.DoesNotExist:
+            raise Http404('Encuesta no encontrada o ya publicada.')
+        # Retorna las preguntas asociadas a esa encuesta
+        return self.model.objects.filter(encuesta=encuesta)
+
+    def get(self, request, *args, **kwargs):
+        """Maneja el flujo de redirección si la encuesta ya fue publicada."""
+        encuesta_id = self.kwargs.get('encuesta_id')
+
+        try:
+            encuesta = Encuesta.objects.get(id=encuesta_id)
+            if encuesta.publicarEncuesta:
+                messages.warning(self.request, 'La encuesta ya fue publicada no puede editar preguntas.')
+                return redirect('encuesta:encuesta_detail', encuesta_id=encuesta_id)
+        except Encuesta.DoesNotExist:
+            messages.error(self.request, 'No se encontró ninguna encuesta coincidente con la consulta.')
+            return redirect('encuesta:inicio_encuestas')
+
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Verificar si la pregunta es de tipo selección múltiple
+        pregunta = self.get_object()
+        if pregunta.tipoPregunta == '4':  # Ajusta según el valor que usas para "Selección múltiple"
+            opciones = OpcionesPregunta.objects.filter(pregunta=pregunta).first()
+            context['opciones'] = opciones
+        return context
+
+    def form_valid(self, form):
+        # Si es una pregunta de selección múltiple, actualizar las opciones también
+        if form.instance.tipoPregunta == '4':  # '4' corresponde a selección múltiple
+            opcion_1 = self.request.POST.get('opcion_1')
+            opcion_2 = self.request.POST.get('opcion_2')
+            opcion_3 = self.request.POST.get('opcion_3')
+            opcion_4 = self.request.POST.get('opcion_4')
+            
+            # Verificar que las 4 opciones estén presentes
+            if not all([opcion_1, opcion_2, opcion_3, opcion_4]):
+                form.add_error(None, "Debe completar todas las opciones para una pregunta de selección múltiple.")
+                return self.form_invalid(form)
+            
+            # Actualizar las opciones si ya existen
+            opciones_pregunta = OpcionesPregunta.objects.filter(pregunta=form.instance).first()
+            if opciones_pregunta:
+                opciones_pregunta.opcion_1 = opcion_1
+                opciones_pregunta.opcion_2 = opcion_2
+                opciones_pregunta.opcion_3 = opcion_3
+                opciones_pregunta.opcion_4 = opcion_4
+                opciones_pregunta.save()
+            else:
+                # Si no existen, crear nuevas opciones
+                OpcionesPregunta.objects.create(
+                    pregunta=form.instance,
+                    opcion_1=opcion_1,
+                    opcion_2=opcion_2,
+                    opcion_3=opcion_3,
+                    opcion_4=opcion_4
+                )
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        # Redirigir al detalle de la encuesta
+        return reverse('encuesta:encuesta_detail', kwargs={'encuesta_id': self.kwargs['encuesta_id']})
+
+class OpcionPregunta_SelectMultiple(LoginSuperStaffMixin, ValidarPermisosMixin, CreateView):
+    permission_required = ('opcion_pregunta.add_opcion_pregunta', 'opcion_pregunta.view_opcion_pregunta', 'opcion_pregunta.change_opcion_pregunta', 'opcion_pregunta.delete_opcion_pregunta')
+    model = OpcionesPregunta
+    form_class = OpcionPreguntaForm  # Este formulario debe manejar las cuatro opciones
+    template_name = 'pregunta/agregar_pregunta.html'
+    pk_url_kwarg = 'pregunta_id'
+
+    def form_valid(self, form):
+        # Asociar las opciones con la pregunta correspondiente
+        form.instance.pregunta = get_object_or_404(Pregunta, pk=self.kwargs['pregunta_id'])
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        # Redireccionar al detalle de la encuesta una vez que las opciones sean guardadas
+        return reverse('encuesta:encuesta_detail', kwargs={'encuesta_id': self.object.pregunta.encuesta.pk})
+    
+    def get_context_data(self, **kwargs):
+        # Añadir la pregunta al contexto para que el template tenga acceso a ella
+        context = super().get_context_data(**kwargs)
+        context['pregunta'] = get_object_or_404(Pregunta, pk=self.kwargs['pregunta_id'])
+        return context
+    
+    def get_form_kwargs(self):
+        # Pasar el `pregunta_id` al formulario si es necesario para usarlo en la lógica del formulario
+        kwargs = super().get_form_kwargs()
+        kwargs['pregunta_id'] = self.kwargs['pregunta_id']
+        return kwargs
+
+class EliminarPregunta(LoginSuperStaffMixin, ValidarPermisosMixin, DeleteView):
+    permission_required = ('pregunta.add_pregunta', 'pregunta.view_pregunta', 'pregunta.change_pregunta', 'pregunta.delete_pregunta')
+    model = Pregunta
+    template_name = 'pregunta/confirmar_eliminar.html'
+    pk_url_kwarg = 'pregunta_id'
+
+    def get_queryset(self):
+        # Filtrar por una encuesta específica, no por un conjunto
+        encuesta_id = self.kwargs['encuesta_id']
+        try:
+            encuesta = Encuesta.objects.get(id=encuesta_id, publicarEncuesta=False)
+        except Encuesta.DoesNotExist:
+            raise Http404('Encuesta no encontrada o ya publicada.')
+        # Retorna las preguntas asociadas a esa encuesta
+        return self.model.objects.filter(encuesta=encuesta)
+
+    def get(self, request, *args, **kwargs):
+        """Maneja el flujo de redirección si la encuesta ya fue publicada."""
+        encuesta_id = self.kwargs.get('encuesta_id')
+
+        try:
+            encuesta = Encuesta.objects.get(id=encuesta_id)
+            if encuesta.publicarEncuesta:
+                messages.warning(self.request, 'La encuesta ya fue publicada no puede eliminar preguntas.')
+                return redirect('encuesta:encuesta_detail', encuesta_id=encuesta_id)
+        except Encuesta.DoesNotExist:
+            messages.error(self.request, 'No se encontró ninguna encuesta coincidente con la consulta.')
+            return redirect('encuesta:inicio_encuestas')
+
+        return super().get(request, *args, **kwargs)
+    
+    def post(self, request, *args, **kwargs):
+        # Obtenemos la pregunta y el id de la encuesta antes de eliminarla
+        pregunta = self.get_object()
+        encuesta_id = pregunta.encuesta.pk
+        pregunta.delete()
+        # Mostramos un mensaje de éxito
+        messages.success(self.request, 'Pregunta eliminada correctamente')
+        # Redirigimos al detalle de la encuesta
+        return redirect('encuesta:encuesta_detail', encuesta_id=encuesta_id)
+
+    def get_success_url(self):
+        # Definimos la URL de éxito tras eliminar la pregunta
+        return reverse('encuesta:encuesta_detail', kwargs={'encuesta_id': self.object.encuesta.pk})
+    
+    def get_context_data(self, **kwargs):
+        # Añadir la pregunta al contexto para que el template tenga acceso a ella
+        context = super().get_context_data(**kwargs)
+        context['encuesta'] = get_object_or_404(Encuesta, pk=self.kwargs['encuesta_id'])
+        context['pregunta'] = self.get_object()
+        return context
+  
+class PublicarEncuesta(LoginSuperStaffMixin, ValidarPermisosMixin, UpdateView):
+    permission_required = ('encuesta.view_encuesta', 'encuesta.add_encuesta', 'encuesta.delete_encuesta', 'encuesta.change_encuesta')
+    model = Encuesta
+    form_class = EncuestaForm
+    template_name = 'encuesta/publicar_encuesta.html'
+    pk_url_kwarg = 'encuesta_id'
+    success_url = reverse_lazy('encuesta:inicio_encuestas')
+
+    def get_queryset(self):
+        """Retorna todas las encuestas no publicadas."""
+        return self.model.objects.filter(publicarEncuesta=False)
+
+    def get(self, request, *args, **kwargs):
+        """Maneja el flujo de redirección si la encuesta no está activa."""
+        try:
+            encuesta = Encuesta.objects.get(id=self.kwargs['encuesta_id'])
+            if encuesta.publicarEncuesta:
+                messages.warning(self.request, 'La encuesta ya fue publicada.')
+                return redirect('encuesta:encuesta_detail', encuesta_id=encuesta.id)
+        except Http404:
+            messages.error(self.request, 'No se encontró ninguna encuesta coincidente con la consulta.')
+            return redirect('encuesta:inicio_encuestas')
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        encuesta = self.get_object()
+        
+        # Validar si la encuesta tiene al menos una pregunta
+        if encuesta.pregunta_set.count() == 0:
+            messages.error(self.request, 'La encuesta debe tener al menos una pregunta antes de publicarse.')
+            return redirect('encuesta:encuesta_detail', encuesta_id=encuesta.id)
+
+        # Publicar encuesta
+        encuesta.publicarEncuesta = True
+        encuesta.save()
+        messages.success(self.request, '¡ENCUESTA PUBLICADA EXITOSAMENTE!.')
+        
+        return redirect('encuesta:encuesta_detail', encuesta_id=encuesta.id)
+
+    def get_success_url(self):
+        return reverse('encuesta:encuesta_detail', kwargs={'encuesta_id': self.object.pk})
+
+#Vistas de encuestas - publica(publico general) y privada(usuarios registrados)
+#Vistas de encuestas - administration
+class VerEncuestasPublicas(ListView):
+    model = Encuesta
+    context_object_name = 'encuestas'
+    template_name = 'encuesta/lista_encuestas/encuestasPublicas.html' 
+
+    def get_queryset(self):
+        """ Retorna todas las encuestas con sus preguntas pre-cargadas."""
+        return self.model.objects.filter(estado=True, publicarEncuesta=True, tipoEncuesta="Publica")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['hoy'] = timezone.now()  # Añadimos la fecha y hora actual al contexto
+        return context
+    
+class VerEncuestasPrivadas(LoginRequiredMixin, ListView):
+    model = Encuesta
+    context_object_name = 'encuestas'
+    template_name = 'ecnuesta/lista_encuestas/encuestasPrivadas.html' 
+
+    def get_queryset(self):
+        """ Retorna todas las encuestas con sus preguntas pre-cargadas."""
+        return self.model.objects.filter(estado=True, publicarEncuesta=True, tipoEncuesta="Privada")
+
+    def get_context_data(self, **kwargs):
+        """ Añade encuestas y sus preguntas al contexto del template."""
+        context = super().get_context_data(**kwargs)
+        return context
+
+class ResponderEncuestaPublica(FormView):
+    model = Respuesta
+    template_name = 'respuesta/responder_encuesta/responder_publica.html'
+    form_class = EncuestaPublicaForm
+    success_url = reverse_lazy('encuesta:ver_encuestas_publicas')
+    pk_url_kwarg = 'encuesta_id'
+
+    def get_queryset(self):
+        # Filtrar por una encuesta específica, no por un conjunto
+        encuesta_id = self.kwargs['encuesta_id']
+        try:
+            encuesta = Encuesta.objects.get(id=encuesta_id, publicarEncuesta=True, tipoEncuesta = "Publica")
+        except Encuesta.DoesNotExist:
+            raise Http404('Encuesta no encontrada.')
+        # Retorna las preguntas asociadas a esa encuesta        
+        return self.model.objects.filter(encuesta=encuesta)
+        
+    def get(self, request, *args, **kwargs):
+        """Maneja el flujo de redirección si la encuesta ya fue publicada."""
+        try:
+            encuesta = Encuesta.objects.get(id=self.kwargs['encuesta_id'])
+            if encuesta.publicarEncuesta == False:
+                messages.warning(self.request, 'La encuesta no está publicada.')
+                return redirect('encuesta:encuestaHome')
+            if encuesta.tipoEncuesta == "Privada":
+                messages.warning(self.request, 'Encuesta Privada, debe iniciar sesión para responder.')
+                return redirect('encuesta:encuestaHome')
+        except Encuesta.DoesNotExist:
+            messages.error(self.request, 'No se encontró ninguna encuesta coincidente con la consulta.')
+            return redirect('encuesta:encuestaHome')
+        return super().get(request, *args, **kwargs)
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        encuesta = get_object_or_404(Encuesta, id=self.kwargs['encuesta_id'])
+        preguntas = Pregunta.objects.filter(encuesta=encuesta)
+        context['preguntas'] = preguntas
+        context['encuesta'] = encuesta
+        context['form'] = self.get_form()
+        return context
+
+    def form_valid(self, form):
+        encuesta = get_object_or_404(Encuesta, id=self.kwargs['encuesta_id'])
+
+        # Crear el registro de la encuesta pública
+        encuesta_publica = RespuestaEncuestaPublica.objects.create(
+            tipoUsuario=form.cleaned_data['tipoUsuario'],
+            tipoDocumento=form.cleaned_data['tipoDocumento'],
+            numeroDocumento=form.cleaned_data['numeroDocumento'],
+            nombre=form.cleaned_data['nombre'],
+            email=form.cleaned_data['email'],
+            encuesta=encuesta
+        )
+
+        preguntas = Pregunta.objects.filter(encuesta=encuesta)
+        respuestas_incompletas = False  # Bandera para rastrear si falta alguna respuesta
+
+        for pregunta in preguntas:
+            if pregunta.tipoPregunta == '4':  # Pregunta de Selección múltiple
+                respuesta = self.request.POST.get(f"respuesta_{pregunta.id}")
+            else:
+                respuesta = self.request.POST.get(f"respuesta_{pregunta.id}")
+
+            if not respuesta:  # Si no se ha respondido una pregunta
+                respuestas_incompletas = True  # Marca que hay una respuesta incompleta
+                break  # No es necesario seguir, ya que falta una respuesta
+
+            # Guardar la respuesta si se proporcionó
+            Respuesta.objects.create(
+                texto_respuesta=respuesta,
+                pregunta=pregunta,
+                respuestaEncuestaPublica=encuesta_publica
+            )
+
+        # Si falta alguna respuesta, mostrar un mensaje de error y no guardar nada
+        if respuestas_incompletas:
+            messages.error(self.request, 'Debe responder todas las preguntas antes de enviar la encuesta.')
+            encuesta_publica.delete()  # Elimina el registro de la encuesta pública creado
+            return self.form_invalid(form)  # Retorna el formulario inválido
+        
+        messages.success(self.request, 'Respuesta envida de manera exitosa.')
+        return super().form_valid(form)
+
+class ResponderEncuestaPrivada(LoginRequiredMixin, FormView):
+    model = RespuestaEncuestaPrivada
+    template_name = 'respuesta/responder_encuesta/responder_privada.html'
+    form_class = EncuestaPrivadaForm
+    success_url = reverse_lazy('encuesta:inicio_encuestas')
+
+    def dispatch(self, request, *args, **kwargs):
+        # Verifica que el usuario esté autenticado
+        if not request.user.is_authenticated:
+            messages.warning(request, "Debes estar autenticado para responder esta encuesta.")
+            return redirect('login')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        encuesta_id = self.kwargs['encuesta_id']
+        encuesta = get_object_or_404(Encuesta, id=encuesta_id, tipoEncuesta='Privada', publicarEncuesta=True)
+        return Pregunta.objects.filter(encuesta=encuesta)
+    
+
+    def get(self, request, *args, **kwargs):
+        """Maneja el flujo de redirección si la encuesta ya fue publicada."""
+        try:
+            encuesta = Encuesta.objects.get(id=self.kwargs['encuesta_id'])
+            if encuesta.publicarEncuesta == False:
+                messages.warning(self.request, 'La encuesta no está publicada.')
+                return redirect('encuesta:encuestaHome')
+            if encuesta.tipoEncuesta == "Publica":
+                messages.warning(self.request, 'Esta es una encuesta publica, accede desde encuestaHome.')
+                return redirect('encuesta:encuestaHome')
+        except Encuesta.DoesNotExist:
+            messages.error(self.request, 'No se encontró ninguna encuesta coincidente con la consulta.')
+            return redirect('encuesta:inicio_encuestas')
+
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        encuesta = get_object_or_404(Encuesta, id=self.kwargs['encuesta_id'])
+        preguntas = Pregunta.objects.filter(encuesta=encuesta)
+        context['preguntas'] = preguntas
+        context['encuesta'] = encuesta
+        return context
+
+    def form_valid(self, form):
+        encuesta = get_object_or_404(Encuesta, id=self.kwargs['encuesta_id'])
+
+        # Crea el registro de la encuesta privada
+        respuesta_encuesta_privada = RespuestaEncuestaPrivada.objects.create(
+            usuario=self.request.user,
+            encuesta=encuesta
+        )
+
+        # Itera sobre las preguntas y guarda las respuestas
+        preguntas = Pregunta.objects.filter(encuesta=encuesta)
+        for pregunta in preguntas:
+            respuesta = self.request.POST.get(f"respuesta_{pregunta.id}")
+            if respuesta:
+                Respuesta.objects.create(
+                    texto_respuesta=respuesta,
+                    pregunta=pregunta,
+                    respuestaEncuestaPrivada=respuesta_encuesta_privada
+                )
+
+        messages.success(self.request, "Encuesta completada con éxito.")
+        return super().form_valid(form)
+
+class VerRespuestas(LoginRequiredMixin, ListView):
+    template_name = 'respuesta/ver_respuestas.html'
+    context_object_name = 'respuestas'
+
+    def get_queryset(self):
+        # Obtener todas las respuestas públicas y privadas
+        respuestas_publicas = Respuesta.objects.filter(respuestaEncuestaPublica__isnull=False)
+        respuestas_privadas = Respuesta.objects.filter(respuestaEncuestaPrivada__isnull=False)
+        
+        # Unir ambas consultas y ordenarlas por encuesta
+        return respuestas_publicas | respuestas_privadas
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Obtener todas las respuestas públicas y privadas, y pasar encuestas
+        context['respuestas_publicas'] = Respuesta.objects.filter(respuestaEncuestaPublica__isnull=False)
+        context['respuestas_privadas'] = Respuesta.objects.filter(respuestaEncuestaPrivada__isnull=False)
+        
+        return context
+
+class ExportarRespuestasPublicasExcel(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        # Crear un nuevo libro de trabajo Excel
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Respuestas de Encuestas Públicas"
+
+        # Encabezados de las columnas
+        # Cabeceras de la hoja de Excel
+        ws.append([
+            "Encuesta", "Tipo de pregunta", "Pregunta", "Respuesta", "Tipo de Usuario", 
+            "Nombre", "Número de Documento", "Correo Electrónico"
+        ])
+
+        # Obtener las respuestas públicas
+        respuestas_publicas = Respuesta.objects.filter(respuestaEncuestaPublica__isnull=False)
+
+        # Llenar las filas con datos
+        for respuesta in respuestas_publicas:
+            numero_documento = respuesta.respuestaEncuestaPublica.numeroDocumento
+            # Intentar convertir numeroDocumento a número, si es posible
+            try:
+                numero_documento = int(numero_documento)  # Convertir a entero
+            except ValueError:
+                numero_documento = respuesta.respuestaEncuestaPublica.numeroDocumento
+
+            # Obtener el tipo de pregunta y convertir la respuesta si es numérica
+            tipo_pregunta = respuesta.pregunta.tipoPregunta  # Obtener el tipo de pregunta
+            respuesta_converted = respuesta.texto_respuesta  # Respuesta original
+
+            # Verificar si el tipo de pregunta es numérica
+            if tipo_pregunta == '3':  # Supongamos que '3' es el código para 'Numérica'
+                try:
+                    respuesta_converted = float(respuesta.texto_respuesta)  # Convertir a número (flotante)
+                except ValueError:
+                    respuesta_converted = respuesta.texto_respuesta  # Si falla, mantener el texto original
+
+            ws.append([
+                respuesta.respuestaEncuestaPublica.encuesta.titulo,
+                respuesta.pregunta.get_tipoPregunta_display(),
+                respuesta.pregunta.texto_pregunta,
+                respuesta_converted,  # Aquí se usa la respuesta convertida
+                respuesta.respuestaEncuestaPublica.get_tipoUsuario_display(),
+                respuesta.respuestaEncuestaPublica.nombre,
+                numero_documento,
+                respuesta.respuestaEncuestaPublica.email
+            ])
+
+
+        # Generar el archivo Excel para la respuesta HTTP
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=Respuestas_Publicas.xlsx'
+        wb.save(response)
+        return response
+
+
+from django.views.generic import ListView
+from django.db.models import Q
+from django.urls import reverse
+
+class BuscarView(TemplateView):
+    template_name = 'busqueda_resultados.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query = self.request.GET.get('q', '')
+        context['query'] = query
+
+        # Filtrar encuestas usando el campo 'titulo' en lugar de 'descripcion'
+        context['encuestas'] = Encuesta.objects.filter(Q(titulo__icontains=query))
+        context['preguntas'] = Pregunta.objects.filter(Q(texto_pregunta__icontains=query))
+        context['respuestas'] = Respuesta.objects.filter(Q(texto_respuesta__icontains=query))
+
+        # Filtrar rutas
+        rutas = [
+            {'name': 'crear_encuesta', 'url': reverse('encuesta:crear_encuesta'), 'descripcion': 'Crear una nueva encuesta'},
+            {'name': 'inicio_encuestas', 'url': reverse('encuesta:inicio_encuestas'), 'descripcion': 'Ver inicio de encuestas'},
+            {'name': 'ver_encuestas_publicas', 'url': reverse('encuesta:ver_encuestas_publicas'), 'descripcion': 'Ver encuestas públicas'},
+            {'name': 'ver_respuestas', 'url': reverse('encuesta:ver_respuestas'), 'descripcion': 'Ver respuestas de encuestas'},
+            # {'name': 'exportar_respuestas_publicas', 'url': reverse('encuesta:exportar_respuestas_publicas'), 'descripcion': 'Exportar respuestas públicas'},
+        ]
+
+        # Filtrar rutas que coincidan con la búsqueda
+        context['rutas'] = [ruta for ruta in rutas if query.lower() in ruta['descripcion'].lower() or query.lower() in ruta['name'].lower()]
+        
+        return context

@@ -1,44 +1,108 @@
 {% extends "encuestaHome.html" %}
 {% block title %}
-Pregunta Tipe
+Agregar Pregunta
 {% endblock title %}
+{% load static %}
+
+{% block navegacion %}
+<div id="ruta_navegacion">
+    <em>App/ modulo encuestas/ detalle encuesta/ agregar pregunta</em>
+</div>
+{% endblock navegacion %}
+
 {% block encuesta %}
-<body>
-    <h5 class="card-header">Editor de encuestas | Agregar pregunta</h5>
-    <div class="card card-body bg-light mt-2 p-4">
-        <form method="POST" id="tipo-pregunta-form">
-            {% csrf_token %}
-            <label for="tipo_pregunta">Seleccione el tipo de pregunta:</label>
-            <select class="form-control1" name="tipo_pregunta" id="tipo_pregunta">
-                <option value="general">Pregunta General</option>
-                <option value="select_multiple">Pregunta de Selección Múltiple</option>
-                <option value="si_o_no">Pregunta Sí o No</option>
-                <option value="numerica">Pregunta Numérica</option>
-            </select>
-            <button class="btn btn-dark" type="submit">Seleccionar</button>
-        </form>
-        <hr>
-        <div id="pregunta-form-container">
-            <!-- Aquí se cargará dinámicamente el segundo formulario -->
-        </div>
+    {% block modulo_encuestas %}
+    <div id="contenedor_modulo_encuestas">
+        <h5>Modulo encuestas</h5>
+        <p>A continuación podra agregar algun tipo de pregunta.</p>
+        <a id="volver_incio_encuestas" href="{% url 'encuesta:inicio_encuestas' %}"><i class="fa-solid fa-house"></i></a>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const tipoPreguntaForm = document.getElementById('tipo-pregunta-form');
-            const preguntaFormContainer = document.getElementById('pregunta-form-container');
+    {% endblock modulo_encuestas %}
+<div id="section_detalle_encuesta">
+    <h5>Agregar pregunta</h5>
+    <form method="POST" id="tipo-pregunta-form" onsubmit="return validateForm();">
+        {% csrf_token %}
+        {{ form.as_p }}
+        
+        <!-- Contenedor para las opciones múltiples -->
+        <div class="opciones_pregunta_slect_mult" id="opciones-container" style="display: none;">
+            <h5>Agregar Opciones</h5>
+            <div class="form-group" id="opciones">
+                <label for="opcion_1">Opción 1</label>
+                <input type="text"  id="opcion_1" name="opcion_1">
+            </div>
+            <div class="form-group" id="opciones">
+                <label for="opcion_2">Opción 2</label>
+                <input type="text"  id="opcion_2" name="opcion_2">
+            </div>
+            <div class="form-group" id="opciones">
+                <label for="opcion_3">Opción 3</label>
+                <input type="text"  id="opcion_3" name="opcion_3">
+            </div>
+            <div class="form-group" id="opciones">
+                <label for="opcion_4">Opción 4</label>
+                <input type="text"  id="opcion_4" name="opcion_4">
+            </div>
+        </div>
 
-            tipoPreguntaForm.addEventListener('submit', function (event) {
-                event.preventDefault(); // Evita el envío del formulario por defecto
+        <div class="footer">
+            <button id="boton_crear_home52" class="boton-estilizado" type="submit">Agregar pregunta</button>
+            <a id="boton_cancelar_home52" class="boton-estilizado" href="{% url 'encuesta:encuesta_detail'  encuesta.id%}">Cancelar</a>
+        </div>
+    </form>
 
-                const selectedOption = document.getElementById('tipo_pregunta').value;
+    <hr>
+    
+</div>
 
-                // Cargar el segundo formulario dinámicamente según la opción seleccionada
-                fetch(`pregunta.html?type=${selectedOption}`)
-                    .then(response => response.text())
-                    .then(html => preguntaFormContainer.innerHTML = html)
-                    .catch(error => console.error('Error:', error));
-            });
-        });
-    </script>
-</body>
+<script>
+    // Mostrar el contenedor de opciones si se selecciona "Selección múltiple"
+    document.getElementById("id_tipoPregunta").addEventListener("change", function() {
+        if (this.value === "4") {  // Ajusta según el valor de "Selección múltiple"
+            document.getElementById("opciones-container").style.display = "block";
+        } else {
+            document.getElementById("opciones-container").style.display = "none";
+        }
+    });
+
+    // Validar que las opciones no estén vacías antes de enviar el formulario
+    function notificacionOpciones(mensaje){
+        Swal.fire({
+            title:'Debe ingresar todas las opiones',
+            text: mensaje,
+            icon: 'warning'
+        })
+    }
+
+    function notificacionTexto(mensaje){
+        Swal.fire({
+            title:'El texto de la pregunta debe tener al menos 10 caracteres.',
+            text: mensaje,
+            icon: 'error'
+        })
+    }
+
+    function validateForm() {
+        const tipoPregunta = document.getElementById("id_tipoPregunta").value;
+        const textoPregunta = document.getElementById("id_texto_pregunta").value;
+        if (tipoPregunta === "4") {  // Ajusta según tu choice para selección múltiple
+            const opcion1 = document.getElementById("opcion_1").value.trim();
+            const opcion2 = document.getElementById("opcion_2").value.trim();
+            const opcion3 = document.getElementById("opcion_3").value.trim();
+            const opcion4 = document.getElementById("opcion_4").value.trim();
+            
+
+            if (textoPregunta.length < 10){
+                notificacionTexto();
+                return false;  // Prevenir el envío del formulario
+            }
+
+            if (!opcion1 || !opcion2 || !opcion3 || !opcion4){
+                notificacionOpciones();
+                return false;  // Prevenir el envío del formulario
+            }
+        }
+        return true;  // Permitir el envío del formulario para otros tipos de preguntas
+    }
+</script>
 {% endblock encuesta %}

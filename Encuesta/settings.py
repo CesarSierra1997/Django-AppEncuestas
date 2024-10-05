@@ -57,6 +57,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'apps.encuesta.middleware.BlockSpecificRoutesMiddleware',
 ]
 
 ROOT_URLCONF = 'Encuesta.urls'
@@ -73,7 +74,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'apps.encuesta.context_processors.direccion_ip',
+                # 'apps.encuesta.context_processors.direccion_ip',
             ],
         },
     },
@@ -154,8 +155,9 @@ if not DEBUG:#RENDER
     # Turn on WhiteNoise storage backend that takes care of compressing static files
     # and creating unique names for each version so they can safely be cached forever.
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-# APPEND_SLASH = True
+else:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    APPEND_SLASH = True
 
 # Configurar WhiteNoise para la compresión y el caché en producción
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

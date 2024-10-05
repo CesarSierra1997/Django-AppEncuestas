@@ -4,12 +4,15 @@ from .models import Usuario
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
+from django.contrib.auth.password_validation import validate_password
+import re
 
 class FormularioLogin(AuthenticationForm):    
     def __init__(self, *args, **kwargs):
         super(FormularioLogin, self).__init__(*args, **kwargs)
         self.fields['username'].widget.attrs['class']='form-control'
         self.fields['username'].widget.attrs['placeholder']='Nombre de usuario'
+        self.fields['username'].widget.attrs['id'] = 'username-mejorado'
         self.fields['password'].widget.attrs['class']='form-control'
         self.fields['password'].widget.attrs['placeholder']='Contraseña'
 
@@ -37,7 +40,7 @@ class FormularioUsuario(forms.ModelForm):
             'tipoDocumento': forms.Select(
                 attrs={
                     'class': 'form-control',
-                    'placeholder': 'Slecione el tipo de documento'
+                    'placeholder': 'Seleccione el tipo de documento'
                 }),
             'numeroDocumento': forms.NumberInput(
                 attrs={'class': 'form-control',
@@ -47,62 +50,106 @@ class FormularioUsuario(forms.ModelForm):
                 attrs={
                     'class':'form-control',
                     'placeholder':'Correo electrónico'
-                }),
+                }
+            ),
             'nombres': forms.TextInput(
                 attrs={
                     'class':'form-control',
-                    'placeholder':'Digite su nombre'
-                }),
+                    'placeholder':'Digite su nombre',
+                    'required':'required'
+                }
+            ),
             'apellidos': forms.TextInput(
                 attrs={
                     'class':'form-control',
-                    'placeholder':'Digite sus apellidos'
-                }),
+                    'placeholder':'Digite sus apellidos',
+                    'required':'required'
+                }
+            ),
             'username': forms.TextInput(
                 attrs={
                     'class':'form-control',
-                    'placeholder':'Nombre de usuario - caractéres permitidos ( /, *, +, -, ., _ )'
-                }),
+                    'placeholder':'Nombre de usuario - caracteres permitidos ( /, *, +, -, ., _ )'
+                }
+            ),
             'rol': forms.Select(
                 attrs={
-                    'class':'form-control'
-                })}
-    def clean_nombres(self):
-        mail = self.cleaned_data.get('mail')
-        if mail.is_valid():
-            mail = mail.lower()   
-        return mail
+                    'class':'form-control',
+                    'placeholder':'Seleccione el rol en el sistema'
+
+                }
+            )
+        }
+    def clean_numeroDocumento(self):
+        numeroDoc = self.cleaned_data["numeroDocumento"]
+        numeroDoc_str = str(numeroDoc)
+        if len(str(numeroDoc_str)) < 10:
+            raise ValidationError(_('El número de documento debe tener al menos 10 caracteres.'))
+        if not numeroDoc_str.isdigit():
+            raise ValidationError(_('El número de documento debe ser un número entero.'))
+        return numeroDoc
+    
 
     def clean_nombres(self):
         nombres = self.cleaned_data.get('nombres')
+        if not nombres:
+            raise ValidationError(_('Este campo es obligatorio.'))
         if not nombres.replace(" ", "").isalpha():
             raise ValidationError(_('El nombre solo debe contener letras.'))
         return nombres.lower()   
 
     def clean_apellidos(self):
         apellidos = self.cleaned_data.get('apellidos')
+        if not apellidos:
+            raise ValidationError(_('Este campo es obligatorio.'))
         if not apellidos.replace(" ", "").isalpha():
             raise ValidationError(_('Los apellidos solo deben contener letras.'))
         return apellidos.lower()    
-    
+
     def clean_username(self):
-        username = self.cleaned_data.get('username')
-        username = username.replace(" ", "_")
-        caracteres_permitidos = set("/-*+._1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-        if not all(char in caracteres_permitidos for char in username):
-            raise ValidationError(_('Se permiten solo caracteres alfanuméricos y los siguientes especiales: /, *, -, +, ., _'))
-        return username
+            username = self.cleaned_data.get('username')
+            username = username.replace(" ", "_")
+            # Longitud mínima de 4 caracteres
+            if len(username) < 4:
+                raise ValidationError(_('El nombre de usuario debe tener al menos 4 caracteres.'))
+
+            # Validar que contenga al menos una letra
+            if not re.search(r'[a-zA-Z]', username):
+                raise ValidationError(_('El nombre de usuario debe contener al menos una letra.'))
+
+            caracteres_permitidos = set("/-*+._1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+            if not all(char in caracteres_permitidos for char in username):
+                raise ValidationError(_('Se permiten solo caracteres alfanuméricos y los siguientes especiales: /, *, -, +, ., _'))
+            return username
 
     def clean_password2(self):
-        print(self.cleaned_data)
         password1 = self.cleaned_data.get('password1')
         password2 = self.cleaned_data.get('password2')
+
         if password1 and password2:
             if password1 != password2:
                 raise forms.ValidationError('Las contraseñas no coinciden')
-            caracteres_permitidos = set("/-*+._1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-            if not all(char in caracteres_permitidos for char in password2):
-                raise ValidationError(_('Se permiten solo caracteres alfanuméricos y los siguientes especiales: /, *, -, +, ., _'))
+
+            # Usar la función de validación de Django para contraseñas seguras
+            try:
+                validate_password(password2)
+            except ValidationError as e:
+                raise forms.ValidationError(e)
+
+            # Validar longitud mínima de 8 caracteres
+            if len(password2) < 8:
+                raise ValidationError(_('La contraseña debe tener al menos 8 caracteres.'))
+
+            # Validar que contenga al menos una mayúscula, una minúscula, un número y un carácter especial
+            if not re.search(r'[A-Z]', password2):
+                raise ValidationError(_('La contraseña debe contener al menos una letra mayúscula.'))
+            if not re.search(r'[a-z]', password2):
+                raise ValidationError(_('La contraseña debe contener al menos una letra minúscula.'))
+            if not re.search(r'\d', password2):
+                raise ValidationError(_('La contraseña debe contener al menos un número.'))
+            if not re.search(r'[/*\-+._]', password2):
+                raise ValidationError(_('La contraseña debe contener al menos un carácter especial: /, *, -, +, ., _'))
+
         return password2
     
     def save(self, commit=True):
@@ -111,29 +158,33 @@ class FormularioUsuario(forms.ModelForm):
         if commit:
             user.save()
         return user
-
-
-
-# class FormularioEstudiante(forms.ModelForm):
+    
+# Formulario para actualizar ciertos datos de un usuario registrado PERFIL: correo, contraseña
+# class FormularioUpdateUsuario(forms.ModelForm):
 #     class Meta:
-#         model = Estudiante
-#         fields = ['usuario_id']
+#         model = Usuario
+#         fields = ['nombres', 'apellidos','email' ]
 #         widgets = {
 
-#             'usuario_id': forms.Select(
+#             'email': forms.EmailInput(
 #                 attrs={
-#                     'class':'form-control'
+#                     'class':'form-control',
+#                     'placeholder':'Correo electrónico'
 #                 }
-#             )}
-        
-# class FormularioProfesor(forms.ModelForm):
-#     class Meta:
-#         model = Profesor
-#         fields = ['usuario_id']
-#         widgets = {
+#             ),
+#             'nombres': forms.TextInput(
+#                 attrs={
+#                     'class':'form-control',
+#                     'placeholder':'Digite su nombre',
+#                     'required':'required'
+#                 }
+#             ),
+#             'apellidos': forms.TextInput(
+#                 attrs={
+#                     'class':'form-control',
+#                     'placeholder':'Digite sus apellidos',
+#                     'required':'required'
+#                 }
+#             ),
+#         }
 
-#             'usuario_id': forms.Select(
-#                 attrs={
-#                     'class':'form-control'
-#                 }
-#             )}

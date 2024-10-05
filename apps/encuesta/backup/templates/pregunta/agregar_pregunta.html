@@ -1,0 +1,85 @@
+{% extends "encuestaHome.html" %}
+{% block title %}
+Pregunta Tipo
+{% endblock title %}
+{% block encuesta %}
+<body>
+    <h5 class="card-header">Editor de encuestas | Agregar pregunta</h5>
+    <div class="card card-body bg-light mt-2 p-4">
+        {% if messages %}
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            {% for message in messages %}
+            {{ message }}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <p><strong>Encuesta </strong>{{encuesta.titulo}}</p>
+        <form method="POST" id="tipo-pregunta-form">
+            {% csrf_token %}
+            <label for="tipo_pregunta">Seleccione el tipo de pregunta que desea agregar:</label>
+            <select class="form-control mt-2" name="tipo_pregunta" id="tipo_pregunta">
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="general" {% if tipo_pregunta == 'general' %}selected{% endif %}>Pregunta General</option>
+                <option value="select_multiple" {% if tipo_pregunta == 'select_multiple' %}selected{% endif %}>Pregunta de Selección Múltiple</option>
+                <option value="si_o_no" {% if tipo_pregunta == 'si_o_no' %}selected{% endif %}>Pregunta Sí o No</option>
+                <option value="numerica" {% if tipo_pregunta == 'numerica' %}selected{% endif %}>Pregunta Numérica</option>
+            </select>
+            <button class="btn btn-dark mt-2" type="submit">Seleccionar</button>
+        </form>
+        <hr>
+        <div id="pregunta-form-container">
+            
+            {% if tipo_pregunta %}
+                
+                
+            <form class="card card-body bg-dark bg-gradient" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="tipo_pregunta" value="{{ tipo_pregunta }}">
+                {{ form.as_p }}
+                
+                {% if tipo_pregunta == "select_multiple" %}
+                <div id="opciones-container">
+                    <label for="opciones" class="text-white">Opciones (Máximo 4):</label>
+                    <div id="opciones-list">
+                        <input type="text" name="opciones" class="form-control mt-2" placeholder="Opción 1">
+                    </div>
+                    <button type="button" class="btn btn-secondary mt-2" id="agregar-opcion-btn">Agregar Opción</button>
+                </div>
+                {% endif %}
+                
+                <button class="btn btn-primary mt-3" type="submit">Guardar Pregunta</button>
+                <a class="btn btn-danger mt-1" href="{% url 'encuesta' encuesta_id %}">Cancelar</a>
+            </form>
+            {% endif %}
+            
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const agregarOpcionBtn = document.getElementById('agregar-opcion-btn');
+            const opcionesList = document.getElementById('opciones-list');
+            const maxOpciones = 4;
+
+            function agregarOpcion() {
+                const totalOpciones = opcionesList.querySelectorAll('input[name="opciones"]').length;
+                if (totalOpciones < maxOpciones) {
+                    const nuevaOpcion = document.createElement('input');
+                    nuevaOpcion.type = 'text';
+                    nuevaOpcion.name = 'opciones';
+                    nuevaOpcion.classList.add('form-control', 'mt-2');
+                    nuevaOpcion.placeholder = `Opción ${totalOpciones + 1}`;
+                    opcionesList.appendChild(nuevaOpcion);
+                } else {
+                    alert('No puedes agregar más de 4 opciones.');
+                }
+            }
+
+            if (agregarOpcionBtn) {
+                agregarOpcionBtn.addEventListener('click', agregarOpcion);
+            }
+        });
+    </script>
+</body>
+{% endblock encuesta %}

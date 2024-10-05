@@ -3,19 +3,59 @@
 {% block title %}
 Pregunta custome
 {% endblock title %}
+{% load static %}
+
+{% block navegacion %}
+<div id="ruta_navegacion">
+    <em>App/ modulo encuestas/ detalle encuesta/ editar</em>
+</div>
+{% endblock navegacion %}
+
 {% block encuesta %}
-<body>
-    <h5 class="card-header">Editor de encuestas | Editar pregunta</h5>
-    <div class="card card-body bg-light mt-2 p-4">
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button class="btn btn-info" type="submit">Actualizar pregunta</button>
-            <a class="btn btn-danger" href="{% url 'encuesta' encuesta_id  %}">Volver</a>
-        </form>
-        <div id="pregunta-form-container">
-            <!-- Aquí se cargará dinámicamente el segundo formulario -->
+
+{% block modulo_encuestas %}
+<div id="contenedor_modulo_encuestas">
+    <h5>Modulo encuestas</h5>
+    <p>A continuación podrás editar la encuesta selecionada</p>
+    <a id="volver_incio_encuestas" href="{% url 'encuesta:inicio_encuestas' %}"><i class="fa-solid fa-house"></i></a>
+</div>
+{% endblock modulo_encuestas %}
+<div id="section_detalle_encuesta">
+    <h2>Editar Pregunta</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        {% if pregunta.tipoPregunta == '4' %}
+            <!-- Si la pregunta es de selección múltiple, mostrar las opciones -->
+        <div class="opciones_pregunta_slect_mult">
+            <div id="opciones">
+                <label  for="opcion_1">Opción A:</label>
+                <input  type="text" name="opcion_1" id="opcion_1" value="{{ opciones.opcion_1 }}" required>
+            </div>
+
+            <div id="opciones">
+                <label for="opcion_2">Opción B:</label>
+                <input type="text" name="opcion_2" id="opcion_2" value="{{ opciones.opcion_2 }}" required>
+            </div>
+
+            <div id="opciones"> 
+                <label for="opcion_3">Opción C:</label>
+                <input type="text" name="opcion_3" id="opcion_3" value="{{ opciones.opcion_3 }}" required>
+            </div>
+
+            <div id="opciones">
+                <label for="opcion_4">Opción D:</label>
+                <input type="text" name="opcion_4" id="opcion_4" value="{{ opciones.opcion_4 }}" required>
+            </div>
         </div>
-    </div>
-</body>
+        {% endif %}
+        <div class="footer">
+            <button id="boton_crear_home52" class="boton-estilizado" type="submit">Guardar cambios</button>
+            <a id="boton_cancelar_home52" class="boton-estilizado" href="{% url 'encuesta:encuesta_detail'  pregunta.encuesta.id%}">Cancelar</a>
+        </div>
+    </form>
+
+</div>
 {% endblock encuesta %}

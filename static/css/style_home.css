@@ -1,24 +1,635 @@
-div#encuesta.card.bg-dark.bg-gradient.mt-2.p-2.text-light {
-    /* Definir el tamaño y el estilo de la caja */
-    width: 100%;
-    height: 100%;
-    transition: transform 0.3s ease;
+/* Breadcrumbs navigation */
+#ruta_navegacion {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #b4b4b44f;
+    border-bottom-right-radius: 50px;
+    padding: 2.5px;
+    margin-bottom: 10px;
 }
 
-div#encuesta.card.bg-dark.bg-gradient.mt-2.p-2.text-light:hover {
-    /* Agrandar la caja al hacer hover */
-    transform: scale(1.1);
+/* Breadcrumbs adjustment */
+#ruta_navegacion em {
+    color: #FF7411;
+    font-size: 1rem;
 }
 
-div#pregunta.card.bg-dark.mt-2.p-2{
-    /* Definir el tamaño y el estilo de la caja */
-    width: 100%;
-    height: 100%;
-    transition: transform 0.3s ease;
+/* Main modules section */
+/* #section_modules {
+    padding: 20px;
+} */
+
+#section_grid_encuestas {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr); /* 1 columna por defecto */
+    gap: 18px; 
+    padding: 5px;
 }
 
-div#pregunta.card.bg-dark.mt-2.p-2:hover {
-        /* Agrandar la caja al hacer hover */
-        transform: scale(1.05);
-        box-shadow: 2px, 2px, 2px, 2px, white;
+@media (min-width: 768px) {
+    #section_grid_encuestas {
+        grid-template-columns: repeat(2, 1fr); /* 2 columnas en pantallas medianas (md) */
     }
+}
+
+@media (min-width: 992px) {
+    #section_grid_encuestas {
+        grid-template-columns: repeat(3, 1fr); /* 3 columnas en pantallas grandes (lg) */
+    }
+}
+
+/* Styling for individual survey cards */
+#encuesta_pop {
+    width: 100%;
+    height: 95%;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    background-color: #007c76e5;
+    color: #000000;
+    text-decoration: none;
+}
+
+#encuesta_pop:hover {
+    transform: scale(1.1);
+    background-color: #008d8696;
+    box-shadow: 2px 2px 8px #000000;
+    color: black
+}
+
+#encuesta_pop_publica {
+    width: 100%;
+    height: 95%;
+    transition: transform 0.3s ease;
+    background-color: #ff7e21e3;
+    text-decoration: none;
+    color: #000000;
+}
+
+#encuesta_pop_publica:hover {
+    transform: scale(1.1);
+    background-color: #ff7411af;
+    box-shadow: 2px 2px 8px #000000;
+    color: black;
+}
+
+/* Section for survey details */
+#section_detalle_encuesta {
+    display: felx;
+    flex-wrap: wrap;
+    background-color: #007c75;
+    padding: 20px;
+    box-shadow: 2px 2px 8px #000000;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+/* Grid layout for questions */
+#section_grid_preguntas {
+    padding: 10px;
+    margin-top: -10px;
+}
+
+/* Styling for individual question cards */
+#pregunta {
+    width: 100%;
+    transition: transform 0.3s ease;
+    background-color: #c0c0c06b;
+    border: 0.1rem solid #007c75;
+    border-radius: 5px;
+    padding: 8px;
+    margin: 2px;
+}
+
+#pregunta:hover {
+    transform: scale(1.015);
+    background-color: rgba(255, 255, 255, 0.521);
+}
+
+/* List of question options */
+#ul_opciones_pregunta {
+    margin-top: 2px;
+}
+
+#ul_opciones_pregunta p {
+    padding: 2px;
+    margin: -6px 0;
+}
+
+/* Icon CASA volver */
+#volver_incio_encuestas {
+    position: absolute;
+    top: 5px;
+    right: 25px;
+    padding: 5px;
+    font-size: 40px;
+    color: #FF7411;
+    transition: transform 0.3s ease;
+}
+
+#volver_incio_encuestas:hover {
+    text-align: center;
+    border-radius: 10px;
+    background-color: #ff7411be;
+    color: #4B4B4B;
+    border: solid 1px black;
+    transform: scale(1.05);
+
+}
+
+#crear_encuesta {
+    position: absolute;
+    top: 25px;
+    right: 65px;
+    background-color: #FF7411;
+    color: white;
+    border-radius: 10px;
+    padding: 5px;
+    font-size: 40px;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+    height: 90px
+}
+
+#crear_encuesta p {
+    font-size: 20px;
+    margin-top: -12px;
+}
+
+#crear_encuesta:hover {
+    color: #FF7411;
+    background-color: #4b4b4b5d;
+    transform: scale(1.3);
+}
+
+
+/* Icono boton editar*/
+#editar_encuesta {
+    color: #757575;
+    position: absolute;
+    top: 180px;
+    right: 50px;
+    padding: 5px;
+    font-size: 40px;
+    transition: transform 0.3s ease;
+}
+#editar_encuesta:hover {
+    color: #FF7411;
+    transform: scale(1.05);
+}
+
+/* General body styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f0f5;
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar styling */
+.navbar {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+}
+
+.navbar-toggler {
+    border: none;
+}
+
+.navbar-toggler .navbar-toggler-icon {
+    color: #fff;
+}
+
+/* Button styles */
+.btn {
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 5px;
+    color: #fff;
+    text-align: center;
+}
+
+.btn:hover {
+    opacity: 0.9;
+    transition: all 0.2s;
+}
+
+.btn-private {
+    background-color: #FF7411;
+}
+
+.btn-public {
+    background-color: #007C75;
+}
+
+/* Responsive image for the surveys */
+.image-container img {
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    display: block;
+}
+
+/* Survey section styles */
+#encuesta {
+    text-align: center;
+    margin-top: 30px;
+}
+
+#encuesta h1 {
+    font-size: 2.5rem;
+    color: #007C75;
+    margin-bottom: 20px;
+}
+
+#encuesta p {
+    font-size: 1.2rem;
+    color: #4b4b4b;
+    margin-bottom: 40px;
+}
+
+/* Login and Profile Dropdown */
+.dropdown-menu {
+    border-radius: 8px;
+}
+
+.dropdown-item {
+    font-size: 1rem;
+}
+
+.nav-link .fa-user-check {
+    margin-right: 8px;
+}
+
+/* IP address styling */
+em {
+    font-size: 0.85rem;
+    color: #fff;
+    right: 10px;
+    top: 50px;
+}
+
+/* Central design element */
+#centro_diseño {
+    position: relative;
+    margin: auto;
+    background-color: white;
+    width: 180px;
+    height: 25px;
+    border-radius: 30px;
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 1px 1px 5px rgb(0, 0, 0);
+}
+
+/* Information text */
+.info_text {
+    padding: 5px;
+    margin-bottom: -15px;
+    position: relative;
+}
+
+.cont_botones_preguntas {
+    position: relative; 
+    height: 50px; 
+    gap: 50px;
+}
+
+.container_pregunta {
+    position: relative;           
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+/* botones de edicion y eliminar pregunta - detalle_encuesta.html */
+.cont_botones_preguntas {
+    position: absolute;          
+    top: 10px;                    
+    right: 10px;                  
+    display: flex;                
+    gap: 5px;                     
+}
+
+.boton_pregunta {
+    display: inline-flex;         
+    justify-content: center;
+    align-items: center;
+    width: 40px;                  
+    height: 40px;                 
+    color: white;                 
+    border-radius: 50%;           
+    font-size: 18px;              
+}
+
+.boton_pregunta.editar {
+    background-color: #FF7411;   
+}
+
+.boton_pregunta.eliminar {
+    background-color: #dc3545;    
+}
+
+.cont_botones_preguntas :hover {
+    background-color: #ffd6b9;  
+    color: #000000; 
+}
+
+/* Opciones de preguntas - agregar_pregunta.hmtl editar_pregunta.hmtl*/
+
+.opciones_pregunta_slect_mult div{
+    display: block;
+    padding-left: 20px;
+}
+
+#opciones{
+    padding-block: 2px !important;
+}
+
+/* BOTONES crear o agregar - cancelar - eliminar HOME 52 */
+
+.footer {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+    width: 100%; 
+    margin-top: 20px; 
+    gap: 10px;
+}
+
+.boton-estilizado {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    padding: 10px; /* Ajuste para darle más espacio y hacerlo más prominente */
+    font-size: 16px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 50%;
+    text-align: center;
+    display: inline-block; /* Para que el <a> se comporte como botón */
+    cursor: pointer;
+    text-decoration: none; /* Eliminar subrayado de los enlaces */
+}
+
+/* <button> - Crear */
+#boton_crear_home52 {
+    background-color: #FF7411;
+    color: white;
+    border: none; 
+}
+
+#boton_crear_home52:hover {
+    background-color: #FF741180;
+    transform: scale(1.05);
+}
+
+/* <a> - Cancelar */
+#boton_cancelar_home52 {
+    background-color: #4B4B4B;
+    color: white;
+    border: none; 
+}
+
+#boton_cancelar_home52:hover {
+    background-color: #4B4B4B80;
+    transform: scale(1.05);
+}
+
+/* <a> - eliminar */
+#boton_eliminar_home52 {
+    background-color: #d30303;
+    color: white;
+    border: none; 
+}
+
+#boton_eliminar_home52:hover {
+    background-color: #d303038c;
+    transform: scale(1.05);
+}
+#boton_publicas_home52 {
+    background-color: #FF7411;
+    color: white;
+    border: none; 
+    height: 60px;
+    font-size: 20px;
+
+}
+
+#boton_publicas_home52:hover {
+    background-color: #FF741180;
+    transform: scale(1.05);
+}
+#boton_privadas_home52 {
+    background-color: #007C75;
+    color: white;
+    border: none; 
+    height: 60px;
+    font-size: 20px;
+}
+
+#boton_privadas_home52:hover {
+    background-color: #007c7665;
+    transform: scale(1.05);
+}
+.boton-publicar {
+    margin-bottom: 5px;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 18px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    width: 100%;
+    display: inline-block;
+    height: 60px;
+    text-decoration: none;
+    align-content: center;
+    text-align: center;
+}
+
+/* Detalle encuesta - boton publicar encuesta*/
+
+#boton_publicarEncuesta_home52{
+    background-color: #00a59d;
+    color: white;
+    border: none; 
+    font-weight: bolder;
+    font-size: 20px;
+    box-shadow: 2px 2px 3px #000;
+    letter-spacing: 2px;
+}
+
+#boton_publicarEncuesta_home52:hover{
+    background-color: #49ff115d;
+    transform: scale(1.01);
+    font-size: 25px;
+    cursor: pointer;
+    border-color: #000;
+    letter-spacing: 5px;
+} 
+
+
+/* Botones registro y edicion de usuario*/
+
+#boton_creacion{
+    background-color: #FF7411;
+    color: white;
+    border: none; 
+}
+
+#boton_creacion:hover {
+    background-color: #FF741180;
+    transform: scale(1.05);
+}
+
+#boton_edicion{
+    background-color: #FF7411;
+    color: white;
+    border: none; 
+}
+
+#boton_edicion:hover {
+    background-color: #FF741180;
+    transform: scale(1.05);
+}
+
+#pop_ver_encuestas{
+    width: 100%;
+    height: 95%;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    background-color: #007c76e5;
+    color: #000000;
+    text-decoration: none;
+
+}
+
+#pop_ver_encuestas:hover {
+    transform: scale(1.1);
+    background-color: #008d8696;
+    box-shadow: 2px 2px 8px #000000;
+    color: black
+}
+
+/* estilos para los errores de las respuestas responderPublicas.html*/
+
+#erroresRespuestas{
+    background-color: #d30303;
+    color: white;
+    border-radius: 5px;
+    box-shadow: 1px 1px 2px black;
+    font-weight: bolder;
+
+}
+
+
+/*RESPUESTAS INICIO*/
+.table-container {
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 15px;
+    text-align: left;
+    table-layout: fixed; /* Fija el layout de las columnas */
+}
+
+th, td {
+    padding: 12px 15px;
+    border: 1px solid #dddddd;
+    word-wrap: break-word; /* Asegura que el contenido no se desborde */
+    text-align: left;
+}
+
+thead {
+    background-color: #009879;
+    color: #ffffff;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f3f3f3;
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+tbody tr:hover {
+    background-color: #ddd;
+}
+
+.busqueda_exportar_respuestas{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+
+}
+
+/* Ajustes adicionales para los inputs de búsqueda */
+#publicSearch {
+    width: 72%;
+    padding: 10px;
+    margin-bottom: 12px;
+    font-size: 18px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+
+/*boton excel*/
+/* Estilos del botón Exportar a Excel */
+.btn-excel {
+    width: 25%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    padding-right: 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #217346; /* Color verde Excel */
+    border: 2px solid #185c37; /* Borde ligeramente más oscuro */
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-excel:hover {
+    background-color: #1e6b3e;
+    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+    box-shadow: 2px 3px 8px black;
+    font-size: 18px;
+    color: #ffffff;
+    padding-right: 10px;
+
+}
+
+/* Estilo del ícono de Excel dentro del botón */
+.excel-icon {
+    width: 50px;
+    height: 50px;
+    margin-right: 5px; /* Espacio entre el ícono y el texto */
+    transition: transform 0.3s ease;
+
+}
+
+.btn-excel:hover .excel-icon {
+    transform: scale(1.5); /* Agrandar un poco el ícono al pasar el mouse */
+}
+
+.btn-excel:active {
+    background-color: #1b5d38; /* Cambiar el color cuando se hace clic */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    transform: translateY(0);
+}
+
+
+/*RESPUESTAS FIN*/

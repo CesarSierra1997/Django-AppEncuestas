@@ -17,13 +17,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from apps.encuesta.views import *
+from apps.usuario.views import Inicio
 from apps.usuario.views import Login, logoutUsuario
 from django.contrib.auth.decorators import login_required
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', inicio,  name='index'),
-    path('encuestas/', include('apps.encuesta.urls')),
+    path('', Inicio.as_view(), name='index'),
+    path('encuesta/', include('apps.encuesta.urls')),
     path('usuario/', include(('apps.usuario.urls','usuario'))),
     path('accounts/login/',Login.as_view(), name='login'),
     path('logout/',login_required(logoutUsuario), name='logout')
