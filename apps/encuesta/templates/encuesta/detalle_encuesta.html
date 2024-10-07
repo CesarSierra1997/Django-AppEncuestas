@@ -49,6 +49,7 @@ Detalle encuesta
             <h5><strong>Estado de la encuesta</strong></h5>
             {% if encuesta.publicarEncuesta %}
                 <strong > Encuesta publicada </strong>
+                <h6>Fecha de publicación: <em>{{encuesta.fechaPublicacion}}</em></h6>
 
                 <!-- Alertas estado ENCUESTA PUBLICADA  -->
                 {% if encuesta.estado and encuesta.fechaFinal|date:"Y-m-d H:i" >= hoy|date:"Y-m-d H:i" %}

@@ -33,17 +33,19 @@
     <table id="publicTable">
         <thead>
             <tr>
+                <th>#</th>
                 <th>Encuesta</th>
                 <th>Pregunta</th>
                 <th>Respuesta</th>
                 <th>Tipo de Usuario</th>
-                <th>Nombre del Usuario</th>
+                <th>Nombre</th>
                 <th>Correo Electrónico</th>
             </tr>
         </thead>
         <tbody>
             {% for respuesta in respuestas_publicas %}
             <tr>
+                <td>{{ respuesta.respuestaEncuestaPublica.encuesta.id }}</td>
                 <td>{{ respuesta.respuestaEncuestaPublica.encuesta.titulo }}</td>
                 <td>{{ respuesta.pregunta.texto_pregunta }}</td>
                 <td>{{ respuesta.texto_respuesta }}</td>
@@ -59,11 +61,18 @@
 <div class="table-container">
     <h3>Respuestas Privadas</h3>
     
-    <input type="text" id="privateSearch" placeholder="Buscar en respuestas privadas...">
-    
+    <div class="busqueda_exportar_respuestas">
+        <input type="text" id="privateSearch" placeholder="Buscar en respuestas privadas...">
+        <a id="exportarExcel" href="#" class="btn-excel">
+            <img src="{% static 'img/excel.webp' %}" alt="Excel Logo" class="excel-icon">
+            Exportar a Excel
+        </a>
+    </div>
+
     <table id="privateTable">
         <thead>
             <tr>
+                <th>#</th>
                 <th>Encuesta</th>
                 <th>Pregunta</th>
                 <th>Respuesta</th>
@@ -74,6 +83,7 @@
         <tbody>
             {% for respuesta in respuestas_privadas %}
             <tr>
+                <td>{{ respuesta.respuestaEncuestaPrivada.encuesta.id }}</td>
                 <td>{{ respuesta.respuestaEncuestaPrivada.encuesta.titulo }}</td>
                 <td>{{ respuesta.pregunta.texto_pregunta }}</td>
                 <td>{{ respuesta.texto_respuesta }}</td>
@@ -118,5 +128,23 @@
         });
     });
 </script>
+<style>
+    /* Ajusta el ancho de la primera columna (#) */
+    #publicTable th:nth-child(1), #publicTable td:nth-child(1),
+    #privateTable th:nth-child(1), #privateTable td:nth-child(1) {
+        width: 50px; /* Ancho de 50px para la columna de ID */
+    }
+
+    /* Ajusta el ancho de la columna de Correo Electrónico */
+    #publicTable th:nth-child(7), #publicTable td:nth-child(7) {
+        width: 250px; /* Ancho de 250px para la columna de Correo Electrónico */
+    }
+
+    /* Ajusta el ancho de otras columnas si es necesario */
+    #publicTable th:nth-child(3), #publicTable td:nth-child(3),
+    #privateTable th:nth-child(3), #privateTable td:nth-child(3) {
+        width: 150px; /* Ancho para la columna de preguntas */
+    }
+</style>
 
 {% endblock encuesta %}

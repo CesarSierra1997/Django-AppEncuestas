@@ -41,5 +41,6 @@ urlpatterns = [
 
 
     path('buscar/', views.BuscarView.as_view(), name='buscar'),
+    path('about/', views.AboutView.as_view(), name='about'),
 
 ]

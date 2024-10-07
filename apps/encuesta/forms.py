@@ -133,18 +133,32 @@ class EncuestaPublicaForm(forms.ModelForm):
                 'invalid': 'Ingrese una dirección de correo válida.',
             },
         }
+    def clean(self):
+            cleaned_data = super().clean()
+            numeroDocumento = cleaned_data.get('numeroDocumento')
+            email = cleaned_data.get('email')
+            encuesta = cleaned_data.get('encuesta')
 
+            if RespuestaEncuestaPublica.objects.filter(encuesta=encuesta, numeroDocumento=numeroDocumento).exists() or \
+            RespuestaEncuestaPublica.objects.filter(encuesta=encuesta, email=email).exists():
+                raise ValidationError("Ya has respondido esta encuesta con este número de documento o correo electrónico.")
+            
+            return cleaned_data
 
 class EncuestaPrivadaForm(forms.ModelForm):
     class Meta:
         model = RespuestaEncuestaPrivada
-        fields = ['usuario']
-        labels = {
-            'usuario': 'Seleccione el usuario',
-        }
-        widgets = {
-            'usuario': forms.Select(attrs={'class': 'form-control', 'placeholder': 'Selecione el usuario'}),
-        }
+        fields = []  # Ajusta los campos necesarios
+
+    # def clean(self):
+    #     cleaned_data = super().clean()
+    #     usuario = cleaned_data.get('usuario')
+    #     encuesta = cleaned_data.get('encuesta')
+
+    #     if RespuestaEncuestaPrivada.objects.filter(usuario=usuario, encuesta=encuesta).exists():
+    #         raise forms.ValidationError("Ya has respondido esta encuesta privada.")
+
+    #     return cleaned_data
 
 class RespuestaForm(forms.ModelForm):
     class Meta:

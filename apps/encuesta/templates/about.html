@@ -1,0 +1,114 @@
+{% extends "encuestaHome.html" %}
+{% block title %}
+About
+{% endblock title %}
+
+{% load static %}
+
+
+{% block encuesta %}
+
+{% block modulo_encuestas %}
+<div id="contenedor_modulo_encuestas">
+    <h5>Contacto</h5>
+    <p>A continuación podrás los datos de contacto e información relevante del sitio</p>
+    <a id="volver_incio_encuestas" href="{% url 'encuesta:encuestaHome' %}"><i class="fa-solid fa-house"></i></a>
+</div>
+{% endblock modulo_encuestas %}
+
+<div id="section_detalle_encuesta">    
+        <header>
+            <nav>
+                <ul class="text-white">
+                    <!-- Aquí agregamos los hipervínculos a las secciones de la página -->
+                    <li><a class="text-white" href="#historia">Nuestra Historia</a></li>
+                    <li><a class="text-white" href="#mision">Misión</a></li>
+                    <li><a class="text-white" href="#vision">Visión</a></li>
+                    <li><a class="text-white" href="#valores">Valores</a></li>
+                    <li><a class="text-white" href="#equipo">Nuestro Equipo</a></li>
+                </ul>
+            </nav>
+        </header>
+    
+        <main>
+            <section class="hero">
+                <div class="container">
+                    <h4>Sobre Nosotros</h4>
+                    <p>Conoce más sobre nuestra misión, visión y valores.</p>
+                </div>
+            </section>
+    
+            <!-- Sección de historia con un id para enlazar desde el menú -->
+            <section id="historia" class="about-us">
+                <div class="container">
+                    <h5>Nuestra Historia</h5>
+                    <p>
+                        Fundados en [año de fundación], nuestra empresa ha estado comprometida con proporcionar soluciones de [tipo de soluciones o productos que ofreces] a nuestros clientes.
+                    </p>
+                </div>
+            </section>
+    
+            <!-- Sección de misión con un id -->
+            <section id="mision" class="mission">
+                <div class="container">
+                    <h5>Nuestra Misión</h5>
+                    <p>
+                        Nuestra misión es [describir la misión de la empresa], buscando siempre la excelencia en cada uno de nuestros proyectos.
+                    </p>
+                </div>
+            </section>
+    
+            <!-- Sección de visión con un id -->
+            <section id="vision" class="vision">
+                <div class="container">
+                    <h5>Nuestra Visión</h5>
+                    <p>
+                        Aspiramos a [describir la visión de la empresa], liderando la industria de [industria] con innovación y dedicación.
+                    </p>
+                </div>
+            </section>
+    
+            <!-- Sección de valores con un id -->
+            <section id="valores" class="our-values">
+                <div class="container">
+                    <h5>Nuestros Valores</h5>
+                    <ul>
+                        <li><strong>Compromiso:</strong> Estamos comprometidos con la calidad y el servicio al cliente.</li>
+                        <li><strong>Innovación:</strong> Siempre buscamos formas nuevas y creativas de resolver problemas.</li>
+                        <li><strong>Trabajo en equipo:</strong> Creemos en la colaboración para alcanzar el éxito.</li>
+                        <li><strong>Integridad:</strong> Nos guiamos por la honestidad y la transparencia en todo lo que hacemos.</li>
+                    </ul>
+                </div>
+            </section>
+    
+            <!-- Sección del equipo con un id -->
+            <section id="equipo" class="team">
+                <div class="container">
+                    <h5>Conoce a Nuestro Equipo</h5>
+                    <div class="team-members">
+                        <div class="member">
+                            <img style="width: 50px; height: auto;" class="img me-2" src="{% static 'img/hm52.png' %}" alt="Imagen de encuestas">
+                            <h3>Nombre del Miembro</h3>
+                            <p>Posición</p>
+                        </div>
+                        <div class="member">
+                            <img style="width: 50px; height: auto;" class="img me-2" src="{% static 'img/hm52.png' %}" alt="Imagen de encuestas">
+                            <h3>Nombre del Miembro</h3>
+                            <p>Posición</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    
+        <footer>
+            <div class="container">
+                <p>&copy; 2024 Tu Empresa. Todos los derechos reservados.</p>
+                <em>{{descripcion}} Version {{version}}  </em>
+            </div>
+        </footer>
+
+</div>
+{% endblock encuesta %}
+
+

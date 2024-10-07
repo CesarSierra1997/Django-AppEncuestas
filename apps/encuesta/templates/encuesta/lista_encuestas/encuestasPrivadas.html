@@ -1,0 +1,55 @@
+{% extends "encuestaHome.html" %}
+{% block title %}
+Encuestas privadas
+{% endblock title %}
+{% block encuesta %}
+
+
+<div class="card-body">
+    
+    <h5>Encuestas privadas <i class="fa-solid fa-lock text-dark"></i></h5>
+    {% if encuestas %}
+    <p>A continuación encontrará el listado de encuestas disponibles en el sistema.</p>
+    <p>Haga click en alguna de las cuestas para ir a ella...</p>
+    <a id="volver_incio_encuestas" href="{% url 'encuesta:encuestaHome' %}"><i class="fa-solid fa-circle-arrow-left"></i></a>
+    <h5 class="text-center card-header">Encuestas disponibles</h5>
+    <div id="section_grid_encuestas">
+
+
+            {% for encuesta in encuestas %}
+
+                {% if encuesta.fechaFinal >= hoy %}
+
+                <div class="col">
+                    <a id="pop_ver_encuestas" href="{% url 'encuesta:responder_encuesta_privada' encuesta.id %}" class="card mt-2 p-2">
+                        <div class="container">
+                            <p><i class="fa-solid fa-file mx-2"> </i> <strong>{{encuesta.titulo}}</strong>
+                            
+                            </p>
+                            <ul>
+
+                                <li>cantidad de preguntas: {{ encuesta.pregunta_set.count }}</li>
+                                <hr>
+                                <strong>Fechas  <i class="fa-solid fa-hourglass-end"></i></strong>
+                                <li>inicia {{encuesta.fechaInicio|date:"d F Y"}} </li>
+                                <li>finaliza {{encuesta.fechaFinal|date:"l, d F Y, g:i A"}} </li>
+                            </ul>
+                        </div>
+                    </a>
+                </div>
+                    
+                {% endif %}
+    
+            {% endfor %}
+        </div>
+    </div>
+
+    {% else %}
+    <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <p>No hay encuestas creadas en el sistema, comuníquese con el administrador</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock encuesta %}

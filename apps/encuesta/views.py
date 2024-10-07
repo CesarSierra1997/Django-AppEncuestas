@@ -3,6 +3,7 @@ from django.views.generic import TemplateView, CreateView, DetailView, ListView,
 from django.views import View
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
+from django.db.models import Q
 from django.http import Http404,HttpResponse
 from django.utils import timezone
 from django.contrib import messages
@@ -34,7 +35,6 @@ class InicioEncuestas(LoginSuperStaffMixin, ValidarPermisosMixin, ListView):
         context['hoy'] = timezone.now()  # Añadimos la fecha y hora actual al contexto
         return context
     
-
 class CrearEncuesta(LoginSuperStaffMixin, ValidarPermisosMixin, CreateView):
     permission_required = ('encuesta.view_encuesta', 'encuesta.add_encuesta', 'encuesta.delete_encuesta', 'encuesta.change_encuesta')
     model = Encuesta
@@ -404,6 +404,7 @@ class PublicarEncuesta(LoginSuperStaffMixin, ValidarPermisosMixin, UpdateView):
 
         # Publicar encuesta
         encuesta.publicarEncuesta = True
+        encuesta.fechaPublicacion = timezone.now()
         encuesta.save()
         messages.success(self.request, '¡ENCUESTA PUBLICADA EXITOSAMENTE!.')
         
@@ -431,7 +432,7 @@ class VerEncuestasPublicas(ListView):
 class VerEncuestasPrivadas(LoginRequiredMixin, ListView):
     model = Encuesta
     context_object_name = 'encuestas'
-    template_name = 'ecnuesta/lista_encuestas/encuestasPrivadas.html' 
+    template_name = 'encuesta/lista_encuestas/encuestasPrivadas.html' 
 
     def get_queryset(self):
         """ Retorna todas las encuestas con sus preguntas pre-cargadas."""
@@ -440,6 +441,7 @@ class VerEncuestasPrivadas(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         """ Añade encuestas y sus preguntas al contexto del template."""
         context = super().get_context_data(**kwargs)
+        context['hoy'] = timezone.now()  # Añadimos la fecha y hora actual al contexto
         return context
 
 class ResponderEncuestaPublica(FormView):
@@ -455,8 +457,8 @@ class ResponderEncuestaPublica(FormView):
         try:
             encuesta = Encuesta.objects.get(id=encuesta_id, publicarEncuesta=True, tipoEncuesta = "Publica")
         except Encuesta.DoesNotExist:
-            raise Http404('Encuesta no encontrada.')
-        # Retorna las preguntas asociadas a esa encuesta        
+            messages.error(self.request, 'La encuesta no existe.')
+            return redirect('encuesta:encuestaHome')      
         return self.model.objects.filter(encuesta=encuesta)
         
     def get(self, request, *args, **kwargs):
@@ -486,6 +488,10 @@ class ResponderEncuestaPublica(FormView):
 
     def form_valid(self, form):
         encuesta = get_object_or_404(Encuesta, id=self.kwargs['encuesta_id'])
+
+        # if RespuestaEncuestaPublica.objects.filter(numeroDocumento=numeroDocumento, encuesta=encuesta).exists():
+        #     messages.error(self.request, 'Ya has respondido a esta encuesta, comuniquese con el admin del sistema.')
+        #     return redirect(self.success_url)
 
         # Crear el registro de la encuesta pública
         encuesta_publica = RespuestaEncuestaPublica.objects.create(
@@ -527,38 +533,34 @@ class ResponderEncuestaPublica(FormView):
         return super().form_valid(form)
 
 class ResponderEncuestaPrivada(LoginRequiredMixin, FormView):
-    model = RespuestaEncuestaPrivada
+    model = Respuesta
     template_name = 'respuesta/responder_encuesta/responder_privada.html'
     form_class = EncuestaPrivadaForm
-    success_url = reverse_lazy('encuesta:inicio_encuestas')
-
-    def dispatch(self, request, *args, **kwargs):
-        # Verifica que el usuario esté autenticado
-        if not request.user.is_authenticated:
-            messages.warning(request, "Debes estar autenticado para responder esta encuesta.")
-            return redirect('login')
-        return super().dispatch(request, *args, **kwargs)
+    success_url = reverse_lazy('encuesta:ver_encuestas_privadas')
+    pk_url_kwarg = 'encuesta_id'
 
     def get_queryset(self):
         encuesta_id = self.kwargs['encuesta_id']
-        encuesta = get_object_or_404(Encuesta, id=encuesta_id, tipoEncuesta='Privada', publicarEncuesta=True)
-        return Pregunta.objects.filter(encuesta=encuesta)
-    
+        try:
+            encuesta = Encuesta.objects.get(id=encuesta_id, publicarEncuesta=True, tipoEncuesta="Privada")
+        except Encuesta.DoesNotExist:
+            messages.error(self.request, 'La encuesta no existe')
+            return redirect('encuesta:encuestaHome')      
+        return self.model.objects.filter(encuesta=encuesta)
 
     def get(self, request, *args, **kwargs):
-        """Maneja el flujo de redirección si la encuesta ya fue publicada."""
+        """Maneja el flujo de redirección si la encuesta privada no es accesible o no está publicada."""
         try:
             encuesta = Encuesta.objects.get(id=self.kwargs['encuesta_id'])
             if encuesta.publicarEncuesta == False:
                 messages.warning(self.request, 'La encuesta no está publicada.')
                 return redirect('encuesta:encuestaHome')
-            if encuesta.tipoEncuesta == "Publica":
-                messages.warning(self.request, 'Esta es una encuesta publica, accede desde encuestaHome.')
+            if encuesta.tipoEncuesta != "Privada":
+                messages.warning(self.request, 'Esta encuesta es privada y requiere inicio de sesión.')
                 return redirect('encuesta:encuestaHome')
         except Encuesta.DoesNotExist:
-            messages.error(self.request, 'No se encontró ninguna encuesta coincidente con la consulta.')
-            return redirect('encuesta:inicio_encuestas')
-
+            messages.error(self.request, 'No se encontró ninguna encuesta coincidente.')
+            return redirect('encuesta:encuestaHome')
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -567,32 +569,54 @@ class ResponderEncuestaPrivada(LoginRequiredMixin, FormView):
         preguntas = Pregunta.objects.filter(encuesta=encuesta)
         context['preguntas'] = preguntas
         context['encuesta'] = encuesta
+        context['form'] = self.get_form()
         return context
 
     def form_valid(self, form):
         encuesta = get_object_or_404(Encuesta, id=self.kwargs['encuesta_id'])
+        usuario = self.request.user  # Usuario autenticado
 
-        # Crea el registro de la encuesta privada
-        respuesta_encuesta_privada = RespuestaEncuestaPrivada.objects.create(
-            usuario=self.request.user,
+        if RespuestaEncuestaPrivada.objects.filter(usuario=usuario, encuesta=encuesta).exists():
+            messages.error(self.request, 'Ya has respondido a esta encuesta, comuniquese con el admin del sistema.')
+            return redirect(self.success_url)
+
+        # Crear el registro de respuesta de encuesta privada
+        encuesta_privada = RespuestaEncuestaPrivada.objects.create(
+            usuario=usuario,
             encuesta=encuesta
         )
 
-        # Itera sobre las preguntas y guarda las respuestas
         preguntas = Pregunta.objects.filter(encuesta=encuesta)
-        for pregunta in preguntas:
-            respuesta = self.request.POST.get(f"respuesta_{pregunta.id}")
-            if respuesta:
-                Respuesta.objects.create(
-                    texto_respuesta=respuesta,
-                    pregunta=pregunta,
-                    respuestaEncuestaPrivada=respuesta_encuesta_privada
-                )
+        respuestas_incompletas = False
 
-        messages.success(self.request, "Encuesta completada con éxito.")
+        for pregunta in preguntas:
+            if pregunta.tipoPregunta == '4':  # Pregunta de Selección múltiple
+                respuesta = self.request.POST.get(f"respuesta_{pregunta.id}")
+            else:
+                respuesta = self.request.POST.get(f"respuesta_{pregunta.id}")
+
+            if not respuesta:
+                respuestas_incompletas = True
+                break
+
+            # Guardar la respuesta si se proporcionó
+            Respuesta.objects.create(
+                texto_respuesta=respuesta,
+                pregunta=pregunta,
+                respuestaEncuestaPrivada=encuesta_privada
+            )
+
+        if respuestas_incompletas:
+            messages.error(self.request, 'Debe responder todas las preguntas antes de enviar la encuesta.')
+            encuesta_privada.delete()
+            return self.form_invalid(form)
+        
+        messages.success(self.request, 'Respuesta enviada de manera exitosa.')
         return super().form_valid(form)
 
-class VerRespuestas(LoginRequiredMixin, ListView):
+class VerRespuestas(LoginSuperStaffMixin, ValidarPermisosMixin, ListView):
+    permission_required = ('encuesta.view_encuesta', 'encuesta.add_encuesta', 'encuesta.delete_encuesta', 'encuesta.change_encuesta')
+    model = Respuesta
     template_name = 'respuesta/ver_respuestas.html'
     context_object_name = 'respuestas'
 
@@ -613,7 +637,7 @@ class VerRespuestas(LoginRequiredMixin, ListView):
         
         return context
 
-class ExportarRespuestasPublicasExcel(LoginRequiredMixin, View):
+class ExportarRespuestasPublicasExcel(LoginSuperStaffMixin, View):
     def get(self, request, *args, **kwargs):
         # Crear un nuevo libro de trabajo Excel
         wb = Workbook()
@@ -668,12 +692,62 @@ class ExportarRespuestasPublicasExcel(LoginRequiredMixin, View):
         wb.save(response)
         return response
 
+# class ExportarRespuestasPrivadaExcel(LoginSuperStaffMixin, View):
+#     def get(self, request, *args, **kwargs):
+#         # Crear un nuevo libro de trabajo Excel
+#         wb = Workbook()
+#         ws = wb.active
+#         ws.title = "Respuestas de Encuestas Privadas"
 
-from django.views.generic import ListView
-from django.db.models import Q
-from django.urls import reverse
+#         # Encabezados de las columnas
+#         # Cabeceras de la hoja de Excel
+#         ws.append([
+#             "Encuesta", "Tipo de pregunta", "Pregunta", "Respuesta", "ID usuario", 
+#             "Nombres", "Apellidos", "Número de Documento", "Correo Electrónico"
+#         ])
 
-class BuscarView(TemplateView):
+#         # Obtener las respuestas públicas
+#         respuestas_privadas = Respuesta.objects.filter(respuestaEncuestaPrivada__isnull=False)
+
+#         # Llenar las filas con datos
+#         for respuesta in respuestas_privadas:
+#             numero_documento = respuesta.respuestaEncuestaPublica.numeroDocumento
+#             # Intentar convertir numeroDocumento a número, si es posible
+#             try:
+#                 numero_documento = int(numero_documento)  # Convertir a entero
+#             except ValueError:
+#                 numero_documento = respuesta.respuestaEncuestaPublica.numeroDocumento
+
+#             # Obtener el tipo de pregunta y convertir la respuesta si es numérica
+#             tipo_pregunta = respuesta.pregunta.tipoPregunta  # Obtener el tipo de pregunta
+#             respuesta_converted = respuesta.texto_respuesta  # Respuesta original
+
+#             # Verificar si el tipo de pregunta es numérica
+#             if tipo_pregunta == '3':  # Supongamos que '3' es el código para 'Numérica'
+#                 try:
+#                     respuesta_converted = float(respuesta.texto_respuesta)  # Convertir a número (flotante)
+#                 except ValueError:
+#                     respuesta_converted = respuesta.texto_respuesta  # Si falla, mantener el texto original
+
+#             ws.append([
+#                 respuesta.respuestaEncuestaPrivada.encuesta.titulo,
+#                 respuesta.pregunta.get_tipoPregunta_display(),
+#                 respuesta.pregunta.texto_pregunta,
+#                 respuesta_converted,  # Aquí se usa la respuesta convertida
+#                 respuesta.respuestaEncuestaPrivada.get_tipoUsuario_display(),
+#                 respuesta.respuestaEncuestaPrivada.usuario.nombres,
+#                 numero_documento,
+#                 respuesta.respuestaEncuestaPrivada.email
+#             ])
+
+
+#         # Generar el archivo Excel para la respuesta HTTP
+#         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+#         response['Content-Disposition'] = 'attachment; filename=Respuestas_Publicas.xlsx'
+#         wb.save(response)
+#         return response
+
+class BuscarView(LoginSuperStaffMixin, TemplateView):
     template_name = 'busqueda_resultados.html'
 
     def get_context_data(self, **kwargs):
@@ -699,3 +773,19 @@ class BuscarView(TemplateView):
         context['rutas'] = [ruta for ruta in rutas if query.lower() in ruta['descripcion'].lower() or query.lower() in ruta['name'].lower()]
         
         return context
+
+class AboutView(TemplateView):
+    template_name = 'about.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['version'] = '1.1'
+        context['descripcion'] = 'Sistema de encuestas en Django'
+        return context
+    
+    def get_absolute_url(self):
+        return reverse('about')
+    
+    def get_success_url(self):
+        return reverse('about')
+    
