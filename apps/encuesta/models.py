@@ -10,7 +10,7 @@ class Encuesta(models.Model):
         ('Publica', 'Encuesta pública'),
         ('Privada', 'Encuesta privada'),
     ]
-    tipoEncuesta = models.CharField('Tipo de Encuesta', max_length=50, choices=TIPO_ENCUESTA, default='Publica')
+    tipoEncuesta = models.CharField('Tipo de Encuesta', max_length=50, choices=TIPO_ENCUESTA)
     administrador = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     fechaInicio = models.DateTimeField(null=False)
     fechaFinal = models.DateTimeField(null=True)
@@ -18,7 +18,7 @@ class Encuesta(models.Model):
     fechaModificacion = models.DateTimeField(auto_now_add=False, null=True)
     estado = models.BooleanField('Estado', default=True)
     publicarEncuesta = models.BooleanField('Visibilidad', default=False)
-    # fechaPublicacion = models.DateTimeField(auto_now_add=False, null=True)
+    fechaPublicacion = models.DateTimeField(auto_now_add=True)
 
 
     def __str__ (self):
@@ -82,6 +82,9 @@ class RespuestaEncuestaPublica(models.Model):
     email = models.EmailField('Correo Electrónico', max_length=254, blank=False, null=False, unique=True)
     encuesta = models.ForeignKey(Encuesta, on_delete=models.CASCADE, related_name='encuesta_preguntas_publica')
 
+    class Meta:
+        unique_together = ('encuesta', 'numeroDocumento', 'email')
+
 # RESPUESTA ENCUESTA PRIVADA
 class RespuestaEncuestaPrivada(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, related_name='usuario_encuesta')
@@ -93,6 +96,7 @@ class Respuesta(models.Model):
     pregunta = models.ForeignKey(Pregunta, on_delete=models.CASCADE, related_name='respuestas')
     respuestaEncuestaPublica = models.ForeignKey(RespuestaEncuestaPublica, on_delete=models.CASCADE, related_name='respuestas_publicas', null=True, blank=True)
     respuestaEncuestaPrivada = models.ForeignKey(RespuestaEncuestaPrivada, on_delete=models.CASCADE, related_name='respuestas_privadas', null=True, blank=True)
+    fechaRespuesta = models.DateTimeField(auto_now_add=True)
 
     def clean(self):
         """Valida que una respuesta pertenezca solo a una encuesta pública o privada."""

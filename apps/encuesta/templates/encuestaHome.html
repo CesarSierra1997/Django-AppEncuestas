@@ -16,30 +16,37 @@ Encuestas Home
 
 <div class="mt-2">
     {% if not request.user.is_authenticated %}
-    <nav class="navbar border border-light-10 fixed-strat" style="background-color: #a5a5a58f;">
-        <div class="container-fluid justify-content-start">
-            <a class="navbar-brand" style="color: #007C75;" href="{% url 'encuesta:encuestaHome' %}">
-                <img style="width: 8%;" class="img" src="{% static 'img/hm52.png' %}" alt="Imagen de encuestas">
+    <nav class="navbar border border-light-10 fixed" style="background-color: #a5a5a58f; height: 50px;">
+        <div class="container-fluid d-flex align-items-center justify-content-start">
+            <div class=" navbar-brand d-flex align-items-center" style="color: #000000da; bottom: 10px; position: relative" >
+                <img style="width: 50px; height: auto;" class="img me-2" src="{% static 'img/hm52.png' %}" alt="Imagen de encuestas">
                 <strong>Encuestas Home 52</strong>
+            </div>
+            <a class="navbar-brand" style="color: #007C75; padding-inline-start: 30px; bottom: 10px; position: relative" href="{% url 'encuesta:encuestaHome' %}">
+                <strong>Inicio</strong>
+            </a>
+            <div class="d-flex align-items-start">
+            <a class="navbar-brand" style="color: #007C75; padding-inline-start: 30px; bottom: 10px; position: relative" href="{% url 'encuesta:about' %}">
+                <strong>Contacto</strong>
             </a>
             {% else %}
             <nav style="background-color: #007C75; border-top-right-radius: 10px; border-top-left-radius: 10px;"
-                class="navbar navbar-light fixed-strat">
-                <div class="container-fluid justify-content-start">
-                    <a class="navbar-brand text-white" href="{% url 'encuesta:encuestaHome' %}">
-                        <img style="width: 5%;" class="img" src="{% static 'img/hm52.png' %}" alt="Imagen de encuestas">
-                        <strong>Fabrica de Encuestas</strong>
+                class="navbar navbar-light fixed">
+                <div class="container-fluid d-flex align-items-start justify-content-start" >
+                    <a class="navbar-brand d-flex align-items-start" style="color: #007C75; padding-inline-start: 5px;  position: relative" href="{% url 'encuesta:encuestaHome' %}">
+                        <img style="width: 50px; height: auto;" class="img" src="{% static 'img/hm52.png' %}" alt="Imagen de encuestas">
+                        <strong>Encuestas Home 52</strong>
                     </a>
                     {% endif %}
                     {% if request.user.is_authenticated %}
                     {% if request.user.is_superuser %}
                     <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                        aria-expanded="false" aria-label="Toggle navigation" style="right: 220px; top:10px; position: relative">
                         <span class="navbar-toggler-icon"></span>
                     </button>
 
-                    <form class="d-flex" style="margin-left: 10px;" method="GET" action="{% url 'encuesta:buscar' %}">
+                    <form class="d-flex" style="right: 200px; top:5px; position: relative" method="GET" action="{% url 'encuesta:buscar' %}">
                         <input class="form-control me-2 bg-light" type="search" name="q"
                             placeholder="Buscar en encuestas" aria-label="Search">
                         <button class="btn btn-outline-dark" type="submit">Buscar</button>
@@ -158,7 +165,7 @@ Encuestas Home
                     <hr>
                     <div class="footer">
                         <a id="boton_publicas_home52"  class="boton-estilizado" href="{% url 'encuesta:ver_encuestas_publicas' %}">Revisar encuestas Publicas</a>
-                        <a id="boton_privadas_home52"  class="boton-estilizado" href="{% url 'login' %}">Revisar encuestas Privadas</a>
+                        <a id="boton_privadas_home52"  class="boton-estilizado" href="{% url 'encuesta:ver_encuestas_privadas' %}">Revisar encuestas Privadas</a>
                     </div>
                 </div>
 
@@ -177,8 +184,7 @@ Encuestas Home
                         <li>Haz click según tu preferencia y visualiza las encuestas disponilbes en el sistema</li>
                     <hr>
                     <div class="footer">
-                        <a id="boton_publicas_home52"  class="boton-estilizado" href="{% url 'encuesta:ver_encuestas_publicas' %}">Encuestas Publicas</a>
-                        <a id="boton_privadas_home52"  class="boton-estilizado" href="{% url 'login' %}">Encuestas Privadas</a>
+                        <a id="boton_privadas_home52" style="width:100%"  class="boton-estilizado" href="{% url 'encuesta:ver_encuestas_privadas' %}">Encuestas Privadas</a>
                     </div>
                 </div>
 

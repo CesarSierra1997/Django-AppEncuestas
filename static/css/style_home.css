@@ -579,7 +579,14 @@ tbody tr:hover {
     border: 1px solid #ddd;
     border-radius: 4px;
 }
-
+#privateSearch {
+    width: 72%;
+    padding: 10px;
+    margin-bottom: 12px;
+    font-size: 18px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
 
 /*boton excel*/
 /* Estilos del botón Exportar a Excel */

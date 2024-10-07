@@ -2,14 +2,22 @@
 {% block title %}
 Pregunta Tipe
 {% endblock title %}
+
+{% load static %}
+
+{% block navegacion %}
+<div id="ruta_navegacion">
+    <em>App/ busqueda?{{ query }}</em>
+</div>
+{% endblock navegacion %}
+
 {% block encuesta %}
 
-
-<div class="container mt-4">
-    <h2>Resultados de la búsqueda: "{{ query }}"</h2>
+<div class="card-body mt-2">
+    <h5>Resultados de la búsqueda: "{{ query }}"</h5>
 
     <!-- Sección de Encuestas -->
-    <h3>Encuestas</h3>
+    <h6>Encuestas</h6>
     {% if encuestas %}
         <ul class="list-group">
             {% for encuesta in encuestas %}
@@ -24,7 +32,7 @@ Pregunta Tipe
     {% endif %}
 
     <!-- Sección de Preguntas -->
-    <h3>Preguntas</h3>
+    <h6>Preguntas</h6>
     {% if preguntas %}
         <ul class="list-group">
             {% for pregunta in preguntas %}
@@ -39,7 +47,7 @@ Pregunta Tipe
     {% endif %}
 
     <!-- Sección de Respuestas -->
-    <h3>Respuestas</h3>
+    <h6>Respuestas</h6>
     {% if respuestas %}
         <ul class="list-group">
             {% for respuesta in respuestas %}
@@ -54,7 +62,7 @@ Pregunta Tipe
     {% endif %}
 
     <!-- Sección de Rutas -->
-    <h3>Rutas</h3>
+    <h6>Rutas</h6>
     {% if rutas %}
         <ul class="list-group">
             {% for ruta in rutas %}

@@ -92,8 +92,8 @@ Inicio encuestas
                         </li>
                         <li>cantidad de preguntas: {{ encuesta.pregunta_set.count }}</li>
                         <hr>
-                        <li>respuestas enviadas: ENDESARROLLO </li>
-                        <li>fecha de publicación <strong>ENDESARROLLO</strong> </li>
+                        {% comment %} <li>respuestas enviadas: ENDESARROLLO </li> {% endcomment %}
+                        <li>fecha de publicación <strong> {{encuesta.fechaPublicacion }} </strong> </li>
                     </ul>
                 </div>
             </a>
@@ -108,7 +108,7 @@ Inicio encuestas
     <p>Haga click en el boton crear, para agregar una encuesta.  <i style="font-size: 35px; position: absolute; top: 75px; ;" class="fa-regular fa-hand-point-right"></i></p>
     <div class="alert alert-danger alert-dismissible" role="alert">
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        <p>No hay encuestas creadas en el sistema, comuníquese con el administrador</p>
+        <p>No hay encuestas creadas en el sistema.<a  href="{% url 'encuesta:crear_encuesta' %}"> crear encuesta</a>
     </div>
     {% endif %}
 </div>
